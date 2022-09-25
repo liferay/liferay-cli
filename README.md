@@ -39,11 +39,11 @@ To directly run the project:
 To add a root command run:
 * linux/mac:
   ```bash
-  ./go/wrapper/go/bin/cobra-cli add <command>
+  ./cobra-cliw add <command>
   ```
 * windows:
   ```bash
-  .\go\wrapper\go\bin\cobra-cli add <command>
+  .\cobra-cliw.cmd add <command>
   ```
 
 _e.g._ to add the command
@@ -53,11 +53,11 @@ _e.g._ to add the command
   run:
   * linux/mac:
     ```bash
-    ./go/wrapper/go/bin/cobra-cli add init
+    ./cobra-cliw add init
     ```
   * windows:
     ```bash
-    .\go\wrapper\go\bin\cobra-cli add init
+    .\cobra-cliw.cmd add init
     ```
 
 
@@ -65,11 +65,11 @@ _e.g._ to add the command
 To add a sub-command run:
 * linux/mac:
   ```bash
-  ./go/wrapper/go/bin/cobra-cli add <subcommand> -p <parent>Cmd
+  ./cobra-cliw add <subcommand> -p <parent>Cmd
   ```
 * windows:
   ```bash
-  .\go\wrapper\go\bin\cobra-cli add <subcommand> -p <parent>Cmd
+  .\cobra-cliw.cmd add <subcommand> -p <parent>Cmd
   ```
 
 _e.g._ to add the sub-command
@@ -79,11 +79,11 @@ _e.g._ to add the sub-command
   run:
   * linux/mac:
     ```bash
-    ./go/wrapper/go/bin/cobra-cli add extension -p initCmd
+    ./cobra-cliw add extension -p initCmd
     ```
   * windows:
     ```bash
-    .\go\wrapper\go\bin\cobra-cli add extension -p initCmd
+    .\cobra-cliw.cmd add extension -p initCmd
     ```
 
 ### Using cobra
