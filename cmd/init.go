@@ -16,8 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -29,7 +27,13 @@ var initCmd = &cobra.Command{
 on-demand resources to keep the local development environment up to date with
 the latest features.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("init called")
+		InitDocker()
+
+		// Identify the repository and branch from which we'll sync resources.
+		// If there isn't a config file already, create one from flags or
+		// defaults.
+
+		// Sync the resources
 	},
 }
 
