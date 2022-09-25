@@ -175,8 +175,9 @@ set GOBIN=%GOROOT%\bin
 :run
 set GO_CMD_LINE_ARGS=%*
 
-SET /P "GOCMD="
-IF NOT DEFINED GOCMD SET "GOCMD=go"
+IF NOT DEFINED GOCMD SET GOCMD=go
+setlocal
+set PATH=%PATH%;%GOROOT%\bin
 
 %GOROOT%\bin\%GOCMD% %*
 if ERRORLEVEL 1 goto error
