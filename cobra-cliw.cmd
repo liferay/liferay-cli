@@ -19,11 +19,6 @@
 
 @REM Begin all REM lines with '@' in case GO_BATCH_ECHO is 'on'
 @echo off
-@REM set title of command window
-title %0
-
 @setlocal
-
 SET GOCMD=cobra-cli
-
 .\gow.cmd %*
