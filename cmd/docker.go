@@ -18,21 +18,22 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"os/exec"
+
+	"github.com/docker/docker/client"
 )
 
-var dockerPath string
+var dockerClient *client.Client
 
 // Check to see if the docker command is on the executable PATH
 func InitDocker() {
-	path, err := exec.LookPath("docker")
-
+	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		log.Fatal(`Could not find docker on the system PATH!
 
 Please install docker and make sure it is added to the system PATH.`)
 	}
 
-	dockerPath = path
-	fmt.Println("docker found at", dockerPath)
+	dockerClient = cli
+
+	fmt.Println("docker found")
 }
