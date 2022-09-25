@@ -234,4 +234,6 @@ export GOBIN="$GOROOT/bin"
 GO_CMD_LINE_ARGS="$@"
 export GO_CMD_LINE_ARGS
 
-exec "$GOROOT/bin/go" "$@"
+GOCMD=${GOCMD:-go}
+
+exec "$GOROOT/bin/$GOCMD" "$@"
