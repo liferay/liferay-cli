@@ -23,12 +23,22 @@ See `lcectl`
 * Run `make all`
 * to build and run do `go run main.go [command]`
 
+## Running locally
+
+To directly run the project:
+* in linux/mac run `./gow run main.go [command]`
+* in windows run `.\gow.cmd run main.go [command]`
+
 ## Adding additional commands
+
+`lcectl` uses [`cobra-cli`](https://github.com/spf13/cobra-cli) for generating commands. Before being able to create new commands install `cobra-cli` (it is not required for building):
+* on linux/mac run `./gow install github.com/spf13/cobra-cli@latest`
+* on windows run `.\gow.cmd install github.com/spf13/cobra-cli@latest`
 
 ### Root command
 To add a root command run
 ```bash
-cobra-cli add <command>
+./go/wrapper/go/bin/cobra-cli add <command>
 ```
 
 _e.g._ to add the command
@@ -37,13 +47,13 @@ _e.g._ to add the command
   ```
   run
   ```bash
-  cobra-cli add init
+  ./go/wrapper/go/bin/cobra-cli add init
   ```
 
 ### Sub-command
 To add a sub-command run
 ```bash
-cobra-cli add <subcommand> -p <parent>Cmd
+./go/wrapper/go/bin/cobra-cli add <subcommand> -p <parent>Cmd
 ```
 
 _e.g._ to add the sub-command
@@ -52,7 +62,7 @@ _e.g._ to add the sub-command
   ```
   run
   ```bash
-  cobra-cli add extension -p initCmd
+  ./go/wrapper/go/bin/cobra-cli add extension -p initCmd
   ```
 
 ### Using cobra
