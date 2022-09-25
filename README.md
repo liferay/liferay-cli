@@ -10,10 +10,17 @@ _TODO_
 
 See `lcectl`
 
-## Build
+## Building
 
-* install Golang (`>=` version 1.18)
-* install `cobra-cli` (https://github.com/spf13/cobra-cli)
+* install `make`
+  * Linux
+    * (Debian flavours) `sudo apt install build-essential`
+  * Windows ([Reference](https://www.technewstoday.com/install-and-use-make-in-windows/))
+
+    * Open the command line and run `winget install --accept-package-agreements --accept-source-agreements gnuwin32.make`
+
+    * Add `C:\Program Files (x86)\GnuWin32\bin` to the system path.
+* Run `make all`
 * to build and run do `go run main.go [command]`
 
 ## Adding additional commands
