@@ -1,15 +1,15 @@
 ifeq ($(OS),Windows_NT)
 	GO_CMD_WRAPPER=gow.cmd
-	RM_CMD=rd /s /q
+	RM_CMD=if exist bin rd /s /q bin
 else
 	GO_CMD_WRAPPER=./gow
-	RM_CMD=rm -rf
+	RM_CMD=rm -rf bin
 endif
 
 all: clean build
 
 clean:
-	$(RM_CMD) ./bin
+	$(RM_CMD)
 
 linux:
 	$(GO_CMD_WRAPPER) build -o bin/linux/amd64/lcectl
