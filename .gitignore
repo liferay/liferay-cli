@@ -1,2 +1,4 @@
+.go/wrapper/go
+.go/wrapper/tmp
 bin/
 lcectl
