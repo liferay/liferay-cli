@@ -36,34 +36,55 @@ To directly run the project:
 * on windows run `.\gow.cmd install github.com/spf13/cobra-cli@latest`
 
 ### Root command
-To add a root command run
-```bash
-./go/wrapper/go/bin/cobra-cli add <command>
-```
+To add a root command run:
+* linux/mac:
+  ```bash
+  ./go/wrapper/go/bin/cobra-cli add <command>
+  ```
+* windows:
+  ```bash
+  .\go\wrapper\go\bin\cobra-cli add <command>
+  ```
 
 _e.g._ to add the command
   ```bash
   lcectl init
   ```
-  run
-  ```bash
-  ./go/wrapper/go/bin/cobra-cli add init
-  ```
+  run:
+  * linux/mac:
+    ```bash
+    ./go/wrapper/go/bin/cobra-cli add init
+    ```
+  * windows:
+    ```bash
+    .\go\wrapper\go\bin\cobra-cli add init
+    ```
+
 
 ### Sub-command
-To add a sub-command run
-```bash
-./go/wrapper/go/bin/cobra-cli add <subcommand> -p <parent>Cmd
-```
+To add a sub-command run:
+* linux/mac:
+  ```bash
+  ./go/wrapper/go/bin/cobra-cli add <subcommand> -p <parent>Cmd
+  ```
+* windows:
+  ```bash
+  .\go\wrapper\go\bin\cobra-cli add <subcommand> -p <parent>Cmd
+  ```
 
 _e.g._ to add the sub-command
   ```bash
   lcectl init extension
   ```
-  run
-  ```bash
-  ./go/wrapper/go/bin/cobra-cli add extension -p initCmd
-  ```
+  run:
+  * linux/mac:
+    ```bash
+    ./go/wrapper/go/bin/cobra-cli add extension -p initCmd
+    ```
+  * windows:
+    ```bash
+    .\go\wrapper\go\bin\cobra-cli add extension -p initCmd
+    ```
 
 ### Using cobra
 
