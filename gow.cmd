@@ -166,7 +166,7 @@ if "%GOW_VERBOSE%" == "true" (
 )
 
 set GOROOT=%GO_INSTALL_PATH%
-set GOBIN="%GOROOT%/bin"
+set GOBIN=%GOROOT%\bin
 
 @REM End of extension
 
