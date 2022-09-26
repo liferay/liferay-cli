@@ -32,7 +32,7 @@ func init() {
 		defaultNetwork = "bridge"
 	}
 	viper.SetDefault(Const.dockerNetwork, defaultNetwork)
-	viper.SetDefault(Const.dockerLocaldevServerImage, "liferay/localdev")
+	viper.SetDefault(Const.dockerLocaldevServerImage, "localdev-server")
 }
 
 var dockerClient *client.Client
