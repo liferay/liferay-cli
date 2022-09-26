@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/docker/docker/client"
@@ -28,12 +27,10 @@ var dockerClient *client.Client
 func InitDocker() {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		log.Fatal(`Could not find docker on the system PATH!
+		log.Fatal(`Could not connect to the docker daemon! Got ${err}
 
-Please install docker and make sure it is added to the system PATH.`)
+Please install docker and make sure the daemon is running.`)
 	}
 
 	dockerClient = cli
-
-	fmt.Println("docker found")
 }
