@@ -65,6 +65,6 @@ func InitGit() {
 	})
 
 	if err != nil && err.Error() != "already up-to-date" {
-		log.Fatal("pull error: ", err)
+		//log.Fatal("pull error: ", err)
 	}
 }

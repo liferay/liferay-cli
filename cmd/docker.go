@@ -17,14 +17,28 @@ package cmd
 
 import (
 	"log"
+	"runtime"
 
 	"github.com/docker/docker/client"
+	"github.com/spf13/viper"
 )
+
+func init() {
+	var defaultNetwork string
+	switch runtime.GOOS {
+	case "linux":
+		defaultNetwork = "host"
+	default:
+		defaultNetwork = "bridge"
+	}
+	viper.SetDefault(Const.dockerNetwork, defaultNetwork)
+	viper.SetDefault(Const.dockerLocaldevServerImage, "liferay/localdev")
+}
 
 var dockerClient *client.Client
 
 // Check to see if the docker command is on the executable PATH
-func InitDocker() {
+func InitDocker() *client.Client {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		log.Fatal(`Could not connect to the docker daemon! Got ${err}
@@ -33,4 +47,5 @@ Please install docker and make sure the daemon is running.`)
 	}
 
 	dockerClient = cli
+	return dockerClient
 }
