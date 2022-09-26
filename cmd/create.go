@@ -18,7 +18,11 @@ import (
 	"strings"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -46,6 +50,8 @@ var createCmd = &cobra.Command{
 			msg := <-c
 			fmt.Println(msg)
 		}
+
+		runLocalDevServer("localdev-server", dockerClient)
 	},
 }
 
@@ -113,6 +119,77 @@ func getDockerfileBytes(path string) ([]byte, error) {
 	}
 
 	return bs, nil
+}
+
+func runLocalDevServer(imageTag string, dockerClient *client.Client) {
+	ctx := context.Background()
+
+	// out, err := dockerClient.ImagePull(ctx, imageTag, types.ImagePullOptions{})
+	// if err != nil {
+	// 	log.Printf("Failed to pull image %s: %s\n", imageTag, err)
+	// } else {
+	// 	defer out.Close()
+	// 	io.Copy(os.Stdout, out)
+	// }
+
+	networkConfig := &network.NetworkingConfig{
+		EndpointsConfig: map[string]*network.EndpointSettings{},
+	}
+	networkConfig.EndpointsConfig[viper.GetString(Const.dockerNetwork)] =
+		&network.EndpointSettings{}
+
+	resp, err := dockerClient.ContainerCreate(
+		ctx,
+		&container.Config{
+			Image: imageTag,
+			Cmd:   []string{"/repo/scripts/cluster-start.sh"},
+		},
+		&container.HostConfig{
+			Mounts: []mount.Mount{
+				{
+					Type:   mount.TypeBind,
+					Source: "/var/run/docker.sock",
+					Target: "/var/run/docker.sock",
+				},
+				{
+					Type:   mount.TypeBind,
+					Source: viper.GetString(Const.repoDir),
+					Target: "/repo",
+				},
+			},
+			AutoRemove: true,
+		},
+		networkConfig,
+		nil,
+		"localdev-start")
+
+	if err != nil {
+		log.Fatalf("Failed to create container %s: %s", imageTag, err)
+	}
+
+	fmt.Println(resp.Warnings, resp.ID)
+
+	err = dockerClient.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
+
+	if err != nil {
+		log.Fatalf("Failed to start container %s: %s", imageTag, err)
+	}
+
+	statusCh, errCh := dockerClient.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
+	select {
+	case err := <-errCh:
+		if err != nil {
+			log.Fatalf("Failed to wait for container %s: %s", imageTag, err)
+		}
+	case <-statusCh:
+	}
+
+	out, err := dockerClient.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
+	if err != nil {
+		log.Fatalf("Failed to get logs for container %s: %s", imageTag, err)
+	}
+
+	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 }
 
 func Tar(src string, writers ...io.Writer) error {
