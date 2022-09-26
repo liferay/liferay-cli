@@ -26,8 +26,10 @@ var initCmd = &cobra.Command{
 	Long: `Initialisation process so lcectl can continously synchronise
 on-demand resources to keep the local development environment up to date with
 the latest features.`,
+	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		InitDocker()
+		InitGit()
 
 		// Identify the repository and branch from which we'll sync resources.
 		// If there isn't a config file already, create one from flags or
