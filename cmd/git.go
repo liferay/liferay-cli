@@ -22,9 +22,14 @@ func init() {
 	viper.SetDefault(Const.repoDir, filepath.ToSlash(path.Join(dirname, ".lcectl")))
 	viper.SetDefault(Const.repoRemote, "https://github.com/gamerson/lxc-localdev")
 	viper.SetDefault(Const.repoBranch, "master")
+	viper.SetDefault(Const.repoSync, "true")
 }
 
-func InitGit() {
+func SyncGit() {
+	if repoSync := viper.GetBool(Const.repoSync); !repoSync {
+		return
+	}
+
 	repoDir := viper.GetString(Const.repoDir)
 	repo, err := git.PlainOpen(repoDir)
 

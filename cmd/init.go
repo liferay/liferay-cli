@@ -29,7 +29,7 @@ the latest features.`,
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		InitDocker()
-		InitGit()
+		SyncGit()
 
 		// Identify the repository and branch from which we'll sync resources.
 		// If there isn't a config file already, create one from flags or

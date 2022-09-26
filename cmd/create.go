@@ -34,7 +34,7 @@ var createCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		dockerClient := InitDocker()
-		InitGit()
+		SyncGit()
 
 		var c chan string = make(chan string)
 
