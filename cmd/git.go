@@ -12,8 +12,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var gitRepo *git.Repository
-
 func init() {
 	dirname, err := os.UserHomeDir()
 
@@ -50,6 +48,10 @@ func InitGit() {
 			Name: "origin",
 			URLs: []string{viper.GetString(Const.repoRemote)},
 		})
+
+		if err != nil {
+			log.Fatal("Remote error: ", err)
+		}
 	}
 
 	worktree, err := repo.Worktree()
@@ -65,6 +67,4 @@ func InitGit() {
 	if err != nil && err.Error() != "already up-to-date" {
 		log.Fatal("pull error: ", err)
 	}
-
-	gitRepo = repo
 }
