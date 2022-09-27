@@ -6,9 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"time"
 
-	"github.com/briandowns/spinner"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/spf13/viper"
@@ -21,7 +19,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	viper.SetDefault(Const.repoDir, filepath.ToSlash(path.Join(dirname, ".lcectl")))
+	viper.SetDefault(Const.repoDir, filepath.ToSlash(path.Join(dirname, ".lcectl", "sources", "localdev")))
 	viper.SetDefault(Const.repoRemote, "https://github.com/gamerson/lxc-localdev")
 	viper.SetDefault(Const.repoBranch, "master")
 	viper.SetDefault(Const.repoSync, "true")

@@ -71,7 +71,7 @@ var createCmd = &cobra.Command{
 			dockerClient, &wg)
 
 		wg.Add(1)
-		runLocalDevServer("localdev-server", dockerClient, &wg)
+		runLocaldevClusterStart("localdev-server", dockerClient, &wg)
 
 		wg.Wait()
 		s.Stop()
@@ -141,7 +141,7 @@ func getDockerfileBytes(path string) ([]byte, error) {
 	return bs, nil
 }
 
-func runLocalDevServer(imageTag string, dockerClient *client.Client, wg *sync.WaitGroup) {
+func runLocaldevClusterStart(imageTag string, dockerClient *client.Client, wg *sync.WaitGroup) {
 	ctx := context.Background()
 
 	// out, err := dockerClient.ImagePull(ctx, imageTag, types.ImagePullOptions{})
