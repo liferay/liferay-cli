@@ -25,7 +25,6 @@ import (
 	"liferay.com/lcectl/cmd/ext"
 	"liferay.com/lcectl/cmd/runtime"
 	"liferay.com/lcectl/docker"
-	"liferay.com/lcectl/git"
 )
 
 var cfgFile string
@@ -48,10 +47,13 @@ func Execute() {
 }
 
 func init() {
-	git.SyncGit()
-	docker.GetDockerClient()
+	initConfig()
 
-	cobra.OnInitialize(initConfig)
+	_, err := docker.GetDockerClient()
+
+	if err != nil {
+		log.Fatalf("%s getting dockerclient", err)
+	}
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
