@@ -18,7 +18,7 @@ var listCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, key := range viper.AllKeys() {
-			fmt.Printf("%s=%s\n", key, viper.Get(key))
+			fmt.Printf("%s=%s\n", key, viper.GetString(key))
 		}
 	},
 }
