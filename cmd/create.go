@@ -36,30 +36,22 @@ var createCmd = &cobra.Command{
 	Short: "Creates the runtime environment for Liferay Client Extension development",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
-		s.Color("green")
-		s.Suffix = " Initializing docker client..."
-		s.FinalMSG = fmt.Sprintf("\u2705 Initialized docker client.\n")
-		s.Start()
-
 		dockerClient := InitDocker()
 
-		s.Stop()
-
+		s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+		s.Color("green")
 		s.Suffix = " Synchronizing localdev sources..."
 		s.FinalMSG = fmt.Sprintf("\u2705 Synced localdev sources.\n")
-		s.Restart()
+		s.Start()
 
 		SyncGit()
 
 		s.Stop()
-
-		s.Suffix = " Creating localdev environment..."
-		s.FinalMSG = fmt.Sprintf("\u2705 Created localdev environment.\n")
-		s.Start()
+		s.Suffix = " Building localdev images..."
+		s.FinalMSG = fmt.Sprintf("\u2705 Built localdev images.\n")
+		s.Restart()
 
 		var wg sync.WaitGroup
-
 		wg.Add(1)
 		go buildImage("dxp-server", path.Join(
 			viper.GetString(Const.repoDir), "docker", "images", "dxp-server"),
@@ -69,6 +61,13 @@ var createCmd = &cobra.Command{
 		go buildImage("localdev-server", path.Join(
 			viper.GetString(Const.repoDir), "docker", "images", "localdev-server"),
 			dockerClient, &wg)
+
+		wg.Wait()
+
+		s.Stop()
+		s.Suffix = " Creating localdev environment..."
+		s.FinalMSG = fmt.Sprintf("\u2705 Created localdev environment.\n")
+		s.Restart()
 
 		wg.Add(1)
 		runLocaldevClusterStart("localdev-server", dockerClient, &wg)
