@@ -23,7 +23,6 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
@@ -174,19 +173,12 @@ func runLocaldevClusterStart(imageTag string, dockerClient *client.Client, wg *s
 			Cmd:   []string{"/repo/scripts/cluster-start.sh"},
 		},
 		&container.HostConfig{
-			Mounts: []mount.Mount{
-				{
-					Type:   mount.TypeBind,
-					Source: "/var/run/docker.sock",
-					Target: "/var/run/docker.sock",
-				},
-				{
-					Type:   mount.TypeBind,
-					Source: viper.GetString(constants.Const.RepoDir),
-					Target: "/repo",
-				},
+			Binds: []string{
+				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
+				"/var/run/docker.sock:/var/run/docker.sock",
 			},
-			AutoRemove: true,
+			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
+			AutoRemove:  true,
 		},
 		networkConfig,
 		nil,
