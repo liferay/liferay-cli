@@ -2,7 +2,7 @@
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 
 */
-package cmd
+package config
 
 import (
 	"bytes"
@@ -15,9 +15,9 @@ import (
 )
 
 // removeCmd represents the remove command
-var removeCmd = &cobra.Command{
-	Use:   "remove <key>",
-	Short: "Remove a config value",
+var deleteCmd = &cobra.Command{
+	Use:   "delete KEY",
+	Short: "Delete a config value",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		Unset(args[0])
@@ -25,7 +25,7 @@ var removeCmd = &cobra.Command{
 }
 
 func init() {
-	configCmd.AddCommand(removeCmd)
+	configCmd.AddCommand(deleteCmd)
 
 	// Here you will define your flags and configuration settings.
 

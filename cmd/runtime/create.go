@@ -2,7 +2,7 @@
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 
 */
-package cmd
+package runtime
 
 import (
 	"archive/tar"
@@ -28,6 +28,10 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"liferay.com/lcectl/constants"
+	lcectldocker "liferay.com/lcectl/docker"
+	"liferay.com/lcectl/git"
 )
 
 // createCmd represents the create command
@@ -35,8 +39,12 @@ var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Creates the runtime environment for Liferay Client Extension development",
 	Args:  cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
-		dockerClient := InitDocker()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dockerClient, err := lcectldocker.GetDockerClient()
+
+		if err != nil {
+			return err
+		}
 
 		s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		s.Color("green")
@@ -44,7 +52,7 @@ var createCmd = &cobra.Command{
 		s.FinalMSG = fmt.Sprintf("\u2705 Synced localdev sources.\n")
 		s.Start()
 
-		SyncGit()
+		git.SyncGit()
 
 		s.Stop()
 		s.Suffix = " Building localdev images..."
@@ -54,12 +62,12 @@ var createCmd = &cobra.Command{
 		var wg sync.WaitGroup
 		wg.Add(1)
 		go buildImage("dxp-server", path.Join(
-			viper.GetString(Const.repoDir), "docker", "images", "dxp-server"),
+			viper.GetString(constants.Const.RepoDir), "docker", "images", "dxp-server"),
 			dockerClient, &wg)
 
 		wg.Add(1)
 		go buildImage("localdev-server", path.Join(
-			viper.GetString(Const.repoDir), "docker", "images", "localdev-server"),
+			viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-server"),
 			dockerClient, &wg)
 
 		wg.Wait()
@@ -74,11 +82,13 @@ var createCmd = &cobra.Command{
 
 		wg.Wait()
 		s.Stop()
+
+		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(createCmd)
+	runtimeCmd.AddCommand(createCmd)
 
 	// Here you will define your flags and configuration settings.
 
@@ -154,7 +164,7 @@ func runLocaldevClusterStart(imageTag string, dockerClient *client.Client, wg *s
 	networkConfig := &network.NetworkingConfig{
 		EndpointsConfig: map[string]*network.EndpointSettings{},
 	}
-	networkConfig.EndpointsConfig[viper.GetString(Const.dockerNetwork)] =
+	networkConfig.EndpointsConfig[viper.GetString(constants.Const.DockerNetwork)] =
 		&network.EndpointSettings{}
 
 	resp, err := dockerClient.ContainerCreate(
@@ -172,7 +182,7 @@ func runLocaldevClusterStart(imageTag string, dockerClient *client.Client, wg *s
 				},
 				{
 					Type:   mount.TypeBind,
-					Source: viper.GetString(Const.repoDir),
+					Source: viper.GetString(constants.Const.RepoDir),
 					Target: "/repo",
 				},
 			},

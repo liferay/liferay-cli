@@ -2,7 +2,7 @@
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 
 */
-package cmd
+package ext
 
 import (
 	"context"
@@ -17,6 +17,8 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"liferay.com/lcectl/constants"
+	"liferay.com/lcectl/docker"
 )
 
 // refreshCmd represents the refresh command
@@ -24,13 +26,18 @@ var refreshCmd = &cobra.Command{
 	Use:   "refresh",
 	Short: "Refreshes client-extension workload resources in localdev server",
 	Run: func(cmd *cobra.Command, args []string) {
-		dockerClient := InitDocker()
+		dockerClient, err := docker.GetDockerClient()
+
+		if err != nil {
+			log.Fatalf("%s getting docker client", err)
+		}
+
 		runLocaldevRefresh("localdev-server", dockerClient)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(refreshCmd)
+	extCmd.AddCommand(refreshCmd)
 
 	// Here you will define your flags and configuration settings.
 
@@ -49,7 +56,7 @@ func runLocaldevRefresh(imageTag string, dockerClient *client.Client) error {
 	networkConfig := &network.NetworkingConfig{
 		EndpointsConfig: map[string]*network.EndpointSettings{},
 	}
-	networkConfig.EndpointsConfig[viper.GetString(Const.dockerNetwork)] =
+	networkConfig.EndpointsConfig[viper.GetString(constants.Const.DockerNetwork)] =
 		&network.EndpointSettings{}
 
 	resp, err := dockerClient.ContainerCreate(

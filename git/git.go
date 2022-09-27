@@ -1,4 +1,4 @@
-package cmd
+package git
 
 import (
 	"fmt"
@@ -10,6 +10,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/spf13/viper"
+	"liferay.com/lcectl/constants"
 )
 
 func init() {
@@ -19,18 +20,18 @@ func init() {
 		log.Fatal(err)
 	}
 
-	viper.SetDefault(Const.repoDir, filepath.ToSlash(path.Join(dirname, ".lcectl", "sources", "localdev")))
-	viper.SetDefault(Const.repoRemote, "https://github.com/gamerson/lxc-localdev")
-	viper.SetDefault(Const.repoBranch, "master")
-	viper.SetDefault(Const.repoSync, "true")
+	viper.SetDefault(constants.Const.RepoDir, filepath.ToSlash(path.Join(dirname, ".lcectl", "sources", "localdev")))
+	viper.SetDefault(constants.Const.RepoRemote, "https://github.com/gamerson/lxc-localdev")
+	viper.SetDefault(constants.Const.RepoBranch, "master")
+	viper.SetDefault(constants.Const.RepoSync, "true")
 }
 
 func SyncGit() {
-	if repoSync := viper.GetBool(Const.repoSync); !repoSync {
+	if repoSync := viper.GetBool(constants.Const.RepoSync); !repoSync {
 		return
 	}
 
-	repoDir := viper.GetString(Const.repoDir)
+	repoDir := viper.GetString(constants.Const.RepoDir)
 	repo, err := git.PlainOpen(repoDir)
 
 	if err != nil {
@@ -41,8 +42,8 @@ func SyncGit() {
 			SingleBranch: true,
 			RemoteName: fmt.Sprintf(
 				"refs/heads/%s",
-				viper.GetString(Const.repoBranch)),
-			URL: viper.GetString(Const.repoRemote),
+				viper.GetString(constants.Const.RepoBranch)),
+			URL: viper.GetString(constants.Const.RepoRemote),
 		})
 
 		if err != nil {
@@ -51,7 +52,7 @@ func SyncGit() {
 
 		_, err = repo.CreateRemote(&config.RemoteConfig{
 			Name: "origin",
-			URLs: []string{viper.GetString(Const.repoRemote)},
+			URLs: []string{viper.GetString(constants.Const.RepoRemote)},
 		})
 
 		if err != nil {

@@ -2,29 +2,27 @@
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 
 */
-package cmd
+package config
 
 import (
-	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // configCmd represents the config command
 var configCmd = &cobra.Command{
-	Use:   "config",
-	Short: "Show the current configuration",
+	Use:   "config COMMAND [OPTIONS] [ARG...]",
+	Short: "Operations for configuration of lcectl",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		for _, key := range viper.AllKeys() {
-			fmt.Printf("%s=%s\n", key, viper.Get(key))
-		}
+		cmd.Help()
+		os.Exit(0)
 	},
 }
 
-func init() {
-	rootCmd.AddCommand(configCmd)
+func AddConfigCmd(cmd *cobra.Command) {
+	cmd.AddCommand(configCmd)
 
 	// Here you will define your flags and configuration settings.
 

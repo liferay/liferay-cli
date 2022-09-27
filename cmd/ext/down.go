@@ -2,7 +2,7 @@
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 
 */
-package cmd
+package ext
 
 import (
 	"context"
@@ -17,6 +17,8 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"liferay.com/lcectl/constants"
+	"liferay.com/lcectl/docker"
 )
 
 // downCmd represents the down command
@@ -25,7 +27,11 @@ var downCmd = &cobra.Command{
 	Short: "Tilts down all client-extension workloads",
 	Long:  `Stops localdev server and DXP after shutting down all client-extension workloads.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		dockerClient := InitDocker()
+		dockerClient, err := docker.GetDockerClient()
+		if err != nil {
+			log.Fatalf("%s error getting dockerclient", err)
+		}
+
 		dir, err := cmd.Flags().GetString("dir")
 		if err != nil {
 			log.Fatalf("%s error getting dir", err)
@@ -36,7 +42,7 @@ var downCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(downCmd)
+	extCmd.AddCommand(downCmd)
 
 	// Here you will define your flags and configuration settings.
 
@@ -60,7 +66,7 @@ func runLocaldevDown(imageTag string, dockerClient *client.Client, wd string) er
 	networkConfig := &network.NetworkingConfig{
 		EndpointsConfig: map[string]*network.EndpointSettings{},
 	}
-	networkConfig.EndpointsConfig[viper.GetString(Const.dockerNetwork)] =
+	networkConfig.EndpointsConfig[viper.GetString(constants.Const.DockerNetwork)] =
 		&network.EndpointSettings{}
 
 	resp, err := dockerClient.ContainerCreate(
@@ -81,7 +87,7 @@ func runLocaldevDown(imageTag string, dockerClient *client.Client, wd string) er
 				},
 				{
 					Type:   mount.TypeBind,
-					Source: viper.GetString(Const.repoDir),
+					Source: viper.GetString(constants.Const.RepoDir),
 					Target: "/repo",
 				},
 				{

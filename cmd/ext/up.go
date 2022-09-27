@@ -2,7 +2,7 @@
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 
 */
-package cmd
+package ext
 
 import (
 	"context"
@@ -21,6 +21,8 @@ import (
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"liferay.com/lcectl/constants"
+	"liferay.com/lcectl/docker"
 )
 
 // upCmd represents the up command
@@ -30,7 +32,12 @@ var upCmd = &cobra.Command{
 	Long:  "Starts up localdev server including DXP server and monitors client-extension workspace to build and deploy workloads",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		dockerClient := InitDocker()
+		dockerClient, err := docker.GetDockerClient()
+
+		if err != nil {
+			log.Fatalf("%s error dockerclient", err)
+		}
+
 		dir, err := cmd.Flags().GetString("dir")
 		if err != nil {
 			log.Fatalf("%s error getting dir", err)
@@ -40,7 +47,7 @@ var upCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(upCmd)
+	extCmd.AddCommand(upCmd)
 
 	// Here you will define your flags and configuration settings.
 
@@ -53,7 +60,7 @@ func init() {
 	// upCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	wd, err := os.Getwd()
 	if err != nil {
-		log.Fatalf("%s error getting working dir")
+		log.Fatalf("%s error getting working dir", err)
 	}
 	upCmd.Flags().String("dir", wd, "Set the base dir for up command")
 }
@@ -64,7 +71,7 @@ func runLocaldevUp(imageTag string, dockerClient *client.Client, wd string) {
 	networkConfig := &network.NetworkingConfig{
 		EndpointsConfig: map[string]*network.EndpointSettings{},
 	}
-	networkConfig.EndpointsConfig[viper.GetString(Const.dockerNetwork)] =
+	networkConfig.EndpointsConfig[viper.GetString(constants.Const.DockerNetwork)] =
 		&network.EndpointSettings{}
 
 	tiltPort, err := nat.NewPort("tcp", "10350")
@@ -75,7 +82,7 @@ func runLocaldevUp(imageTag string, dockerClient *client.Client, wd string) {
 	}
 
 	exposedPorts := map[nat.Port]struct{}{
-		tiltPort: struct{}{},
+		tiltPort: {},
 	}
 
 	resp, err := dockerClient.ContainerCreate(
@@ -106,7 +113,7 @@ func runLocaldevUp(imageTag string, dockerClient *client.Client, wd string) {
 				},
 				{
 					Type:   mount.TypeBind,
-					Source: viper.GetString(Const.repoDir),
+					Source: viper.GetString(constants.Const.RepoDir),
 					Target: "/repo",
 				},
 				{

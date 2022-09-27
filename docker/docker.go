@@ -13,14 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package cmd
+package docker
 
 import (
-	"log"
 	"runtime"
 
 	"github.com/docker/docker/client"
 	"github.com/spf13/viper"
+	"liferay.com/lcectl/constants"
 )
 
 func init() {
@@ -31,21 +31,22 @@ func init() {
 	default:
 		defaultNetwork = "bridge"
 	}
-	viper.SetDefault(Const.dockerNetwork, defaultNetwork)
-	viper.SetDefault(Const.dockerLocaldevServerImage, "localdev-server")
+	viper.SetDefault(constants.Const.DockerNetwork, defaultNetwork)
+	viper.SetDefault(constants.Const.DockerLocaldevServerImage, "localdev-server")
 }
 
 var dockerClient *client.Client
 
 // Check to see if the docker command is on the executable PATH
-func InitDocker() *client.Client {
-	cli, err := client.NewClientWithOpts(client.FromEnv)
-	if err != nil {
-		log.Fatal(`Could not connect to the docker daemon! Got ${err}
-
-Please install docker and make sure the daemon is running.`)
+func GetDockerClient() (*client.Client, error) {
+	if dockerClient != nil {
+		return dockerClient, nil
 	}
 
-	dockerClient = cli
-	return dockerClient
+	dockerClient, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return nil, err
+	}
+
+	return dockerClient, nil
 }
