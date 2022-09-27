@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -17,6 +18,7 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -151,6 +153,9 @@ func runLocaldevUp(imageTag string, dockerClient *client.Client, wd string) {
 
 	go io.Copy(os.Stdout, hijacked.Reader)
 	go io.Copy(os.Stderr, hijacked.Reader)
+
+	time.Sleep(4 * time.Second)
+	browser.OpenURL("http://localhost:10350/r/(all)/overview")
 
 	statusCh, errCh := dockerClient.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
 	select {
