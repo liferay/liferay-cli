@@ -11,11 +11,13 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -24,7 +26,6 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -35,25 +36,45 @@ var createCmd = &cobra.Command{
 	Short: "Creates the runtime environment for Liferay Client Extension development",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+		s.Color("green")
+		s.Suffix = " Initializing docker client..."
+		s.FinalMSG = fmt.Sprintf("\u2705 Initialized docker client.\n")
+		s.Start()
+
 		dockerClient := InitDocker()
+
+		s.Stop()
+
+		s.Suffix = " Synchronizing localdev sources..."
+		s.FinalMSG = fmt.Sprintf("\u2705 Synced localdev sources.\n")
+		s.Restart()
+
 		SyncGit()
 
-		var c chan string = make(chan string)
+		s.Stop()
 
-		go buildImage(c, "dxp-server", path.Join(
+		s.Suffix = " Creating localdev environment..."
+		s.FinalMSG = fmt.Sprintf("\u2705 Created localdev environment.\n")
+		s.Start()
+
+		var wg sync.WaitGroup
+
+		wg.Add(1)
+		go buildImage("dxp-server", path.Join(
 			viper.GetString(Const.repoDir), "docker", "images", "dxp-server"),
-			dockerClient)
+			dockerClient, &wg)
 
-		go buildImage(c, "localdev-server", path.Join(
+		wg.Add(1)
+		go buildImage("localdev-server", path.Join(
 			viper.GetString(Const.repoDir), "docker", "images", "localdev-server"),
-			dockerClient)
+			dockerClient, &wg)
 
-		for i := 0; i < 2; i++ {
-			msg := <-c
-			fmt.Println(msg)
-		}
+		wg.Add(1)
+		runLocalDevServer("localdev-server", dockerClient, &wg)
 
-		runLocalDevServer("localdev-server", dockerClient)
+		wg.Wait()
+		s.Stop()
 	},
 }
 
@@ -72,10 +93,10 @@ func init() {
 }
 
 func buildImage(
-	c chan string, imageTag string, dockerFileDir string,
-	dockerClient *client.Client) {
+	imageTag string, dockerFileDir string,
+	dockerClient *client.Client, wg *sync.WaitGroup) {
 
-	log.Println("Building ", imageTag)
+	/*log.Println("Building ", imageTag)*/
 
 	ctx := context.Background()
 	buff := bytes.NewBuffer(nil)
@@ -90,12 +111,9 @@ func buildImage(
 		log.Fatal("Error during docker build: ", err)
 	}
 
-	io.Copy(os.Stdout, response.Body)
-	if err = response.Body.Close(); err != nil {
-		c <- fmt.Sprintf("Docker build %s failed: %s", imageTag, err.Error())
-	} else {
-		c <- fmt.Sprintf("Docker build %s completed", imageTag)
-	}
+	defer response.Body.Close()
+	ioutil.ReadAll(response.Body)
+	wg.Done()
 }
 
 func getDockerfileBytes(path string) ([]byte, error) {
@@ -123,7 +141,7 @@ func getDockerfileBytes(path string) ([]byte, error) {
 	return bs, nil
 }
 
-func runLocalDevServer(imageTag string, dockerClient *client.Client) {
+func runLocalDevServer(imageTag string, dockerClient *client.Client, wg *sync.WaitGroup) {
 	ctx := context.Background()
 
 	// out, err := dockerClient.ImagePull(ctx, imageTag, types.ImagePullOptions{})
@@ -169,7 +187,7 @@ func runLocalDevServer(imageTag string, dockerClient *client.Client) {
 		log.Fatalf("Failed to create container %s: %s", imageTag, err)
 	}
 
-	fmt.Println(resp.Warnings, resp.ID)
+	/*fmt.Println(resp.Warnings, resp.ID)*/
 
 	err = dockerClient.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
 
@@ -186,12 +204,9 @@ func runLocalDevServer(imageTag string, dockerClient *client.Client) {
 	case <-statusCh:
 	}
 
-	out, err := dockerClient.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
-	if err != nil {
-		log.Fatalf("Failed to get logs for container %s: %s", imageTag, err)
-	}
+	/*out, err := dockerClient.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})*/
 
-	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
+	wg.Done()
 }
 
 func Tar(src string, writers ...io.Writer) error {
