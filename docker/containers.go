@@ -34,4 +34,8 @@ func BuildImages(verbose bool) {
 		verbose, &wg)
 
 	wg.Wait()
+
+	if s != nil {
+		s.Stop()
+	}
 }
