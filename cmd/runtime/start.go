@@ -41,7 +41,7 @@ var startCmd = &cobra.Command{
 		spinner.Spin(
 			"Starting", "Started", Verbose,
 			func(fior func(io.ReadCloser)) int {
-				return lcectldocker.InvokeCommandInLocaldev("localdev-start", config, host, Verbose, fior)
+				return lcectldocker.InvokeCommandInLocaldev("localdev-start", config, host, true, Verbose, fior)
 			})
 	},
 }

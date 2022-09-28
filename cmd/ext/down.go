@@ -48,7 +48,7 @@ var downCmd = &cobra.Command{
 		spinner.Spin(
 			"Downing", "Downed", Verbose,
 			func(fior func(io.ReadCloser)) int {
-				return docker.InvokeCommandInLocaldev("localdev-down", config, host, Verbose, fior)
+				return docker.InvokeCommandInLocaldev("localdev-down", config, host, true, Verbose, fior)
 			})
 	},
 }

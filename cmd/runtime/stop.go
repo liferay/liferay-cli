@@ -41,7 +41,7 @@ var stopCmd = &cobra.Command{
 		spinner.Spin(
 			"Stopping", "Stopped", Verbose,
 			func(fior func(io.ReadCloser)) int {
-				return lcectldocker.InvokeCommandInLocaldev("localdev-stop", config, host, Verbose, fior)
+				return lcectldocker.InvokeCommandInLocaldev("localdev-stop", config, host, true, Verbose, fior)
 			})
 	},
 }

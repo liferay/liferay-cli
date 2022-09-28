@@ -68,7 +68,7 @@ var upCmd = &cobra.Command{
 		spinner.Spin(
 			"Upping", "Up", Verbose,
 			func(fior func(io.ReadCloser)) int {
-				return docker.InvokeCommandInLocaldev("localdev-up", config, host, Verbose, fior)
+				return docker.InvokeCommandInLocaldev("localdev-up", config, host, false, Verbose, nil)
 			})
 
 		browser.OpenURL("http://localhost:10350/r/(all)/overview")

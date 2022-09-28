@@ -149,7 +149,7 @@ func BuildImage(
 	},
 */
 func InvokeCommandInLocaldev(
-	containerName string, config container.Config, host container.HostConfig, verbose bool, logPipe func(io.ReadCloser)) int {
+	containerName string, config container.Config, host container.HostConfig, autoremove bool, verbose bool, logPipe func(io.ReadCloser)) int {
 
 	dockerClient, err := GetDockerClient()
 
@@ -201,13 +201,17 @@ func InvokeCommandInLocaldev(
 		log.Fatalf("%s getting container logs", err)
 	}
 
-	if logPipe != nil {
-		logPipe(out)
+	if autoremove {
+		defer dockerClient.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{})
 	}
 
-	defer dockerClient.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{})
+	if logPipe != nil {
+		logPipe(out)
 
-	return <-statusChan
+		return <-statusChan
+	}
+
+	return 0
 }
 
 // ReadDockerignore reads the .dockerignore file in the context directory and
