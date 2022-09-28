@@ -21,6 +21,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"sync"
@@ -99,7 +100,7 @@ func BuildImage(
 		log.Fatalf("%s reading dockerignore", err)
 	}
 
-	excludes = trimBuildFilesFromExcludes(excludes, "Dockerfile", false)
+	excludes = trimBuildFilesFromExcludes(excludes, path.Join(dockerFileDir, "Dockerfile"), false)
 	buildCtx, err := archive.TarWithOptions(dockerFileDir, &archive.TarOptions{
 		ExcludePatterns: excludes,
 		ChownOpts:       &idtools.Identity{UID: 0, GID: 0},
@@ -141,8 +142,19 @@ func BuildImage(
 	wg.Done()
 }
 
+/*
+	container.Config{
+		Image: "localdev-server",
+		Cmd:   command,
+		Env:   env,
+	},
+	container.HostConfig{
+		Binds:       binds,
+		NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
+	},
+*/
 func InvokeCommandInLocaldev(
-	containerName string, command []string, verbose bool, wg *sync.WaitGroup) {
+	containerName string, config container.Config, host container.HostConfig, verbose bool, wg *sync.WaitGroup) {
 
 	dockerClient, err := GetDockerClient()
 
@@ -160,22 +172,7 @@ func InvokeCommandInLocaldev(
 	// 	io.Copy(os.Stdout, out)
 	// }
 
-	resp, err := dockerClient.ContainerCreate(
-		ctx,
-		&container.Config{
-			Image: "localdev-server",
-			Cmd:   command,
-		},
-		&container.HostConfig{
-			Binds: []string{
-				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
-				"/var/run/docker.sock:/var/run/docker.sock",
-			},
-			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
-		},
-		nil,
-		nil,
-		containerName)
+	resp, err := dockerClient.ContainerCreate(ctx, &config, &host, nil, nil, containerName)
 
 	if err != nil {
 		log.Fatalf("Failed to create container %s: %s", containerName, err)

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/briandowns/spinner"
+	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -52,8 +53,20 @@ var deleteCmd = &cobra.Command{
 		s.Restart()
 
 		wg.Add(1)
-		lcectldocker.InvokeCommandInLocaldev(
-			"localdev-stop", []string{"/repo/scripts/cluster-delete.sh"}, Verbose, &wg)
+
+		config := container.Config{
+			Image: "localdev-server",
+			Cmd:   []string{"/repo/scripts/cluster-delete.sh"},
+		}
+		host := container.HostConfig{
+			Binds: []string{
+				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
+				"/var/run/docker.sock:/var/run/docker.sock",
+			},
+			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
+		}
+
+		lcectldocker.InvokeCommandInLocaldev("localdev-delete", config, host, Verbose, &wg)
 
 		wg.Wait()
 		s.Stop()

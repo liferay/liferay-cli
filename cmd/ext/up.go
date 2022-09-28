@@ -5,18 +5,12 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package ext
 
 import (
-	"context"
 	"fmt"
-	"io"
 	"log"
 	"os"
-	"time"
+	"sync"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/mount"
-	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
@@ -32,62 +26,38 @@ var upCmd = &cobra.Command{
 	Long:  "Starts up localdev server including DXP server and monitors client-extension workspace to build and deploy workloads",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		dockerClient, err := docker.GetDockerClient()
+		var wg sync.WaitGroup
+		wg.Add(1)
+
+		tiltPort, err := nat.NewPort("tcp", "10350")
 
 		if err != nil {
-			log.Fatalf("%s error dockerclient", err)
+			fmt.Println("Unable to create tilt port")
+			return
 		}
 
-		dir, err := cmd.Flags().GetString("dir")
-		if err != nil {
-			log.Fatalf("%s error getting dir", err)
+		exposedPorts := map[nat.Port]struct{}{
+			tiltPort: {},
 		}
-		runLocaldevUp("localdev-server", dockerClient, dir)
-	},
-}
 
-func init() {
-	extCmd.AddCommand(upCmd)
-
-	wd, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("%s error getting working dir", err)
-	}
-	upCmd.Flags().String("dir", wd, "Set the base dir for up command")
-}
-
-func runLocaldevUp(imageTag string, dockerClient *client.Client, wd string) {
-	ctx := context.Background()
-
-	networkConfig := &network.NetworkingConfig{
-		EndpointsConfig: map[string]*network.EndpointSettings{},
-	}
-	networkConfig.EndpointsConfig[viper.GetString(constants.Const.DockerNetwork)] =
-		&network.EndpointSettings{}
-
-	tiltPort, err := nat.NewPort("tcp", "10350")
-
-	if err != nil {
-		fmt.Println("Unable to create tilt port")
-		return
-	}
-
-	exposedPorts := map[nat.Port]struct{}{
-		tiltPort: {},
-	}
-
-	resp, err := dockerClient.ContainerCreate(
-		ctx,
-		&container.Config{
-			Image:        imageTag,
+		config := container.Config{
+			Image:        "localdev-server",
 			Cmd:          []string{"tilt", "up", "-f", "/repo/tilt/Tiltfile", "--stream"},
 			Env:          []string{"DO_NOT_TRACK=1"},
 			ExposedPorts: exposedPorts,
 			AttachStdout: true,
 			AttachStderr: true,
 			Tty:          true,
-		},
-		&container.HostConfig{
+		}
+		host := container.HostConfig{
+			Binds: []string{
+				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
+				"/var/run/docker.sock:/var/run/docker.sock",
+				fmt.Sprintf("%s:/workspace/client-extensions", dir),
+				"localdevGradleCache:/root/.gradle",
+				"localdevLiferayCache:/root/.liferay",
+			},
+			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 			PortBindings: nat.PortMap{
 				tiltPort: []nat.PortBinding{
 					{
@@ -96,71 +66,23 @@ func runLocaldevUp(imageTag string, dockerClient *client.Client, wd string) {
 					},
 				},
 			},
-			Mounts: []mount.Mount{
-				{
-					Type:   mount.TypeBind,
-					Source: "/var/run/docker.sock",
-					Target: "/var/run/docker.sock",
-				},
-				{
-					Type:   mount.TypeBind,
-					Source: viper.GetString(constants.Const.RepoDir),
-					Target: "/repo",
-				},
-				{
-					Type:   mount.TypeBind,
-					Source: wd,
-					Target: "/workspace/client-extensions",
-				},
-				{
-					Type:   mount.TypeVolume,
-					Source: "localdevGradleCache",
-					Target: "/root/.gradle",
-				},
-				{
-					Type:   mount.TypeVolume,
-					Source: "localdevLiferayCache",
-					Target: "/root/.liferay",
-				},
-			},
-			AutoRemove: true,
-		},
-		networkConfig,
-		nil,
-		"localdev-server")
-
-	if err != nil {
-		log.Fatalf("Failed to create container %s: %s", imageTag, err)
-	}
-
-	err = dockerClient.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
-
-	if err != nil {
-		log.Fatalf("Failed to start container %s: %s", imageTag, err)
-	}
-
-	hijacked, err := dockerClient.ContainerAttach(ctx, resp.ID, types.ContainerAttachOptions{
-		Stderr: true,
-		Stdout: true,
-		Stream: true,
-	})
-
-	if err != nil {
-		log.Fatalf("Failed to attach to container %s", resp.ID)
-	}
-
-	go io.Copy(os.Stdout, hijacked.Reader)
-	go io.Copy(os.Stderr, hijacked.Reader)
-
-	time.Sleep(4 * time.Second)
-	browser.OpenURL("http://localhost:10350/r/(all)/overview")
-
-	statusCh, errCh := dockerClient.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
-	select {
-	case err := <-errCh:
-		if err != nil {
-			panic(err)
 		}
-	case <-statusCh:
+
+		docker.InvokeCommandInLocaldev("localdev-up", config, host, Verbose, &wg)
+
+		wg.Wait()
+
+		browser.OpenURL("http://localhost:10350/r/(all)/overview")
+	},
+}
+
+func init() {
+	upCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "enable verbose output")
+	extCmd.AddCommand(upCmd)
+
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("%s error getting working dir", err)
 	}
+	upCmd.Flags().StringVarP(&dir, "dir", "d", wd, "Set the base dir for up command")
 }
