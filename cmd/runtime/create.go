@@ -28,7 +28,7 @@ var createCmd = &cobra.Command{
 
 		config := container.Config{
 			Image: "localdev-server",
-			Cmd:   []string{"/repo/scripts/cluster-create.sh"},
+			Cmd:   []string{"/repo/scripts/runtime/create.sh"},
 		}
 		host := container.HostConfig{
 			Binds: []string{
