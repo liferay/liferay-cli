@@ -32,8 +32,8 @@ var startCmd = &cobra.Command{
 		if !Verbose {
 			s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 			s.Color("green")
-			s.Suffix = " Synchronizing localdev sources..."
-			s.FinalMSG = fmt.Sprintf("\u2705 Synced localdev sources.\n")
+			s.Suffix = " Synchronizing 'localdev' sources..."
+			s.FinalMSG = fmt.Sprintf("\u2705 Synced 'localdev' sources.\n")
 			s.Start()
 		}
 
@@ -41,8 +41,8 @@ var startCmd = &cobra.Command{
 
 		if s != nil {
 			s.Stop()
-			s.Suffix = " Building localdev image..."
-			s.FinalMSG = fmt.Sprintf("\u2705 Built localdev images.\n")
+			s.Suffix = " Building 'localdev' image..."
+			s.FinalMSG = fmt.Sprintf("\u2705 Built 'localdev' images.\n")
 			s.Restart()
 		}
 
@@ -56,8 +56,8 @@ var startCmd = &cobra.Command{
 
 		if s != nil {
 			s.Stop()
-			s.Suffix = " Starting localdev environment..."
-			s.FinalMSG = fmt.Sprintf("\u2705 Started localdev environment.\n")
+			s.Suffix = " Starting 'localdev' environment..."
+			s.FinalMSG = fmt.Sprintf("\u2705 Started 'localdev' environment.\n")
 			s.Restart()
 		}
 
@@ -75,7 +75,7 @@ var startCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		pipeSpinner := lcectlspinner.SpinnerPipe(s, " Starting localdev environment [%s]", Verbose)
+		pipeSpinner := lcectlspinner.SpinnerPipe(s, " Starting 'localdev' environment [%s]", Verbose)
 
 		signal := lcectldocker.InvokeCommandInLocaldev("localdev-start", config, host, Verbose, &wg, pipeSpinner)
 
