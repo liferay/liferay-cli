@@ -165,6 +165,25 @@ func InvokeCommandInLocaldev(
 
 	ctx := context.Background()
 
+	containers, err := dockerClient.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	if err != nil {
+		log.Printf("%s error listing containers\n", err)
+	}
+
+	// delete any left over container
+	match := "/" + containerName
+	for _, container := range containers {
+		for _, name := range container.Names {
+			if name == match {
+				if verbose {
+					fmt.Printf("deleting lingering container %s (%s)\n", container.Names[0], container.ID)
+				}
+
+				dockerClient.ContainerRemove(ctx, container.ID, types.ContainerRemoveOptions{Force: true})
+			}
+		}
+	}
+
 	// out, err := dockerClient.ImagePull(ctx, imageTag, types.ImagePullOptions{})
 	// if err != nil {
 	// 	log.Printf("Failed to pull image %s: %s\n", imageTag, err)
