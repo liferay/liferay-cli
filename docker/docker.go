@@ -209,7 +209,9 @@ func InvokeCommandInLocaldev(
 		log.Fatalf("%s getting container logs", err)
 	}
 
-	logPipe(out)
+	if logPipe != nil {
+		logPipe(out)
+	}
 
 	defer dockerClient.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{})
 
