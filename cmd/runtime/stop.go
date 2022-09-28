@@ -26,7 +26,7 @@ var stopCmd = &cobra.Command{
 	Use:   "stop",
 	Short: "Stops the runtime environment for Liferay Client Extension development",
 	Args:  cobra.NoArgs,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Run: func(cmd *cobra.Command, args []string) {
 		var s *spinner.Spinner
 
 		if !Verbose {
@@ -77,15 +77,17 @@ var stopCmd = &cobra.Command{
 
 		pipeSpinner := lcectlspinner.SpinnerPipe(s, " Stopping localdev environment [%s]", Verbose)
 
-		lcectldocker.InvokeCommandInLocaldev("localdev-stop", config, host, Verbose, &wg, pipeSpinner)
+		signal := lcectldocker.InvokeCommandInLocaldev("localdev-stop", config, host, Verbose, &wg, pipeSpinner)
 
 		wg.Wait()
 
 		if s != nil {
+			if signal > 0 {
+				s.FinalMSG = fmt.Sprintf("\u2718 Something went wrong...\n")
+			}
+
 			s.Stop()
 		}
-
-		return nil
 	},
 }
 

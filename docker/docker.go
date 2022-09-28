@@ -149,7 +149,7 @@ func BuildImage(
 	},
 */
 func InvokeCommandInLocaldev(
-	containerName string, config container.Config, host container.HostConfig, verbose bool, wg *sync.WaitGroup, logPipe func(io.ReadCloser)) {
+	containerName string, config container.Config, host container.HostConfig, verbose bool, wg *sync.WaitGroup, logPipe func(io.ReadCloser)) int {
 
 	dockerClient, err := GetDockerClient()
 
@@ -196,8 +196,7 @@ func InvokeCommandInLocaldev(
 		fmt.Printf("Built container with id: %s\n", resp.ID)
 	}
 
-	statusChan := waitExitOrRemoved(ctx, dockerClient, resp.ID, true)
-	defer func() { <-statusChan }()
+	statusChan := waitExitOrRemoved(ctx, dockerClient, resp.ID, false)
 
 	err = dockerClient.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
 
@@ -215,6 +214,8 @@ func InvokeCommandInLocaldev(
 	defer dockerClient.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{})
 
 	wg.Done()
+
+	return <-statusChan
 }
 
 // ReadDockerignore reads the .dockerignore file in the context directory and
@@ -251,11 +252,6 @@ func trimBuildFilesFromExcludes(excludes []string, dockerfile string, dockerfile
 }
 
 func waitExitOrRemoved(ctx context.Context, dockerClient *client.Client, containerID string, waitRemove bool) <-chan int {
-	if len(containerID) == 0 {
-		// containerID can never be empty
-		panic("Internal Error: waitExitOrRemoved needs a containerID as parameter")
-	}
-
 	condition := container.WaitConditionNextExit
 	if waitRemove {
 		condition = container.WaitConditionRemoved

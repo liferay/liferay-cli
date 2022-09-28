@@ -82,11 +82,15 @@ var createCmd = &cobra.Command{
 
 		pipeSpinner := lcectlspinner.SpinnerPipe(s, " Creating localdev environment [%s]", Verbose)
 
-		lcectldocker.InvokeCommandInLocaldev("localdev-start", config, host, Verbose, &wg, pipeSpinner)
+		signal := lcectldocker.InvokeCommandInLocaldev("localdev-start", config, host, Verbose, &wg, pipeSpinner)
 
 		wg.Wait()
 
 		if s != nil {
+			if signal > 0 {
+				s.FinalMSG = fmt.Sprintf("\u2718 Something went wrong...\n")
+			}
+
 			s.Stop()
 		}
 	},
