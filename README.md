@@ -93,3 +93,42 @@ See [the cobra documentation here](https://github.com/spf13/cobra/blob/main/user
 ### Using viper
 
 See [the viper documentation here](https://github.com/spf13/viper#readme)
+
+## Planned Commands
+
+#### commands
+
+* `config` - show config help **DONE**
+  * `get KEY` - get a config value **DONE**
+  * `set KEY VALUE` - set a config value **DONE**
+  * `delete KEY` - delete a value **DONE**
+  * `list` - show current keys and values **DONE**
+* `runtime` - shows runtime help
+  * `create` - creates (if not already) and starts (if not already) the runtime **DONE**
+    * `-n|--no-start`
+    * `-v|--verbose` **DONE**
+  * `start` - starts already created runtime
+  * `stop` - stops the runtime without deleting it **DONE**
+    * `-v|--verbose` **DONE**
+  * `delete` - deletes the runtime and all resources **DONE**
+    * `-v|--verbose` **DONE**
+  * `status` - shows the status of runtime resources
+* `ext(ension)` - (context/directory sensitive) shows extension help
+  * `create` - create a new extension using a wizard
+  * `build [extension]` - build extention(s)
+  * `up` - brings up the extension(s) watcher (requires a running runtime) **DONE**
+    * `-b|--browser` - (default is false) opens the browser
+    * `-s|--stream` - (default is false) stay connected to streamed logs
+    * `-v|--verbose` **DONE**
+  * `down` - brings down the extension(s) watcher (requires a running runtime) **DONE**
+    * `-v|--verbose` **DONE**
+  * `refresh` - (temporary) until we have a live refresh **DONE**
+    * `-v|--verbose` **DONE**
+  * `status` - shows the status of extensions
+    * `-w|--watch`
+* `lxc/auth` - shows lxc help
+  * `login` - login to an lxc account, creates the profile if not already present
+  * `logout` - logout of the lxc account
+  * `status` - show the current login profile details
+  * `deploy` - deploy an extension to a specific env
+  * `delete` - delete a login profile
