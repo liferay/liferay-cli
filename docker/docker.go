@@ -16,7 +16,6 @@ limitations under the License.
 package docker
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"io"
@@ -36,7 +35,6 @@ import (
 	"github.com/docker/docker/pkg/idtools"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/progress"
-	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/docker/pkg/streamformatter"
 	"github.com/spf13/viper"
 	"liferay.com/lcectl/constants"
@@ -110,16 +108,12 @@ func BuildImage(
 		log.Fatalf("%s creating tar", err)
 	}
 
-	progBuff := os.Stdout
-	progressOutput := streamformatter.NewProgressOutput(progBuff)
+	progressOutput := streamformatter.NewProgressOutput(os.Stdout)
 	if !verbose {
 		progressOutput = &lastProgressOutput{output: progressOutput}
 	}
 
-	var body io.Reader
-	if buildCtx != nil {
-		body = progress.NewProgressReader(buildCtx, progressOutput, 0, "", "Sending build context to Docker daemon")
-	}
+	body := progress.NewProgressReader(buildCtx, progressOutput, 0, "", "Sending build context to Docker daemon")
 
 	response, err := dockerClient.ImageBuild(
 		ctx, body, types.ImageBuildOptions{
