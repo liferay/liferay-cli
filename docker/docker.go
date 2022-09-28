@@ -16,9 +16,6 @@ limitations under the License.
 package docker
 
 import (
-	"archive/tar"
-	"bytes"
-	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
@@ -26,16 +23,37 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"sync"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/builder/dockerignore"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/archive"
+	"github.com/docker/docker/pkg/fileutils"
+	"github.com/docker/docker/pkg/idtools"
+	"github.com/docker/docker/pkg/progress"
 	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/docker/docker/pkg/streamformatter"
 	"github.com/spf13/viper"
 	"liferay.com/lcectl/constants"
 )
+
+// lastProgressOutput is the same as progress.Output except
+// that it only output with the last update. It is used in
+// non terminal scenarios to suppress verbose messages
+type lastProgressOutput struct {
+	output progress.Output
+}
+
+// WriteProgress formats progress information from a ProgressReader.
+func (out *lastProgressOutput) WriteProgress(prog progress.Progress) error {
+	if !prog.LastUpdate {
+		return nil
+	}
+
+	return out.output.WriteProgress(prog)
+}
 
 var dockerClient *client.Client
 
@@ -74,11 +92,34 @@ func BuildImage(
 	}
 
 	ctx := context.Background()
-	buff := bytes.NewBuffer(nil)
-	Tar(dockerFileDir, buff)
+
+	excludes, err := readDockerignore(dockerFileDir)
+	if err != nil {
+		log.Fatalf("%s reading dockerignore", err)
+	}
+
+	excludes = trimBuildFilesFromExcludes(excludes, "Dockerfile", false)
+	buildCtx, err := archive.TarWithOptions(dockerFileDir, &archive.TarOptions{
+		ExcludePatterns: excludes,
+		ChownOpts:       &idtools.Identity{UID: 0, GID: 0},
+	})
+	if err != nil {
+		log.Fatalf("%s creating tar", err)
+	}
+
+	progBuff := os.Stdout
+	progressOutput := streamformatter.NewProgressOutput(progBuff)
+	if !verbose {
+		progressOutput = &lastProgressOutput{output: progressOutput}
+	}
+
+	var body io.Reader
+	if buildCtx != nil {
+		body = progress.NewProgressReader(buildCtx, progressOutput, 0, "", "Sending build context to Docker daemon")
+	}
 
 	response, err := dockerClient.ImageBuild(
-		ctx, buff, types.ImageBuildOptions{
+		ctx, body, types.ImageBuildOptions{
 			Tags: []string{imageTag},
 		})
 
@@ -163,55 +204,37 @@ func InvokeCommandInLocaldev(
 	wg.Done()
 }
 
-func Tar(src string, writers ...io.Writer) error {
-	// ensure the src actually exists before trying to tar it
-	if _, err := os.Stat(src); err != nil {
-		return fmt.Errorf("Unable to tar files - %v", err.Error())
+// ReadDockerignore reads the .dockerignore file in the context directory and
+// returns the list of paths to exclude
+func readDockerignore(contextDir string) ([]string, error) {
+	var excludes []string
+
+	f, err := os.Open(filepath.Join(contextDir, ".dockerignore"))
+	switch {
+	case os.IsNotExist(err):
+		return excludes, nil
+	case err != nil:
+		return nil, err
+	}
+	defer f.Close()
+
+	return dockerignore.ReadAll(f)
+}
+
+// TrimBuildFilesFromExcludes removes the named Dockerfile and .dockerignore from
+// the list of excluded files. The daemon will remove them from the final context
+// but they must be in available in the context when passed to the API.
+func trimBuildFilesFromExcludes(excludes []string, dockerfile string, dockerfileFromStdin bool) []string {
+	if keep, _ := fileutils.Matches(".dockerignore", excludes); keep {
+		excludes = append(excludes, "!.dockerignore")
 	}
 
-	mw := io.MultiWriter(writers...)
-
-	gzw := gzip.NewWriter(mw)
-	defer gzw.Close()
-
-	tw := tar.NewWriter(gzw)
-	defer tw.Close()
-
-	// walk path
-	return filepath.Walk(src, func(file string, fi os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if !fi.Mode().IsRegular() {
-			return nil
-		}
-
-		// create a new dir/file header
-		header, err := tar.FileInfoHeader(fi, fi.Name())
-		if err != nil {
-			return err
-		}
-
-		header.Name = strings.TrimPrefix(strings.Replace(file, src, "", -1), string(filepath.Separator))
-
-		if err := tw.WriteHeader(header); err != nil {
-			return err
-		}
-
-		f, err := os.Open(file)
-		if err != nil {
-			return err
-		}
-
-		if _, err := io.Copy(tw, f); err != nil {
-			return err
-		}
-
-		f.Close()
-
-		return nil
-	})
+	// canonicalize dockerfile name to be platform-independent.
+	dockerfile = filepath.ToSlash(dockerfile)
+	if keep, _ := fileutils.Matches(dockerfile, excludes); keep && !dockerfileFromStdin {
+		excludes = append(excludes, "!"+dockerfile)
+	}
+	return excludes
 }
 
 func waitExitOrRemoved(ctx context.Context, dockerClient *client.Client, containerID string, waitRemove bool) <-chan int {
