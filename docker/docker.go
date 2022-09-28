@@ -155,7 +155,7 @@ func BuildImage(
 	},
 */
 func InvokeCommandInLocaldev(
-	containerName string, config container.Config, host container.HostConfig, verbose bool, wg *sync.WaitGroup, c chan string) {
+	containerName string, config container.Config, host container.HostConfig, verbose bool, wg *sync.WaitGroup, logPipe func(io.ReadCloser)) {
 
 	dockerClient, err := GetDockerClient()
 
@@ -197,20 +197,7 @@ func InvokeCommandInLocaldev(
 		log.Fatalf("%s getting container logs", err)
 	}
 
-	if verbose {
-		stdcopy.StdCopy(os.Stdout, os.Stderr, out)
-	} else {
-		reader := bufio.NewReader(out)
-		for {
-			str, err := reader.ReadString('\n')
-			if err != nil {
-				close(c)
-				break
-			} else {
-				c <- str
-			}
-		}
-	}
+	logPipe(out)
 
 	defer dockerClient.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{})
 

@@ -7,7 +7,6 @@ package runtime
 import (
 	"fmt"
 	"path"
-	"strings"
 	"sync"
 	"time"
 
@@ -19,6 +18,7 @@ import (
 	"liferay.com/lcectl/constants"
 	lcectldocker "liferay.com/lcectl/docker"
 	"liferay.com/lcectl/git"
+	lcectlspinner "liferay.com/lcectl/spinner"
 )
 
 // createCmd represents the create command
@@ -26,19 +26,25 @@ var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Creates the runtime environment for Liferay Client Extension development",
 	Args:  cobra.NoArgs,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
-		s.Color("green")
-		s.Suffix = " Synchronizing localdev sources..."
-		s.FinalMSG = fmt.Sprintf("\u2705 Synced localdev sources.\n")
-		s.Start()
+	Run: func(cmd *cobra.Command, args []string) {
+		var s *spinner.Spinner
+
+		if !Verbose {
+			s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+			s.Color("green")
+			s.Suffix = " Synchronizing localdev sources..."
+			s.FinalMSG = fmt.Sprintf("\u2705 Synced localdev sources.\n")
+			s.Start()
+		}
 
 		git.SyncGit()
 
-		s.Stop()
-		s.Suffix = " Building localdev images..."
-		s.FinalMSG = fmt.Sprintf("\u2705 Built localdev images.\n")
-		s.Restart()
+		if s != nil {
+			s.Stop()
+			s.Suffix = " Building localdev images..."
+			s.FinalMSG = fmt.Sprintf("\u2705 Built localdev images.\n")
+			s.Restart()
+		}
 
 		var wg sync.WaitGroup
 		wg.Add(1)
@@ -53,16 +59,18 @@ var createCmd = &cobra.Command{
 
 		wg.Wait()
 
-		s.Stop()
-		s.Suffix = " Creating localdev environment..."
-		s.FinalMSG = fmt.Sprintf("\u2705 Created localdev environment.\n")
-		s.Restart()
+		if s != nil {
+			s.Stop()
+			s.Suffix = " Creating localdev environment..."
+			s.FinalMSG = fmt.Sprintf("\u2705 Created localdev environment.\n")
+			s.Restart()
+		}
 
 		wg.Add(1)
 
 		config := container.Config{
 			Image: "localdev-server",
-			Cmd:   []string{"/repo/scripts/cluster-start.sh"},
+			Cmd:   []string{"/repo/scripts/cluster-create.sh"},
 		}
 		host := container.HostConfig{
 			Binds: []string{
@@ -72,20 +80,15 @@ var createCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		c := make(chan (string))
-		go func() {
-			for {
-				msg := <-c
-				s.Suffix = fmt.Sprintf(" Creating localdev environment...[%s]", strings.TrimSpace(msg))
-			}
-		}()
+		pipeSpinner := lcectlspinner.SpinnerPipe(s, " Creating localdev environment [%s]", Verbose)
 
-		lcectldocker.InvokeCommandInLocaldev("localdev-start", config, host, Verbose, &wg, c)
+		lcectldocker.InvokeCommandInLocaldev("localdev-start", config, host, Verbose, &wg, pipeSpinner)
 
 		wg.Wait()
-		s.Stop()
 
-		return nil
+		if s != nil {
+			s.Stop()
+		}
 	},
 }
 

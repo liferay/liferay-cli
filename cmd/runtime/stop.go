@@ -18,6 +18,7 @@ import (
 	"liferay.com/lcectl/constants"
 	lcectldocker "liferay.com/lcectl/docker"
 	"liferay.com/lcectl/git"
+	lcectlspinner "liferay.com/lcectl/spinner"
 )
 
 // createCmd represents the create command
@@ -26,18 +27,24 @@ var stopCmd = &cobra.Command{
 	Short: "Stops the runtime environment for Liferay Client Extension development",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
-		s.Color("green")
-		s.Suffix = " Synchronizing localdev sources..."
-		s.FinalMSG = fmt.Sprintf("\u2705 Synced localdev sources.\n")
-		s.Start()
+		var s *spinner.Spinner
+
+		if !Verbose {
+			s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+			s.Color("green")
+			s.Suffix = " Synchronizing localdev sources..."
+			s.FinalMSG = fmt.Sprintf("\u2705 Synced localdev sources.\n")
+			s.Start()
+		}
 
 		git.SyncGit()
 
-		s.Stop()
-		s.Suffix = " Building localdev image..."
-		s.FinalMSG = fmt.Sprintf("\u2705 Built localdev images.\n")
-		s.Restart()
+		if s != nil {
+			s.Stop()
+			s.Suffix = " Building localdev image..."
+			s.FinalMSG = fmt.Sprintf("\u2705 Built localdev images.\n")
+			s.Restart()
+		}
 
 		var wg sync.WaitGroup
 		wg.Add(1)
@@ -47,10 +54,12 @@ var stopCmd = &cobra.Command{
 
 		wg.Wait()
 
-		s.Stop()
-		s.Suffix = " Stopping localdev environment..."
-		s.FinalMSG = fmt.Sprintf("\u2705 Stopped localdev environment.\n")
-		s.Restart()
+		if s != nil {
+			s.Stop()
+			s.Suffix = " Stopping localdev environment..."
+			s.FinalMSG = fmt.Sprintf("\u2705 Stopped localdev environment.\n")
+			s.Restart()
+		}
 
 		wg.Add(1)
 
@@ -66,10 +75,15 @@ var stopCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		lcectldocker.InvokeCommandInLocaldev("localdev-stop", config, host, Verbose, &wg, nil)
+		pipeSpinner := lcectlspinner.SpinnerPipe(s, " Stopping localdev environment [%s]", Verbose)
+
+		lcectldocker.InvokeCommandInLocaldev("localdev-stop", config, host, Verbose, &wg, pipeSpinner)
 
 		wg.Wait()
-		s.Stop()
+
+		if s != nil {
+			s.Stop()
+		}
 
 		return nil
 	},
