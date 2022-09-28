@@ -25,12 +25,6 @@ var createCmd = &cobra.Command{
 	Short: "Creates the runtime environment for Liferay Client Extension development",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		dockerClient, err := lcectldocker.GetDockerClient()
-
-		if err != nil {
-			return err
-		}
-
 		s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		s.Color("green")
 		s.Suffix = " Synchronizing localdev sources..."
@@ -48,12 +42,12 @@ var createCmd = &cobra.Command{
 		wg.Add(1)
 		go lcectldocker.BuildImage("dxp-server", path.Join(
 			viper.GetString(constants.Const.RepoDir), "docker", "images", "dxp-server"),
-			dockerClient, &wg)
+			Verbose, &wg)
 
 		wg.Add(1)
 		go lcectldocker.BuildImage("localdev-server", path.Join(
 			viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-server"),
-			dockerClient, &wg)
+			Verbose, &wg)
 
 		wg.Wait()
 
@@ -63,7 +57,8 @@ var createCmd = &cobra.Command{
 		s.Restart()
 
 		wg.Add(1)
-		lcectldocker.InvokeCommandInLocaldev("localdev-start", []string{"/repo/scripts/cluster-start.sh"}, dockerClient, &wg)
+		lcectldocker.InvokeCommandInLocaldev(
+			"localdev-start", []string{"/repo/scripts/cluster-start.sh"}, Verbose, &wg)
 
 		wg.Wait()
 		s.Stop()
@@ -73,5 +68,6 @@ var createCmd = &cobra.Command{
 }
 
 func init() {
+	createCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "enable verbose output")
 	runtimeCmd.AddCommand(createCmd)
 }

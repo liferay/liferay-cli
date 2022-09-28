@@ -22,7 +22,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -32,8 +31,8 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/spf13/viper"
 	"liferay.com/lcectl/constants"
 )
@@ -66,8 +65,13 @@ func GetDockerClient() (*client.Client, error) {
 }
 
 func BuildImage(
-	imageTag string, dockerFileDir string,
-	dockerClient *client.Client, wg *sync.WaitGroup) {
+	imageTag string, dockerFileDir string, verbose bool, wg *sync.WaitGroup) {
+
+	dockerClient, err := GetDockerClient()
+
+	if err != nil {
+		log.Fatalf("%s getting dockerclient", err)
+	}
 
 	ctx := context.Background()
 	buff := bytes.NewBuffer(nil)
@@ -83,11 +87,24 @@ func BuildImage(
 	}
 
 	defer response.Body.Close()
-	ioutil.ReadAll(response.Body)
+
+	if verbose {
+		_, err = io.Copy(os.Stdout, response.Body)
+	} else {
+		io.ReadAll(response.Body)
+	}
 	wg.Done()
 }
 
-func InvokeCommandInLocaldev(containerName string, command []string, dockerClient *client.Client, wg *sync.WaitGroup) {
+func InvokeCommandInLocaldev(
+	containerName string, command []string, verbose bool, wg *sync.WaitGroup) {
+
+	dockerClient, err := GetDockerClient()
+
+	if err != nil {
+		log.Fatalf("%s getting dockerclient", err)
+	}
+
 	ctx := context.Background()
 
 	// out, err := dockerClient.ImagePull(ctx, imageTag, types.ImagePullOptions{})
@@ -110,9 +127,8 @@ func InvokeCommandInLocaldev(containerName string, command []string, dockerClien
 				"/var/run/docker.sock:/var/run/docker.sock",
 			},
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
-			AutoRemove:  true,
 		},
-		networkConfig,
+		nil,
 		nil,
 		containerName)
 
@@ -120,7 +136,12 @@ func InvokeCommandInLocaldev(containerName string, command []string, dockerClien
 		log.Fatalf("Failed to create container %s: %s", containerName, err)
 	}
 
-	/*fmt.Println(resp.Warnings, resp.ID)*/
+	if verbose {
+		fmt.Printf("Built container with id: %s\n", resp.ID)
+	}
+
+	statusChan := waitExitOrRemoved(ctx, dockerClient, resp.ID, true)
+	defer func() { <-statusChan }()
 
 	err = dockerClient.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
 
@@ -128,16 +149,14 @@ func InvokeCommandInLocaldev(containerName string, command []string, dockerClien
 		log.Fatalf("Failed to start container %s: %s", containerName, err)
 	}
 
-	statusCh, errCh := dockerClient.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
-	select {
-	case err := <-errCh:
+	if verbose {
+		out, err := dockerClient.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true})
 		if err != nil {
-			log.Fatalf("Failed to wait for container %s: %s", containerName, err)
+			log.Fatalf("%s getting container logs", err)
 		}
-	case <-statusCh:
-	}
 
-	/*out, err := dockerClient.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})*/
+		stdcopy.StdCopy(os.Stdout, os.Stderr, out)
+	}
 
 	wg.Done()
 }
@@ -191,4 +210,36 @@ func Tar(src string, writers ...io.Writer) error {
 
 		return nil
 	})
+}
+
+func waitExitOrRemoved(ctx context.Context, dockerClient *client.Client, containerID string, waitRemove bool) <-chan int {
+	if len(containerID) == 0 {
+		// containerID can never be empty
+		panic("Internal Error: waitExitOrRemoved needs a containerID as parameter")
+	}
+
+	condition := container.WaitConditionNextExit
+	if waitRemove {
+		condition = container.WaitConditionRemoved
+	}
+
+	resultC, errC := dockerClient.ContainerWait(ctx, containerID, condition)
+
+	statusC := make(chan int)
+	go func() {
+		select {
+		case result := <-resultC:
+			if result.Error != nil {
+				log.Printf("Error waiting for container: %v\n", result.Error.Message)
+				statusC <- 125
+			} else {
+				statusC <- int(result.StatusCode)
+			}
+		case err := <-errC:
+			log.Printf("error waiting for container: %v\n", err)
+			statusC <- 125
+		}
+	}()
+
+	return statusC
 }

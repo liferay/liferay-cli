@@ -25,12 +25,6 @@ var stopCmd = &cobra.Command{
 	Short: "Stops the runtime environment for Liferay Client Extension development",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		dockerClient, err := lcectldocker.GetDockerClient()
-
-		if err != nil {
-			return err
-		}
-
 		s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		s.Color("green")
 		s.Suffix = " Synchronizing localdev sources..."
@@ -48,7 +42,7 @@ var stopCmd = &cobra.Command{
 		wg.Add(1)
 		go lcectldocker.BuildImage("localdev-server", path.Join(
 			viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-server"),
-			dockerClient, &wg)
+			Verbose, &wg)
 
 		wg.Wait()
 
@@ -58,7 +52,8 @@ var stopCmd = &cobra.Command{
 		s.Restart()
 
 		wg.Add(1)
-		lcectldocker.InvokeCommandInLocaldev("localdev-stop", []string{"/repo/scripts/cluster-stop.sh"}, dockerClient, &wg)
+		lcectldocker.InvokeCommandInLocaldev(
+			"localdev-stop", []string{"/repo/scripts/cluster-stop.sh"}, Verbose, &wg)
 
 		wg.Wait()
 		s.Stop()
@@ -68,5 +63,6 @@ var stopCmd = &cobra.Command{
 }
 
 func init() {
+	stopCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "enable verbose output")
 	runtimeCmd.AddCommand(stopCmd)
 }
