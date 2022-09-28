@@ -158,6 +158,8 @@ func InvokeCommandInLocaldev(
 		stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 	}
 
+	dockerClient.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{})
+
 	wg.Done()
 }
 
@@ -236,7 +238,7 @@ func waitExitOrRemoved(ctx context.Context, dockerClient *client.Client, contain
 				statusC <- int(result.StatusCode)
 			}
 		case err := <-errC:
-			log.Printf("error waiting for container: %v\n", err)
+			log.Printf("Error waiting for container: %v\n", err)
 			statusC <- 125
 		}
 	}()
