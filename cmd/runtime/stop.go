@@ -6,9 +6,8 @@ package runtime
 
 import (
 	"fmt"
-	"time"
+	"io"
 
-	"github.com/briandowns/spinner"
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -16,7 +15,7 @@ import (
 	"liferay.com/lcectl/constants"
 	lcectldocker "liferay.com/lcectl/docker"
 	"liferay.com/lcectl/prereq"
-	lcectlspinner "liferay.com/lcectl/spinner"
+	"liferay.com/lcectl/spinner"
 )
 
 // createCmd represents the create command
@@ -39,27 +38,11 @@ var stopCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		var s *spinner.Spinner
-
-		if !Verbose {
-			s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
-			s.Color("green")
-			s.Suffix = " Stopping 'localdev' environment..."
-			s.FinalMSG = fmt.Sprintf("\u2705 Stopped 'localdev' environment.\n")
-			s.Start()
-		}
-
-		pipeSpinner := lcectlspinner.SpinnerPipe(s, " Stopping 'localdev' environment [%s]", Verbose)
-
-		signal := lcectldocker.InvokeCommandInLocaldev("localdev-stop", config, host, Verbose, pipeSpinner)
-
-		if s != nil {
-			if signal > 0 {
-				s.FinalMSG = fmt.Sprintf("\u2718 Something went wrong...\n")
-			}
-
-			s.Stop()
-		}
+		spinner.Spin(
+			"Stopping", "Stopped", Verbose,
+			func(fior func(io.ReadCloser)) int {
+				return lcectldocker.InvokeCommandInLocaldev("localdev-stop", config, host, Verbose, fior)
+			})
 	},
 }
 

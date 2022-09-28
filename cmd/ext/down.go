@@ -6,6 +6,7 @@ package ext
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -15,6 +16,7 @@ import (
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
 	"liferay.com/lcectl/prereq"
+	"liferay.com/lcectl/spinner"
 )
 
 var dir string
@@ -43,7 +45,11 @@ var downCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		docker.InvokeCommandInLocaldev("localdev-down", config, host, Verbose, nil)
+		spinner.Spin(
+			"Downing", "Downed", Verbose,
+			func(fior func(io.ReadCloser)) int {
+				return docker.InvokeCommandInLocaldev("localdev-down", config, host, Verbose, fior)
+			})
 	},
 }
 

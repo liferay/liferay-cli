@@ -6,6 +6,7 @@ package ext
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
@@ -13,6 +14,7 @@ import (
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
 	"liferay.com/lcectl/prereq"
+	"liferay.com/lcectl/spinner"
 )
 
 // refreshCmd represents the refresh command
@@ -40,7 +42,11 @@ var refreshCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		docker.InvokeCommandInLocaldev("localdev-refresh", config, host, Verbose, nil)
+		spinner.Spin(
+			"Refreshing", "Refreshed", Verbose,
+			func(fior func(io.ReadCloser)) int {
+				return docker.InvokeCommandInLocaldev("localdev-refresh", config, host, Verbose, fior)
+			})
 	},
 }
 

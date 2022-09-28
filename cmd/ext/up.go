@@ -6,6 +6,7 @@ package ext
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -17,6 +18,7 @@ import (
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
 	"liferay.com/lcectl/prereq"
+	"liferay.com/lcectl/spinner"
 )
 
 // upCmd represents the up command
@@ -64,7 +66,11 @@ var upCmd = &cobra.Command{
 			},
 		}
 
-		docker.InvokeCommandInLocaldev("localdev-up", config, host, Verbose, nil)
+		spinner.Spin(
+			"Upping", "Up", Verbose,
+			func(fior func(io.ReadCloser)) int {
+				return docker.InvokeCommandInLocaldev("localdev-up", config, host, Verbose, fior)
+			})
 
 		browser.OpenURL("http://localhost:10350/r/(all)/overview")
 	},

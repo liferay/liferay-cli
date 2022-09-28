@@ -6,9 +6,8 @@ package runtime
 
 import (
 	"fmt"
-	"time"
+	"io"
 
-	"github.com/briandowns/spinner"
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -16,7 +15,7 @@ import (
 	"liferay.com/lcectl/constants"
 	lcectldocker "liferay.com/lcectl/docker"
 	"liferay.com/lcectl/prereq"
-	lcectlspinner "liferay.com/lcectl/spinner"
+	"liferay.com/lcectl/spinner"
 )
 
 // createCmd represents the create command
@@ -39,19 +38,11 @@ var createCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		pipeSpinner := lcectlspinner.SpinnerPipe(s, " Creating 'localdev' environment [%s]", Verbose)
-
-		signal := lcectldocker.InvokeCommandInLocaldev("localdev-start", config, host, Verbose, &wg, pipeSpinner)
-
-		wg.Wait()
-
-		if s != nil {
-			if signal > 0 {
-				s.FinalMSG = fmt.Sprintf("\u2718 Something went wrong...\n")
-			}
-
-			s.Stop()
-		}
+		spinner.Spin(
+			"Creating", "Created", Verbose,
+			func(fior func(io.ReadCloser)) int {
+				return lcectldocker.InvokeCommandInLocaldev("localdev-create", config, host, Verbose, fior)
+			})
 	},
 }
 
