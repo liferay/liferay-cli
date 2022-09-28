@@ -32,7 +32,7 @@ var downCmd = &cobra.Command{
 
 		config := container.Config{
 			Image: "localdev-server",
-			Cmd:   []string{"tilt", "down", "-f", "/repo/tilt/Tiltfile"},
+			Cmd:   []string{"/repo/scripts/ext/down.sh"},
 		}
 		host := container.HostConfig{
 			Binds: []string{

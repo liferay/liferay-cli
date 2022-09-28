@@ -43,8 +43,7 @@ var upCmd = &cobra.Command{
 
 		config := container.Config{
 			Image:        "localdev-server",
-			Cmd:          []string{"tilt", "up", "-f", "/repo/tilt/Tiltfile", "--stream"},
-			Env:          []string{"DO_NOT_TRACK=1"},
+			Cmd:          []string{"/repo/scripts/ext/up.sh"},
 			ExposedPorts: exposedPorts,
 		}
 		host := container.HostConfig{

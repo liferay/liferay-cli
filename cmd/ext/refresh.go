@@ -26,7 +26,7 @@ var refreshCmd = &cobra.Command{
 
 		config := container.Config{
 			Image:        "localdev-server",
-			Cmd:          []string{"tilt", "trigger", "(Tiltfile)", "--host", "host.docker.internal"},
+			Cmd:          []string{"/repo/scripts/ext/refresh.sh"},
 			AttachStdout: true,
 			AttachStderr: true,
 			Tty:          true,
