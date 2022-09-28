@@ -6,13 +6,13 @@ package ext
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
+	"liferay.com/lcectl/prereq"
 )
 
 // refreshCmd represents the refresh command
@@ -20,8 +20,7 @@ var refreshCmd = &cobra.Command{
 	Use:   "refresh",
 	Short: "Refreshes client-extension workload resources in localdev server",
 	Run: func(cmd *cobra.Command, args []string) {
-		var wg sync.WaitGroup
-		wg.Add(1)
+		prereq.Prereq(Verbose)
 
 		config := container.Config{
 			Image:        "localdev-server",
@@ -41,9 +40,7 @@ var refreshCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		docker.InvokeCommandInLocaldev("localdev-refresh", config, host, Verbose, &wg, nil)
-
-		wg.Wait()
+		docker.InvokeCommandInLocaldev("localdev-refresh", config, host, Verbose, nil)
 	},
 }
 

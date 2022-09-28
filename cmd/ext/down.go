@@ -8,13 +8,13 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sync"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
+	"liferay.com/lcectl/prereq"
 )
 
 var dir string
@@ -26,8 +26,7 @@ var downCmd = &cobra.Command{
 	Long:  `Stops localdev server and DXP after shutting down all client-extension workloads.`,
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		var wg sync.WaitGroup
-		wg.Add(1)
+		prereq.Prereq(Verbose)
 
 		config := container.Config{
 			Image: "localdev-server",
@@ -44,9 +43,7 @@ var downCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		docker.InvokeCommandInLocaldev("localdev-down", config, host, Verbose, &wg, nil)
-
-		wg.Wait()
+		docker.InvokeCommandInLocaldev("localdev-down", config, host, Verbose, nil)
 	},
 }
 

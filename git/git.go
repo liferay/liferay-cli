@@ -6,7 +6,9 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/spf13/viper"
@@ -26,9 +28,20 @@ func init() {
 	viper.SetDefault(constants.Const.RepoSync, true)
 }
 
-func SyncGit() {
+func SyncGit(verbose bool) {
 	if repoSync := viper.GetBool(constants.Const.RepoSync); !repoSync {
 		return
+	}
+
+	var s *spinner.Spinner
+
+	if !verbose {
+		s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+		s.Color("green")
+		s.Suffix = " Synchronizing 'localdev' sources..."
+		s.FinalMSG = fmt.Sprintf("\u2705 Synced 'localdev' sources.\n")
+		s.Start()
+		defer s.Stop()
 	}
 
 	repoDir := viper.GetString(constants.Const.RepoDir)

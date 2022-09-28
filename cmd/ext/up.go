@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sync"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
@@ -17,6 +16,7 @@ import (
 	"github.com/spf13/viper"
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
+	"liferay.com/lcectl/prereq"
 )
 
 // upCmd represents the up command
@@ -26,8 +26,7 @@ var upCmd = &cobra.Command{
 	Long:  "Starts up localdev server including DXP server and monitors client-extension workspace to build and deploy workloads",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		var wg sync.WaitGroup
-		wg.Add(1)
+		prereq.Prereq(Verbose)
 
 		tiltPort, err := nat.NewPort("tcp", "10350")
 
@@ -45,9 +44,6 @@ var upCmd = &cobra.Command{
 			Cmd:          []string{"tilt", "up", "-f", "/repo/tilt/Tiltfile", "--stream"},
 			Env:          []string{"DO_NOT_TRACK=1"},
 			ExposedPorts: exposedPorts,
-			AttachStdout: true,
-			AttachStderr: true,
-			Tty:          true,
 		}
 		host := container.HostConfig{
 			Binds: []string{
@@ -68,9 +64,7 @@ var upCmd = &cobra.Command{
 			},
 		}
 
-		docker.InvokeCommandInLocaldev("localdev-up", config, host, Verbose, &wg, nil)
-
-		wg.Wait()
+		docker.InvokeCommandInLocaldev("localdev-up", config, host, Verbose, nil)
 
 		browser.OpenURL("http://localhost:10350/r/(all)/overview")
 	},

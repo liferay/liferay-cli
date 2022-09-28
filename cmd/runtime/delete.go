@@ -6,8 +6,6 @@ package runtime
 
 import (
 	"fmt"
-	"path"
-	"sync"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -17,7 +15,7 @@ import (
 
 	"liferay.com/lcectl/constants"
 	lcectldocker "liferay.com/lcectl/docker"
-	"liferay.com/lcectl/git"
+	"liferay.com/lcectl/prereq"
 	lcectlspinner "liferay.com/lcectl/spinner"
 )
 
@@ -27,41 +25,7 @@ var deleteCmd = &cobra.Command{
 	Short: "Delete the runtime environment for Liferay Client Extension development",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		var s *spinner.Spinner
-
-		if !Verbose {
-			s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
-			s.Color("green")
-			s.Suffix = " Synchronizing 'localdev' sources..."
-			s.FinalMSG = fmt.Sprintf("\u2705 Synced 'localdev' sources.\n")
-			s.Start()
-		}
-
-		git.SyncGit()
-
-		if s != nil {
-			s.Stop()
-			s.Suffix = " Building 'localdev' image..."
-			s.FinalMSG = fmt.Sprintf("\u2705 Built 'localdev' images.\n")
-			s.Restart()
-		}
-
-		var wg sync.WaitGroup
-		wg.Add(1)
-		go lcectldocker.BuildImage("localdev-server", path.Join(
-			viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-server"),
-			Verbose, &wg)
-
-		wg.Wait()
-
-		if s != nil {
-			s.Stop()
-			s.Suffix = " Deleting 'localdev' environment..."
-			s.FinalMSG = fmt.Sprintf("\u2705 Deleted 'localdev' environment.\n")
-			s.Restart()
-		}
-
-		wg.Add(1)
+		prereq.Prereq(Verbose)
 
 		config := container.Config{
 			Image: "localdev-server",
@@ -75,11 +39,19 @@ var deleteCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		pipeSpinner := lcectlspinner.SpinnerPipe(s, " Deletinging 'localdev' environment [%s]", Verbose)
+		var s *spinner.Spinner
 
-		signal := lcectldocker.InvokeCommandInLocaldev("localdev-delete", config, host, Verbose, &wg, pipeSpinner)
+		if !Verbose {
+			s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+			s.Color("green")
+			s.Suffix = " Deleting 'localdev' environment..."
+			s.FinalMSG = fmt.Sprintf("\u2705 Deleted 'localdev' environment.\n")
+			s.Start()
+		}
 
-		wg.Wait()
+		pipeSpinner := lcectlspinner.SpinnerPipe(s, " Deleting 'localdev' environment [%s]", Verbose)
+
+		signal := lcectldocker.InvokeCommandInLocaldev("localdev-delete", config, host, Verbose, pipeSpinner)
 
 		if s != nil {
 			if signal > 0 {

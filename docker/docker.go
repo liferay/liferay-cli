@@ -149,7 +149,7 @@ func BuildImage(
 	},
 */
 func InvokeCommandInLocaldev(
-	containerName string, config container.Config, host container.HostConfig, verbose bool, wg *sync.WaitGroup, logPipe func(io.ReadCloser)) int {
+	containerName string, config container.Config, host container.HostConfig, verbose bool, logPipe func(io.ReadCloser)) int {
 
 	dockerClient, err := GetDockerClient()
 
@@ -177,14 +177,6 @@ func InvokeCommandInLocaldev(
 			}
 		}
 	}
-
-	// out, err := dockerClient.ImagePull(ctx, imageTag, types.ImagePullOptions{})
-	// if err != nil {
-	// 	log.Printf("Failed to pull image %s: %s\n", imageTag, err)
-	// } else {
-	// 	defer out.Close()
-	// 	io.Copy(os.Stdout, out)
-	// }
 
 	resp, err := dockerClient.ContainerCreate(ctx, &config, &host, nil, nil, containerName)
 
@@ -214,8 +206,6 @@ func InvokeCommandInLocaldev(
 	}
 
 	defer dockerClient.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{})
-
-	wg.Done()
 
 	return <-statusChan
 }
