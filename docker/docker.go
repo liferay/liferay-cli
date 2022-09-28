@@ -158,7 +158,7 @@ func InvokeCommandInLocaldev(
 		stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 	}
 
-	dockerClient.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{})
+	defer dockerClient.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{})
 
 	wg.Done()
 }
