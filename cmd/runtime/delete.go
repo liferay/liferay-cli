@@ -66,7 +66,7 @@ var deleteCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		lcectldocker.InvokeCommandInLocaldev("localdev-delete", config, host, Verbose, &wg)
+		lcectldocker.InvokeCommandInLocaldev("localdev-delete", config, host, Verbose, &wg, nil)
 
 		wg.Wait()
 		s.Stop()

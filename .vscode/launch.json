@@ -10,7 +10,7 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["runtime create"]
+      "args": ["runtime", "create"]
     }
   ]
 }

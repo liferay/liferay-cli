@@ -16,6 +16,7 @@ limitations under the License.
 package docker
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"io"
@@ -154,7 +155,7 @@ func BuildImage(
 	},
 */
 func InvokeCommandInLocaldev(
-	containerName string, config container.Config, host container.HostConfig, verbose bool, wg *sync.WaitGroup) {
+	containerName string, config container.Config, host container.HostConfig, verbose bool, wg *sync.WaitGroup, c chan string) {
 
 	dockerClient, err := GetDockerClient()
 
@@ -191,13 +192,24 @@ func InvokeCommandInLocaldev(
 		log.Fatalf("Failed to start container %s: %s", containerName, err)
 	}
 
-	if verbose {
-		out, err := dockerClient.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true})
-		if err != nil {
-			log.Fatalf("%s getting container logs", err)
-		}
+	out, err := dockerClient.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true})
+	if err != nil {
+		log.Fatalf("%s getting container logs", err)
+	}
 
+	if verbose {
 		stdcopy.StdCopy(os.Stdout, os.Stderr, out)
+	} else {
+		reader := bufio.NewReader(out)
+		for {
+			str, err := reader.ReadString('\n')
+			if err != nil {
+				close(c)
+				break
+			} else {
+				c <- str
+			}
+		}
 	}
 
 	defer dockerClient.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{})

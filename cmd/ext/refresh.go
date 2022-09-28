@@ -41,7 +41,7 @@ var refreshCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		docker.InvokeCommandInLocaldev("localdev-refresh", config, host, Verbose, &wg)
+		docker.InvokeCommandInLocaldev("localdev-refresh", config, host, Verbose, &wg, nil)
 
 		wg.Wait()
 	},

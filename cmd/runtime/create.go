@@ -7,6 +7,7 @@ package runtime
 import (
 	"fmt"
 	"path"
+	"strings"
 	"sync"
 	"time"
 
@@ -71,7 +72,15 @@ var createCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		lcectldocker.InvokeCommandInLocaldev("localdev-start", config, host, Verbose, &wg)
+		c := make(chan (string))
+		go func() {
+			for {
+				msg := <-c
+				s.Suffix = fmt.Sprintf(" Creating localdev environment...[%s]", strings.TrimSpace(msg))
+			}
+		}()
+
+		lcectldocker.InvokeCommandInLocaldev("localdev-start", config, host, Verbose, &wg, c)
 
 		wg.Wait()
 		s.Stop()

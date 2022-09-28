@@ -68,7 +68,7 @@ var upCmd = &cobra.Command{
 			},
 		}
 
-		docker.InvokeCommandInLocaldev("localdev-up", config, host, Verbose, &wg)
+		docker.InvokeCommandInLocaldev("localdev-up", config, host, Verbose, &wg, nil)
 
 		wg.Wait()
 

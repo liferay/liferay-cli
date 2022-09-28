@@ -66,7 +66,7 @@ var stopCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		lcectldocker.InvokeCommandInLocaldev("localdev-stop", config, host, Verbose, &wg)
+		lcectldocker.InvokeCommandInLocaldev("localdev-stop", config, host, Verbose, &wg, nil)
 
 		wg.Wait()
 		s.Stop()
