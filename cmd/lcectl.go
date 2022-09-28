@@ -61,10 +61,6 @@ func init() {
 
 	lcectlCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.lcectl.yaml)")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	lcectlCmd.Flags().BoolP("verbose", "v", false, "enable verbose output")
-
 	// add sub-commands
 	config.AddConfigCmd(lcectlCmd)
 	runtime.AddRuntimeCmd(lcectlCmd)

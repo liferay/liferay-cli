@@ -98,12 +98,6 @@ func InvokeCommandInLocaldev(containerName string, command []string, dockerClien
 	// 	io.Copy(os.Stdout, out)
 	// }
 
-	networkConfig := &network.NetworkingConfig{
-		EndpointsConfig: map[string]*network.EndpointSettings{},
-	}
-	networkConfig.EndpointsConfig[viper.GetString(constants.Const.DockerNetwork)] =
-		&network.EndpointSettings{}
-
 	resp, err := dockerClient.ContainerCreate(
 		ctx,
 		&container.Config{

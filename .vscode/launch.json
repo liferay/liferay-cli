@@ -5,12 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch main.go file",
+      "name": "lcectl runtime create",
       "type": "go",
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["help"]
+      "args": ["runtime create"]
     }
   ]
 }
