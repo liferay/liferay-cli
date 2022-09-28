@@ -20,9 +20,9 @@ import (
 )
 
 // createCmd represents the create command
-var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Creates the runtime environment for Liferay Client Extension development",
+var stopCmd = &cobra.Command{
+	Use:   "stop",
+	Short: "Stops the runtime environment for Liferay Client Extension development",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dockerClient, err := lcectldocker.GetDockerClient()
@@ -40,16 +40,11 @@ var createCmd = &cobra.Command{
 		git.SyncGit()
 
 		s.Stop()
-		s.Suffix = " Building localdev images..."
+		s.Suffix = " Building localdev image..."
 		s.FinalMSG = fmt.Sprintf("\u2705 Built localdev images.\n")
 		s.Restart()
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go lcectldocker.BuildImage("dxp-server", path.Join(
-			viper.GetString(constants.Const.RepoDir), "docker", "images", "dxp-server"),
-			dockerClient, &wg)
-
 		wg.Add(1)
 		go lcectldocker.BuildImage("localdev-server", path.Join(
 			viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-server"),
@@ -58,12 +53,12 @@ var createCmd = &cobra.Command{
 		wg.Wait()
 
 		s.Stop()
-		s.Suffix = " Creating localdev environment..."
-		s.FinalMSG = fmt.Sprintf("\u2705 Created localdev environment.\n")
+		s.Suffix = " Stopping localdev environment..."
+		s.FinalMSG = fmt.Sprintf("\u2705 Stopped localdev environment.\n")
 		s.Restart()
 
 		wg.Add(1)
-		lcectldocker.InvokeCommandInLocaldev("localdev-start", []string{"/repo/scripts/cluster-start.sh"}, dockerClient, &wg)
+		lcectldocker.InvokeCommandInLocaldev("localdev-stop", []string{"/repo/scripts/cluster-stop.sh"}, dockerClient, &wg)
 
 		wg.Wait()
 		s.Stop()
@@ -73,7 +68,7 @@ var createCmd = &cobra.Command{
 }
 
 func init() {
-	runtimeCmd.AddCommand(createCmd)
+	runtimeCmd.AddCommand(stopCmd)
 
 	// Here you will define your flags and configuration settings.
 
