@@ -32,6 +32,7 @@ import (
 	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/docker/pkg/fileutils"
 	"github.com/docker/docker/pkg/idtools"
+	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/progress"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/docker/pkg/streamformatter"
@@ -130,7 +131,10 @@ func BuildImage(
 	defer response.Body.Close()
 
 	if verbose {
-		_, err = io.Copy(os.Stdout, response.Body)
+		err = jsonmessage.DisplayJSONMessagesStream(response.Body, os.Stdout, os.Stdout.Fd(), true, nil)
+		if err != nil {
+			_, err = io.Copy(os.Stdout, response.Body)
+		}
 	} else {
 		io.ReadAll(response.Body)
 	}
