@@ -61,7 +61,17 @@ func SyncGit(verbose bool) {
 		})
 
 		if err != nil {
-			log.Fatal("Clone error: ", err)
+			if s != nil {
+				s.FinalMSG = fmt.Sprintf("\u2718 'localdev' sources error %s.\n", err)
+				s.Stop()
+				os.Exit(1)
+			} else {
+				log.Fatalf("'localdev' sources error %s.\n", err)
+			}
+		}
+
+		if s != nil {
+			s.FinalMSG = fmt.Sprintf("\u2705 Cloned 'localdev' sources to %s\n", repoDir)
 		} else {
 			fmt.Printf("Cloned 'localdev' sources to %s\n", repoDir)
 		}
@@ -96,6 +106,7 @@ func SyncGit(verbose bool) {
 
 			if s != nil {
 				s.FinalMSG = fmt.Sprintf("\u2718 'localdev' sources error %s.\n", err)
+				s.Stop()
 				os.Exit(1)
 			} else {
 				log.Fatalf("'localdev' sources error %s.\n", err)
