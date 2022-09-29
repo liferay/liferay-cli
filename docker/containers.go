@@ -2,12 +2,13 @@ package docker
 
 import (
 	"fmt"
+	"log"
 	"path"
-	"sync"
 	"time"
 
 	"github.com/briandowns/spinner"
 	"github.com/spf13/viper"
+	"golang.org/x/sync/errgroup"
 	"liferay.com/lcectl/constants"
 )
 
@@ -20,27 +21,33 @@ func BuildImages(verbose bool) {
 		s.Suffix = " Building 'localdev' images..."
 		s.FinalMSG = fmt.Sprintf("\u2705 Built 'localdev' images.\n")
 		s.Start()
+		defer s.Stop()
 	}
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go BuildImage("dxp-server", path.Join(
-		viper.GetString(constants.Const.RepoDir), "docker", "images", "dxp-server"),
-		verbose, &wg)
+	var g errgroup.Group
 
-	wg.Add(1)
-	go BuildImage("localdev-server", path.Join(
-		viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-server"),
-		verbose, &wg)
+	g.Go(func() error {
+		return BuildImage("dxp-server", path.Join(
+			viper.GetString(constants.Const.RepoDir), "docker", "images", "dxp-server"),
+			verbose)
+	})
 
-	wg.Add(1)
-	go BuildImage("localdev-dnsmasq", path.Join(
-		viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-dnsmasq"),
-		verbose, &wg)
+	g.Go(func() error {
+		return BuildImage("localdev-server", path.Join(
+			viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-server"),
+			verbose)
+	})
 
-	wg.Wait()
+	g.Go(func() error {
+		return BuildImage("localdev-dnsmasq", path.Join(
+			viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-dnsmasq"),
+			verbose)
+	})
 
-	if s != nil {
-		s.Stop()
+	// g.Wait waits for all goroutines to complete
+	// and returns the first non-nil error returned
+	// by one of the goroutines.
+	if err := g.Wait(); err != nil {
+		log.Fatal(err)
 	}
 }

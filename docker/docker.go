@@ -24,7 +24,6 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
-	"sync"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -84,19 +83,19 @@ func GetDockerClient() (*client.Client, error) {
 }
 
 func BuildImage(
-	imageTag string, dockerFileDir string, verbose bool, wg *sync.WaitGroup) {
+	imageTag string, dockerFileDir string, verbose bool) error {
 
 	dockerClient, err := GetDockerClient()
 
 	if err != nil {
-		log.Fatalf("%s getting dockerclient", err)
+		return err
 	}
 
 	ctx := context.Background()
 
 	excludes, err := readDockerignore(dockerFileDir)
 	if err != nil {
-		log.Fatalf("%s reading dockerignore", err)
+		return err
 	}
 
 	excludes = trimBuildFilesFromExcludes(excludes, path.Join(dockerFileDir, "Dockerfile"), false)
@@ -105,7 +104,7 @@ func BuildImage(
 		ChownOpts:       &idtools.Identity{UID: 0, GID: 0},
 	})
 	if err != nil {
-		log.Fatalf("%s creating tar", err)
+		return err
 	}
 
 	progressOutput := streamformatter.NewProgressOutput(os.Stdout)
@@ -121,7 +120,7 @@ func BuildImage(
 		})
 
 	if err != nil {
-		log.Fatal("Error during docker build: ", err)
+		return err
 	}
 
 	defer response.Body.Close()
@@ -134,7 +133,8 @@ func BuildImage(
 	} else {
 		io.ReadAll(response.Body)
 	}
-	wg.Done()
+
+	return nil
 }
 
 /*
