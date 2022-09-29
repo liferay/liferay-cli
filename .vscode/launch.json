@@ -11,6 +11,22 @@
       "mode": "debug",
       "program": "main.go",
       "args": ["runtime", "create"]
+    },
+    {
+      "name": "lcectl ext refresh -v",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "main.go",
+      "args": ["ext", "refresh", "-v"],
+      "cwd": "${input:workspacePath}"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "workspacePath",
+      "description": "Enter the path to client extensions workspace",
+      "type": "promptString"
     }
   ]
 }
