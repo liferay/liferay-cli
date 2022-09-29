@@ -137,17 +137,6 @@ func BuildImage(
 	return nil
 }
 
-/*
-	container.Config{
-		Image: "localdev-server",
-		Cmd:   command,
-		Env:   env,
-	},
-	container.HostConfig{
-		Binds:       binds,
-		NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
-	},
-*/
 func InvokeCommandInLocaldev(
 	containerName string, config container.Config, host container.HostConfig, autoremove bool, verbose bool, logPipe func(io.ReadCloser, bool)) int {
 
