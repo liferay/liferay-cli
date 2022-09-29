@@ -10,7 +10,8 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/transport"
 	"github.com/spf13/viper"
 	"liferay.com/lcectl/constants"
 )
@@ -47,43 +48,64 @@ func SyncGit(verbose bool) {
 	repoDir := viper.GetString(constants.Const.RepoDir)
 	repo, err := git.PlainOpen(repoDir)
 
+	cloned := false
+
 	if err != nil {
 		os.MkdirAll(repoDir, os.ModePerm)
 
 		repo, err = git.PlainClone(repoDir, false, &git.CloneOptions{
 			Depth:        1,
+			RemoteName:   "origin",
 			SingleBranch: true,
-			RemoteName: fmt.Sprintf(
-				"refs/heads/%s",
-				viper.GetString(constants.Const.RepoBranch)),
-			URL: viper.GetString(constants.Const.RepoRemote),
+			URL:          viper.GetString(constants.Const.RepoRemote),
 		})
 
 		if err != nil {
 			log.Fatal("Clone error: ", err)
+		} else {
+			fmt.Printf("Cloned 'localdev' sources to %s\n", repoDir)
 		}
 
-		_, err = repo.CreateRemote(&config.RemoteConfig{
-			Name: "origin",
-			URLs: []string{viper.GetString(constants.Const.RepoRemote)},
-		})
+		cloned = true
+	}
+
+	if !cloned {
+		worktree, err := repo.Worktree()
 
 		if err != nil {
-			log.Fatal("Remote error: ", err)
+			log.Fatal("worktree error: ", err)
 		}
-	}
 
-	worktree, err := repo.Worktree()
+		if err = worktree.Pull(&git.PullOptions{
+			Force: true,
+			ReferenceName: plumbing.ReferenceName(
+				"refs/heads/" + viper.GetString(constants.Const.RepoBranch)),
+			RemoteName:   "origin",
+			SingleBranch: true,
+		}); err != nil {
 
-	if err != nil {
-		log.Fatal("worktree error: ", err)
-	}
+			if err == git.NoErrAlreadyUpToDate || err == transport.ErrEmptyUploadPackRequest {
+				if s != nil {
+					s.FinalMSG = fmt.Sprintf("\u2705 'localdev' sources %s.\n", git.NoErrAlreadyUpToDate)
+				} else {
+					fmt.Printf("'localdev' sources %s.\n", git.NoErrAlreadyUpToDate)
+				}
 
-	err = worktree.Pull(&git.PullOptions{
-		RemoteName: "origin",
-	})
+				return
+			}
 
-	if err != nil && err.Error() != "already up-to-date" {
-		//log.Fatal("pull error: ", err)
+			if s != nil {
+				s.FinalMSG = fmt.Sprintf("\u2718 'localdev' sources error %s.\n", err)
+				os.Exit(1)
+			} else {
+				log.Fatalf("'localdev' sources error %s.\n", err)
+			}
+		}
+
+		if s != nil {
+			s.FinalMSG = fmt.Sprintf("\u2705 'localdev' sources updated.\n")
+		} else {
+			fmt.Printf("'localdev' sources updated.\n")
+		}
 	}
 }
