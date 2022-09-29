@@ -11,8 +11,8 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 )
 
-func SpinnerPipe(s *spinner.Spinner, prefix string, verbose bool) func(io.ReadCloser) {
-	return func(out io.ReadCloser) {
+func SpinnerPipe(s *spinner.Spinner, prefix string) func(io.ReadCloser, bool) {
+	return func(out io.ReadCloser, verbose bool) {
 		if verbose {
 			stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 		} else if s != nil {

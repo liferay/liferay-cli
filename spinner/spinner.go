@@ -8,7 +8,7 @@ import (
 	"github.com/briandowns/spinner"
 )
 
-type SpinOperation func(func(io.ReadCloser)) int
+type SpinOperation func(func(io.ReadCloser, bool)) int
 
 func Spin(doing string, done string, verbose bool, operation SpinOperation) {
 	var s *spinner.Spinner
@@ -21,7 +21,7 @@ func Spin(doing string, done string, verbose bool, operation SpinOperation) {
 		s.Start()
 	}
 
-	pipeSpinner := SpinnerPipe(s, fmt.Sprintf(" %s 'localdev' environment", done)+" [%s]", verbose)
+	pipeSpinner := SpinnerPipe(s, fmt.Sprintf(" %s 'localdev' environment", done)+" [%s]")
 
 	signal := operation(pipeSpinner)
 

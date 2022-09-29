@@ -149,7 +149,7 @@ func BuildImage(
 	},
 */
 func InvokeCommandInLocaldev(
-	containerName string, config container.Config, host container.HostConfig, autoremove bool, verbose bool, logPipe func(io.ReadCloser)) int {
+	containerName string, config container.Config, host container.HostConfig, autoremove bool, verbose bool, logPipe func(io.ReadCloser, bool)) int {
 
 	dockerClient, err := GetDockerClient()
 
@@ -206,7 +206,7 @@ func InvokeCommandInLocaldev(
 	}
 
 	if logPipe != nil {
-		logPipe(out)
+		logPipe(out, verbose)
 
 		return <-statusChan
 	}

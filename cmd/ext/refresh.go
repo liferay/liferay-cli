@@ -44,7 +44,7 @@ var refreshCmd = &cobra.Command{
 
 		spinner.Spin(
 			"Refreshing", "Refreshed", Verbose,
-			func(fior func(io.ReadCloser)) int {
+			func(fior func(io.ReadCloser, bool)) int {
 				return docker.InvokeCommandInLocaldev("localdev-refresh", config, host, true, Verbose, fior)
 			})
 	},

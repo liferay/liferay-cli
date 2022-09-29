@@ -40,7 +40,7 @@ var deleteCmd = &cobra.Command{
 
 		spinner.Spin(
 			"Deleting", "Deleted", Verbose,
-			func(fior func(io.ReadCloser)) int {
+			func(fior func(io.ReadCloser, bool)) int {
 				return lcectldocker.InvokeCommandInLocaldev("localdev-delete", config, host, true, Verbose, fior)
 			})
 	},
