@@ -31,9 +31,16 @@ func SpinnerPipe(s *spinner.Spinner, prefix string, verbose bool) func(io.ReadCl
 					close(c)
 					break
 				} else {
-					c <- strings.TrimSpace(str)
+					c <- truncateText(strings.TrimSpace(str), 80)
 				}
 			}
 		}
 	}
+}
+
+func truncateText(s string, max int) string {
+	if max > len(s) {
+		return s
+	}
+	return s[:strings.LastIndex(s[:max], " ")]
 }

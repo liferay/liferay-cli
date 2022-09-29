@@ -185,7 +185,7 @@ func InvokeCommandInLocaldev(
 	}
 
 	if verbose {
-		fmt.Printf("Built container with id: %s\n", resp.ID)
+		fmt.Printf("Created container with id: %s\n", resp.ID)
 	}
 
 	statusChan := waitExitOrRemoved(ctx, dockerClient, resp.ID, false)
