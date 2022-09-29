@@ -33,6 +33,11 @@ func BuildImages(verbose bool) {
 		viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-server"),
 		verbose, &wg)
 
+	wg.Add(1)
+	go BuildImage("localdev-dnsmasq", path.Join(
+		viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-dnsmasq"),
+		verbose, &wg)
+
 	wg.Wait()
 
 	if s != nil {
