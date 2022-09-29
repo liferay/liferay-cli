@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"unicode"
 
 	"github.com/briandowns/spinner"
 	"github.com/docker/docker/pkg/stdcopy"
@@ -31,7 +32,7 @@ func SpinnerPipe(s *spinner.Spinner, prefix string) func(io.ReadCloser, bool) {
 					close(c)
 					break
 				} else {
-					c <- truncateText(strings.TrimSpace(str), 80)
+					c <- removeInvisibleChars(truncateText(strings.TrimSpace(str), 80))
 				}
 			}
 		}
@@ -43,4 +44,13 @@ func truncateText(s string, max int) string {
 		return s
 	}
 	return s[:strings.LastIndex(s[:max], " ")]
+}
+
+func removeInvisibleChars(s string) string {
+	return strings.Map(func(r rune) rune {
+		if unicode.IsGraphic(r) || unicode.IsPrint(r) {
+			return r
+		}
+		return -1
+	}, s)
 }
