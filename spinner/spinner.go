@@ -8,20 +8,31 @@ import (
 	"github.com/briandowns/spinner"
 )
 
+type SpinOptions struct {
+	// The "doing" verb. e.g. "Building"
+	Doing string
+	// The "done" verb. e.g. "Built"
+	Done string
+	// The noun on which the operation is being performed. e.g. "rocket"
+	On string
+	// Whether to use spinner is enabled or not
+	Enable bool
+}
+
 type SpinOperation func(func(io.ReadCloser, bool)) int
 
-func Spin(doing string, done string, verbose bool, operation SpinOperation) {
+func Spin(options SpinOptions, operation SpinOperation) {
 	var s *spinner.Spinner
 
-	if !verbose {
+	if !options.Enable {
 		s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		s.Color("green")
-		s.Suffix = fmt.Sprintf(" %s 'localdev' environment...", doing)
-		s.FinalMSG = fmt.Sprintf("\u2705 %s 'localdev' environment.\n", done)
+		s.Suffix = fmt.Sprintf(" %s %s...", options.On, options.Doing)
+		s.FinalMSG = fmt.Sprintf("\u2705 %s %s.\n", options.On, options.Done)
 		s.Start()
 	}
 
-	pipeSpinner := SpinnerPipe(s, fmt.Sprintf(" %s 'localdev' environment", done)+" [%s]")
+	pipeSpinner := SpinnerPipe(s, fmt.Sprintf(" %s %s", options.On, options.Done)+" [%s]")
 
 	signal := operation(pipeSpinner)
 

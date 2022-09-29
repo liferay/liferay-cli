@@ -66,7 +66,9 @@ var upCmd = &cobra.Command{
 		}
 
 		spinner.Spin(
-			"Upping", "Up", Verbose,
+			spinner.SpinOptions{
+				Doing: "Starting", Done: "Started", On: "'localdev' extension environment", Enable: Verbose,
+			},
 			func(fior func(io.ReadCloser, bool)) int {
 				return docker.InvokeCommandInLocaldev("localdev-up", config, host, false, Verbose, nil)
 			})

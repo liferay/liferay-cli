@@ -39,7 +39,9 @@ var createCmd = &cobra.Command{
 		}
 
 		spinner.Spin(
-			"Creating", "Created", Verbose,
+			spinner.SpinOptions{
+				Doing: "Creating", Done: "Created", On: "'localdev' runtime environment", Enable: Verbose,
+			},
 			func(fior func(io.ReadCloser, bool)) int {
 				return lcectldocker.InvokeCommandInLocaldev("localdev-create", config, host, true, Verbose, fior)
 			})

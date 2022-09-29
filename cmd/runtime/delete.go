@@ -39,7 +39,9 @@ var deleteCmd = &cobra.Command{
 		}
 
 		spinner.Spin(
-			"Deleting", "Deleted", Verbose,
+			spinner.SpinOptions{
+				Doing: "Deleting", Done: "Deleted", On: "'localdev' runtime environment", Enable: Verbose,
+			},
 			func(fior func(io.ReadCloser, bool)) int {
 				return lcectldocker.InvokeCommandInLocaldev("localdev-delete", config, host, true, Verbose, fior)
 			})
