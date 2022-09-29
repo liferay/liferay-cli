@@ -6,6 +6,7 @@ package config
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,7 +18,9 @@ var listCmd = &cobra.Command{
 	Short: "List all config keys and values",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		for _, key := range viper.AllKeys() {
+		keys := viper.AllKeys()
+		sort.Sort(sort.StringSlice(keys))
+		for _, key := range keys {
 			fmt.Printf("%s=%s\n", key, viper.GetString(key))
 		}
 	},
