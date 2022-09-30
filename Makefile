@@ -8,7 +8,11 @@ endif
 
 UNAME_S := $(shell uname -s)
 
-ifeq ($(UNAME_S),Darwin)
+ifeq ($(OS),Windows_NT)
+	INSTALL_DEPS=windows
+	INSTALL_SRC=bin\windows\amd64\lcectl.exe
+	INSTALL_CMD=copy $(INSTALL_SRC) "C:\Windows\" /V
+else ifeq ($(UNAME_S),Darwin)
 	INSTALL_DEPS=mac
 	INSTALL_SRC=bin/darwin/amd64/lcectl
 	INSTALL_CMD=cp $(INSTALL_SRC) /usr/local/bin/lcectl
@@ -16,10 +20,6 @@ else ifeq ($(UNAME_S),Linux)
 	INSTALL_DEPS=linux
 	INSTALL_SRC=bin/linux/amd64/lcectl
 	INSTALL_CMD=cp $(INSTALL_SRC) /usr/local/bin/lcectl
-else ifeq ($(OS),Windows_NT)
-	INSTALL_DEPS=windows
-	INSTALL_SRC=bin\windows\amd64\lcectl.exe
-	INSTALL_CMD=copy $(INSTALL_SRC) "C:\Windows\" /V
 endif
 
 all: clean build
