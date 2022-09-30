@@ -892,6 +892,12 @@ func isFastForward(s storer.EncodedObjectStorer, old, new plumbing.Hash) (bool, 
 		found = true
 		return storer.ErrStop
 	})
+
+	// Shallow clones may lead to a commit where the parent is absent
+	// resulting in plumbing.ErrObjectNotFound.
+	if err == plumbing.ErrObjectNotFound {
+		return found, nil
+	}
 	return found, err
 }
 
