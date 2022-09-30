@@ -19,7 +19,7 @@ func BuildImages(verbose bool) {
 		s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		s.Color("green")
 		s.Suffix = " Building 'localdev' images..."
-		s.FinalMSG = fmt.Sprintf("\u2705 Built 'localdev' images.\n")
+		s.FinalMSG = fmt.Sprintf("\u2705 'localdev' images built.\n")
 		s.Start()
 		defer s.Stop()
 	}
