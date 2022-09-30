@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
@@ -20,6 +21,9 @@ import (
 	"liferay.com/lcectl/prereq"
 	"liferay.com/lcectl/spinner"
 )
+
+var openBrowser bool
+var browserUrl = "http://localhost:10350/r/(all)/overview"
 
 // upCmd represents the up command
 var startCmd = &cobra.Command{
@@ -73,7 +77,15 @@ var startCmd = &cobra.Command{
 				return docker.InvokeCommandInLocaldev("localdev-up", config, host, false, Verbose, nil)
 			})
 
-		browser.OpenURL("http://localhost:10350/r/(all)/overview")
+		if openBrowser {
+			go func() {
+				time.Sleep(2 * time.Second)
+
+				browser.OpenURL(browserUrl)
+			}()
+		} else {
+			fmt.Printf("The management console can be opened at\n\t\n\t%s\n\n", browserUrl)
+		}
 	},
 }
 
@@ -86,4 +98,5 @@ func init() {
 		log.Fatalf("%s error getting working dir", err)
 	}
 	startCmd.Flags().StringVarP(&dir, "dir", "d", wd, "Set the base dir for up command")
+	startCmd.Flags().BoolVarP(&openBrowser, "browser", "b", false, "Open the browser to the management UI")
 }
