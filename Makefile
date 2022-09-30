@@ -23,16 +23,23 @@ endif
 
 all: clean build
 
+patches:
+	ifeq ($(OS),Windows_NT)
+		git apply patches\issues-305.patch --directory=vendor\github.com\go-git\go-git/v5
+	else
+		git apply patches/issues-305.patch --directory=vendor/github.com/go-git/go-git/v5
+	endif
+
 clean:
 	$(RM_CMD)
 
-linux:
+linux: patches
 	$(GO_CMD_WRAPPER) build -o bin/linux/amd64/lcectl
 
-mac:
+mac: patches
 	$(GO_CMD_WRAPPER) build -o bin/darwin/amd64/lcectl
 
-windows:
+windows: patches
 	$(GO_CMD_WRAPPER) build -o bin/windows/amd64/lcectl.exe
 
 build: linux mac windows
