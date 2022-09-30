@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/briandowns/spinner"
+	"liferay.com/lcectl/ansicolor"
 )
 
 type SpinOptions struct {
@@ -28,7 +29,7 @@ func Spin(options SpinOptions, operation SpinOperation) {
 		s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		s.Color("green")
 		s.Suffix = fmt.Sprintf(" %s %s...", options.On, options.Doing)
-		s.FinalMSG = fmt.Sprintf("\u2705 %s %s.\n", options.On, options.Done)
+		s.FinalMSG = fmt.Sprintf(ansicolor.Good+" %s %s.\n", options.On, options.Done)
 		s.Start()
 	}
 
@@ -38,7 +39,7 @@ func Spin(options SpinOptions, operation SpinOperation) {
 
 	if s != nil {
 		if signal > 0 {
-			s.FinalMSG = fmt.Sprintf("\u2718 Something went wrong...\n")
+			s.FinalMSG = fmt.Sprintf(ansicolor.Bad + " Something went wrong...\n")
 		}
 
 		s.Stop()

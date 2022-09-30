@@ -9,6 +9,7 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/spf13/viper"
 	"golang.org/x/sync/errgroup"
+	"liferay.com/lcectl/ansicolor"
 	"liferay.com/lcectl/constants"
 )
 
@@ -19,7 +20,7 @@ func BuildImages(verbose bool) {
 		s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		s.Color("green")
 		s.Suffix = " Building 'localdev' images..."
-		s.FinalMSG = fmt.Sprintf("\u2705 'localdev' images built.\n")
+		s.FinalMSG = fmt.Sprintf(ansicolor.Good + " 'localdev' images built.\n")
 		s.Start()
 		defer s.Stop()
 	}

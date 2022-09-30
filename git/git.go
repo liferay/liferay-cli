@@ -13,6 +13,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport"
 	"github.com/spf13/viper"
+	"liferay.com/lcectl/ansicolor"
 	"liferay.com/lcectl/constants"
 )
 
@@ -40,7 +41,7 @@ func SyncGit(verbose bool) {
 		s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		s.Color("green")
 		s.Suffix = " Synchronizing 'localdev' sources..."
-		s.FinalMSG = fmt.Sprintf("\u2705 Synced 'localdev' sources.\n")
+		s.FinalMSG = fmt.Sprintf(ansicolor.Good + " Synced 'localdev' sources.\n")
 		s.Start()
 		defer s.Stop()
 	}
@@ -62,7 +63,7 @@ func SyncGit(verbose bool) {
 
 		if err != nil {
 			if s != nil {
-				s.FinalMSG = fmt.Sprintf("\u2718 'localdev' sources error %s.\n", err)
+				s.FinalMSG = fmt.Sprintf(ansicolor.Bad+" 'localdev' sources error %s.\n", err)
 				s.Stop()
 				os.Exit(1)
 			} else {
@@ -71,7 +72,7 @@ func SyncGit(verbose bool) {
 		}
 
 		if s != nil {
-			s.FinalMSG = fmt.Sprintf("\u2705 Cloned 'localdev' sources to %s\n", repoDir)
+			s.FinalMSG = fmt.Sprintf(ansicolor.Good+" Cloned 'localdev' sources to %s\n", repoDir)
 		} else {
 			fmt.Printf("Cloned 'localdev' sources to %s\n", repoDir)
 		}
@@ -96,7 +97,7 @@ func SyncGit(verbose bool) {
 
 			if err == git.NoErrAlreadyUpToDate || err == transport.ErrEmptyUploadPackRequest {
 				if s != nil {
-					s.FinalMSG = fmt.Sprintf("\u2705 'localdev' sources %s.\n", git.NoErrAlreadyUpToDate)
+					s.FinalMSG = fmt.Sprintf(ansicolor.Good+" 'localdev' sources %s.\n", git.NoErrAlreadyUpToDate)
 				} else {
 					fmt.Printf("'localdev' sources %s.\n", git.NoErrAlreadyUpToDate)
 				}
@@ -105,7 +106,7 @@ func SyncGit(verbose bool) {
 			}
 
 			if s != nil {
-				s.FinalMSG = fmt.Sprintf("\u2718 'localdev' sources error %s.\n", err)
+				s.FinalMSG = fmt.Sprintf(ansicolor.Bad+" 'localdev' sources error %s.\n", err)
 				s.Stop()
 				os.Exit(1)
 			} else {
@@ -114,7 +115,7 @@ func SyncGit(verbose bool) {
 		}
 
 		if s != nil {
-			s.FinalMSG = fmt.Sprintf("\u2705 'localdev' sources updated.\n")
+			s.FinalMSG = fmt.Sprintf(ansicolor.Good + " 'localdev' sources updated.\n")
 		} else {
 			fmt.Printf("'localdev' sources updated.\n")
 		}
