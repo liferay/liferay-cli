@@ -182,10 +182,6 @@ func InvokeCommandInLocaldev(
 		log.Fatalf("Failed to create container %s: %s", containerName, err)
 	}
 
-	if verbose {
-		fmt.Printf("Created container with id: %s\n", resp.ID)
-	}
-
 	statusChan := waitExitOrRemoved(ctx, dockerClient, resp.ID, false)
 
 	err = dockerClient.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
