@@ -57,6 +57,9 @@ github.com/acomagu/bufpipe
 # github.com/briandowns/spinner v1.19.0
 ## explicit; go 1.14
 github.com/briandowns/spinner
+# github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
+## explicit
+github.com/chzyer/readline
 # github.com/cilium/ebpf v0.7.0
 ## explicit; go 1.16
 # github.com/containerd/cgroups v1.0.3
@@ -233,6 +236,11 @@ github.com/kevinburke/ssh_config
 # github.com/magiconair/properties v1.8.6
 ## explicit; go 1.13
 github.com/magiconair/properties
+# github.com/manifoldco/promptui v0.9.0
+## explicit; go 1.12
+github.com/manifoldco/promptui
+github.com/manifoldco/promptui/list
+github.com/manifoldco/promptui/screenbuf
 # github.com/marwan-at-work/mod v0.4.3
 ## explicit; go 1.14
 # github.com/mattn/go-colorable v0.1.12
