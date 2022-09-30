@@ -84,7 +84,7 @@ var startCmd = &cobra.Command{
 				browser.OpenURL(browserUrl)
 			}()
 		} else {
-			fmt.Printf("The management console can be opened at\n\t\n\t%s\n\n", browserUrl)
+			fmt.Printf("The management console can be opened at\n\t\n\t\"%s\"\n\n", browserUrl)
 		}
 	},
 }
