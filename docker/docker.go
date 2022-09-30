@@ -21,7 +21,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 
@@ -98,7 +97,7 @@ func BuildImage(
 		return err
 	}
 
-	excludes = trimBuildFilesFromExcludes(excludes, path.Join(dockerFileDir, "Dockerfile"), false)
+	excludes = trimBuildFilesFromExcludes(excludes, "Dockerfile", false)
 	buildCtx, err := archive.TarWithOptions(dockerFileDir, &archive.TarOptions{
 		ExcludePatterns: excludes,
 		ChownOpts:       &idtools.Identity{UID: 0, GID: 0},

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
 
 	"github.com/spf13/viper"
@@ -21,7 +20,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	viper.SetDefault(constants.Const.CETypesFile, filepath.ToSlash(path.Join(dirname, ".lcectl", "client-extension-types.json")))
+	viper.SetDefault(constants.Const.CETypesFile, filepath.Join(dirname, ".lcectl", "client-extension-types.json"))
 	viper.SetDefault(constants.Const.CETypesURL, "https://raw.githubusercontent.com/liferay/liferay-portal/%s/modules/apps/client-extension/client-extension-type-api/src/main/resources/com/liferay/client/extension/type/dependencies/client-extension-types.json")
 }
 

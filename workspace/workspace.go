@@ -3,7 +3,7 @@ package workspace
 import (
 	"errors"
 	"fmt"
-	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/magiconair/properties"
@@ -16,7 +16,7 @@ func GetProductVersion() (string, error) {
 	repoDir := viper.GetString(constants.Const.RepoDir)
 
 	p, err := properties.LoadFile(
-		path.Join(repoDir, "docker", "images", "localdev-server", "workspace", "gradle.properties"), properties.UTF8)
+		filepath.Join(repoDir, "docker", "images", "localdev-server", "workspace", "gradle.properties"), properties.UTF8)
 
 	if err != nil {
 		return "", err

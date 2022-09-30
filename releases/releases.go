@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
 
 	"github.com/spf13/viper"
@@ -22,7 +21,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	viper.SetDefault(constants.Const.ReleasesFile, filepath.ToSlash(path.Join(dirname, ".lcectl", "releases.json")))
+	viper.SetDefault(constants.Const.ReleasesFile, filepath.Join(dirname, ".lcectl", "releases.json"))
 	viper.SetDefault(constants.Const.ReleasesURL, "https://releases-cdn.liferay.com/tools/workspace/.product_info.json")
 }
 
