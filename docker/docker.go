@@ -68,6 +68,14 @@ func init() {
 	viper.SetDefault(constants.Const.DockerLocaldevServerImage, "localdev-server")
 }
 
+func GetDockerSocket() string {
+	if runtime.GOOS == "windows" {
+		return "//var/run/docker.sock"
+	}
+
+	return "/var/run/docker.sock"
+}
+
 func GetDockerClient() (*client.Client, error) {
 	if dockerClient != nil {
 		return dockerClient, nil

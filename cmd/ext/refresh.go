@@ -34,7 +34,7 @@ var refreshCmd = &cobra.Command{
 		host := container.HostConfig{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
-				"/var/run/docker.sock:/var/run/docker.sock",
+				docker.GetDockerSocket() + ":/var/run/docker.sock",
 				fmt.Sprintf("%s:/workspace/client-extensions", dir),
 				"localdevGradleCache:/root/.gradle",
 				"localdevLiferayCache:/root/.liferay",

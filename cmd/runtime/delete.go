@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/viper"
 
 	"liferay.com/lcectl/constants"
+	"liferay.com/lcectl/docker"
 	lcectldocker "liferay.com/lcectl/docker"
 	"liferay.com/lcectl/prereq"
 	"liferay.com/lcectl/spinner"
@@ -33,7 +34,7 @@ var deleteCmd = &cobra.Command{
 		host := container.HostConfig{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
-				"/var/run/docker.sock:/var/run/docker.sock",
+				docker.GetDockerSocket() + ":/var/run/docker.sock",
 			},
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
