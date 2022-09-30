@@ -2,12 +2,16 @@ ifeq ($(OS),Windows_NT)
 	GO_CMD_WRAPPER=gow.cmd
 	RM_CMD=if exist bin rd /s /q bin
 
+	GIT_GO_PATCH=patches\issues-305.patch
+
 	INSTALL_DEPS=windows
 	INSTALL_SRC=bin\windows\amd64\lcectl.exe
 	INSTALL_CMD=@echo off & echo ==== Copy $(INSTALL_SRC) onto your %%PATH%%, or into %windir%
 else
 	GO_CMD_WRAPPER=./gow
 	RM_CMD=rm -rf bin
+
+	GIT_GO_PATCH=patches\issues-305.patch
 
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Darwin)
@@ -24,11 +28,7 @@ endif
 all: clean build
 
 patches:
-	ifeq ($(OS),Windows_NT)
-		git apply patches\issues-305.patch --directory=vendor\github.com\go-git\go-git/v5
-	else
-		git apply patches/issues-305.patch --directory=vendor/github.com/go-git/go-git/v5
-	endif
+	git apply $(GIT_GO_PATCH) --directory=vendor/github.com/go-git/go-git/v5
 
 clean:
 	$(RM_CMD)
