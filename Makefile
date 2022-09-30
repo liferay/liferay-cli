@@ -4,7 +4,7 @@ ifeq ($(OS),Windows_NT)
 
 	INSTALL_DEPS=windows
 	INSTALL_SRC=bin\windows\amd64\lcectl.exe
-	INSTALL_CMD=copy $(INSTALL_SRC) "C:\Windows\" /V
+	INSTALL_CMD=@echo off & echo ==== Copy $(INSTALL_SRC) onto your %%PATH%%, or into %windir%
 else
 	GO_CMD_WRAPPER=./gow
 	RM_CMD=rm -rf bin
