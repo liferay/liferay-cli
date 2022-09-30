@@ -22,9 +22,9 @@ import (
 )
 
 // upCmd represents the up command
-var upCmd = &cobra.Command{
-	Use:   "up",
-	Short: "Tilts up all client-extension workloads",
+var startCmd = &cobra.Command{
+	Use:   "start",
+	Short: "Starts all client-extension workloads",
 	Long:  "Starts up localdev server including DXP server and monitors client-extension workspace to build and deploy workloads",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -78,12 +78,12 @@ var upCmd = &cobra.Command{
 }
 
 func init() {
-	upCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "enable verbose output")
-	extCmd.AddCommand(upCmd)
+	startCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "enable verbose output")
+	extCmd.AddCommand(startCmd)
 
 	wd, err := os.Getwd()
 	if err != nil {
 		log.Fatalf("%s error getting working dir", err)
 	}
-	upCmd.Flags().StringVarP(&dir, "dir", "d", wd, "Set the base dir for up command")
+	startCmd.Flags().StringVarP(&dir, "dir", "d", wd, "Set the base dir for up command")
 }
