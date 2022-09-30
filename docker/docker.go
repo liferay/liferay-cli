@@ -107,15 +107,17 @@ func BuildImage(
 		return err
 	}
 
-	progressOutput := streamformatter.NewProgressOutput(os.Stdout)
-	if !verbose {
-		progressOutput = &lastProgressOutput{output: progressOutput}
+	if verbose {
+		progressOutput := streamformatter.NewProgressOutput(os.Stdout)
+		if !verbose {
+			progressOutput = &lastProgressOutput{output: progressOutput}
+		}
+
+		buildCtx = progress.NewProgressReader(buildCtx, progressOutput, 0, "", "Sending build context to Docker daemon")
 	}
 
-	body := progress.NewProgressReader(buildCtx, progressOutput, 0, "", "Sending build context to Docker daemon")
-
 	response, err := dockerClient.ImageBuild(
-		ctx, body, types.ImageBuildOptions{
+		ctx, buildCtx, types.ImageBuildOptions{
 			Tags: []string{imageTag},
 		})
 
