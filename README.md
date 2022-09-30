@@ -132,3 +132,10 @@ See [the viper documentation here](https://github.com/spf13/viper#readme)
   * `status` - show the current login profile details
   * `deploy` - deploy an extension to a specific env
   * `delete` - delete a login profile
+
+### Notes
+
+Mounting a directory in windows:
+
+* `mkdir client-extensions`
+* `lcectl ext start --dir %cd%\client-extensions`
