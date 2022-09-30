@@ -22,9 +22,9 @@ import (
 var dir string
 
 // downCmd represents the down command
-var downCmd = &cobra.Command{
-	Use:   "down",
-	Short: "Tilts down all client-extension workloads",
+var stopCmd = &cobra.Command{
+	Use:   "stop",
+	Short: "Stops all client-extension workloads",
 	Long:  `Stops localdev server and DXP after shutting down all client-extension workloads.`,
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -56,12 +56,12 @@ var downCmd = &cobra.Command{
 }
 
 func init() {
-	downCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "enable verbose output")
-	extCmd.AddCommand(downCmd)
+	stopCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "enable verbose output")
+	extCmd.AddCommand(stopCmd)
 
 	wd, err := os.Getwd()
 	if err != nil {
 		log.Fatalf("Error getting working dir")
 	}
-	downCmd.Flags().StringVarP(&dir, "dir", "d", wd, "Set the base dir for down command")
+	stopCmd.Flags().StringVarP(&dir, "dir", "d", wd, "Set the base dir for down command")
 }
