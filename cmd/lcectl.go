@@ -28,8 +28,6 @@ import (
 	"liferay.com/lcectl/flags"
 )
 
-var cfgFile string
-
 // lcectlCmd represents the base command when called without any subcommands
 var lcectlCmd = &cobra.Command{
 	Use:              "lcectl [OPTIONS] COMMAND [ARG...]",
@@ -60,7 +58,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	lcectlCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.lcectl.yaml)")
+	lcectlCmd.PersistentFlags().StringVar(&flags.ConfigFile, "config", "", "config file (default is $HOME/.lcectl.yaml)")
 	lcectlCmd.PersistentFlags().BoolVarP(&flags.Verbose, "verbose", "v", false, "enable verbose output")
 
 	// add sub-commands
@@ -71,9 +69,9 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" {
+	if flags.ConfigFile != "" {
 		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
+		viper.SetConfigFile(flags.ConfigFile)
 	} else {
 		// Find home directory.
 		home, err := os.UserHomeDir()

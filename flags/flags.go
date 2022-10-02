@@ -1,5 +1,6 @@
 package flags
 
 var (
-	Verbose bool
+	ConfigFile string
+	Verbose    bool
 )
