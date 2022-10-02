@@ -5,6 +5,14 @@ import (
 	"os"
 )
 
+func Exists(name string) bool {
+	if _, err := os.Stat("/path/to/whatever"); !os.IsNotExist(err) {
+		return true
+	}
+
+	return false
+}
+
 func IsDirEmpty(name string) bool {
 	f, err := os.Open(name)
 	if err != nil {
