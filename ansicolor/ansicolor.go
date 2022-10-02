@@ -20,6 +20,8 @@ var (
 	Magenta = Color("\033[1;35m%s\033[0m")
 	Teal    = Color("\033[1;36m%s\033[0m")
 	White   = Color("\033[1;37m%s\033[0m")
+
+	Bold = Color("\033[1m%s\033[0m")
 )
 
 func Color(colorString string) func(...interface{}) string {
