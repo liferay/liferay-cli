@@ -7,8 +7,6 @@ package ext
 import (
 	"fmt"
 	"io"
-	"log"
-	"os"
 	"time"
 
 	"github.com/docker/docker/api/types/container"
@@ -55,7 +53,7 @@ var startCmd = &cobra.Command{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
 				docker.GetDockerSocket() + ":/var/run/docker.sock",
-				fmt.Sprintf("%s:/workspace/client-extensions", dir),
+				fmt.Sprintf("%s:/workspace/client-extensions", flags.ClientExtensionDir),
 				"localdevGradleCache:/root/.gradle",
 				"localdevLiferayCache:/root/.liferay",
 			},
@@ -92,11 +90,5 @@ var startCmd = &cobra.Command{
 
 func init() {
 	extCmd.AddCommand(startCmd)
-
-	wd, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("%s error getting working dir", err)
-	}
-	startCmd.Flags().StringVarP(&dir, "dir", "d", wd, "Set the base dir for up command")
 	startCmd.Flags().BoolVarP(&openBrowser, "browser", "b", false, "Open the browser to the management UI")
 }

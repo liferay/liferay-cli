@@ -7,8 +7,6 @@ package ext
 import (
 	"fmt"
 	"io"
-	"log"
-	"os"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
@@ -19,8 +17,6 @@ import (
 	"liferay.com/lcectl/prereq"
 	"liferay.com/lcectl/spinner"
 )
-
-var dir string
 
 // downCmd represents the down command
 var stopCmd = &cobra.Command{
@@ -39,7 +35,7 @@ var stopCmd = &cobra.Command{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
 				docker.GetDockerSocket() + ":/var/run/docker.sock",
-				fmt.Sprintf("%s:/workspace/client-extensions", dir),
+				fmt.Sprintf("%s:/workspace/client-extensions", flags.ClientExtensionDir),
 				"localdevGradleCache:/root/.gradle",
 				"localdevLiferayCache:/root/.liferay",
 			},
@@ -58,10 +54,4 @@ var stopCmd = &cobra.Command{
 
 func init() {
 	extCmd.AddCommand(stopCmd)
-
-	wd, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("Error getting working dir")
-	}
-	stopCmd.Flags().StringVarP(&dir, "dir", "d", wd, "Set the base dir for down command")
 }

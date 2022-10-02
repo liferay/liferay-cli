@@ -5,9 +5,11 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package ext
 
 import (
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
+	"liferay.com/lcectl/flags"
 )
 
 // extCmd represents the ext command
@@ -22,5 +24,11 @@ var extCmd = &cobra.Command{
 }
 
 func AddExtCmd(cmd *cobra.Command) {
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("%s error getting working dir", err)
+	}
+	extCmd.PersistentFlags().StringVarP(&flags.ClientExtensionDir, "dir", "d", wd, "Set the base dir for up command")
+
 	cmd.AddCommand(extCmd)
 }

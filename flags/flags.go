@@ -1,6 +1,7 @@
 package flags
 
 var (
-	ConfigFile string
-	Verbose    bool
+	ClientExtensionDir string
+	ConfigFile         string
+	Verbose            bool
 )
