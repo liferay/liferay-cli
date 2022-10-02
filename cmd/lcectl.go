@@ -25,6 +25,7 @@ import (
 	"liferay.com/lcectl/cmd/ext"
 	"liferay.com/lcectl/cmd/runtime"
 	"liferay.com/lcectl/docker"
+	"liferay.com/lcectl/flags"
 )
 
 var cfgFile string
@@ -60,6 +61,7 @@ func init() {
 	// will be global for your application.
 
 	lcectlCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.lcectl.yaml)")
+	lcectlCmd.PersistentFlags().BoolVarP(&flags.Verbose, "verbose", "v", false, "enable verbose output")
 
 	// add sub-commands
 	config.AddConfigCmd(lcectlCmd)

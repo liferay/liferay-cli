@@ -10,8 +10,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var Verbose bool
-
 // extCmd represents the ext command
 var extCmd = &cobra.Command{
 	Use:   "ext COMMAND [OPTIONS] [ARG...]",

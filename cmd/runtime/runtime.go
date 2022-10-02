@@ -10,8 +10,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var Verbose bool
-
 // runtimeCmd represents the runtime command
 var runtimeCmd = &cobra.Command{
 	Use:   "runtime COMMAND [OPTIONS] [ARG...]",

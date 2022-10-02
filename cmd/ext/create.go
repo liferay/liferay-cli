@@ -12,6 +12,7 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"liferay.com/lcectl/cetypes"
+	"liferay.com/lcectl/flags"
 	"liferay.com/lcectl/prereq"
 )
 
@@ -22,7 +23,7 @@ var createCmd = &cobra.Command{
 	Use:   "create [OPTIONS] [FLAGS]",
 	Short: "Creates new Client Extensions using a wizard-like interface",
 	Run: func(cmd *cobra.Command, args []string) {
-		prereq.Prereq(Verbose)
+		prereq.Prereq(flags.Verbose)
 
 		validate := func(input string) error {
 			if len(input) <= 0 {
@@ -46,7 +47,7 @@ var createCmd = &cobra.Command{
 			return
 		}
 
-		dat, err := cetypes.ClientExtensionTypeKeys(Verbose)
+		dat, err := cetypes.ClientExtensionTypeKeys(flags.Verbose)
 
 		if err != nil {
 			fmt.Printf("Error getting Client Extension Types %v\n", err)
@@ -71,6 +72,5 @@ var createCmd = &cobra.Command{
 }
 
 func init() {
-	createCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "enable verbose output")
 	extCmd.AddCommand(createCmd)
 }

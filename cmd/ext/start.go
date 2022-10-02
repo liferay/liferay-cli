@@ -18,6 +18,7 @@ import (
 	"github.com/spf13/viper"
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
+	"liferay.com/lcectl/flags"
 	"liferay.com/lcectl/prereq"
 	"liferay.com/lcectl/spinner"
 )
@@ -32,7 +33,7 @@ var startCmd = &cobra.Command{
 	Long:  "Starts up localdev server including DXP server and monitors client-extension workspace to build and deploy workloads",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		prereq.Prereq(Verbose)
+		prereq.Prereq(flags.Verbose)
 
 		tiltPort, err := nat.NewPort("tcp", "10350")
 
@@ -71,10 +72,10 @@ var startCmd = &cobra.Command{
 
 		spinner.Spin(
 			spinner.SpinOptions{
-				Doing: "Starting", Done: "Started", On: "'localdev' extension environment", Enable: Verbose,
+				Doing: "Starting", Done: "Started", On: "'localdev' extension environment", Enable: flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool)) int {
-				return docker.InvokeCommandInLocaldev("localdev-up", config, host, false, Verbose, nil)
+				return docker.InvokeCommandInLocaldev("localdev-up", config, host, false, flags.Verbose, nil)
 			})
 
 		if openBrowser {
@@ -90,7 +91,6 @@ var startCmd = &cobra.Command{
 }
 
 func init() {
-	startCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "enable verbose output")
 	extCmd.AddCommand(startCmd)
 
 	wd, err := os.Getwd()

@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/viper"
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
+	"liferay.com/lcectl/flags"
 	"liferay.com/lcectl/prereq"
 	"liferay.com/lcectl/spinner"
 )
@@ -22,7 +23,7 @@ var refreshCmd = &cobra.Command{
 	Use:   "refresh",
 	Short: "Refreshes client-extension workload resources in localdev server",
 	Run: func(cmd *cobra.Command, args []string) {
-		prereq.Prereq(Verbose)
+		prereq.Prereq(flags.Verbose)
 
 		config := container.Config{
 			Image:        "localdev-server",
@@ -44,15 +45,14 @@ var refreshCmd = &cobra.Command{
 
 		spinner.Spin(
 			spinner.SpinOptions{
-				Doing: "Refreshing", Done: "Refreshed", On: "'localdev' extension environment", Enable: Verbose,
+				Doing: "Refreshing", Done: "Refreshed", On: "'localdev' extension environment", Enable: flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool)) int {
-				return docker.InvokeCommandInLocaldev("localdev-refresh", config, host, true, Verbose, fior)
+				return docker.InvokeCommandInLocaldev("localdev-refresh", config, host, true, flags.Verbose, fior)
 			})
 	},
 }
 
 func init() {
-	refreshCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "enable verbose output")
 	extCmd.AddCommand(refreshCmd)
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/viper"
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
+	"liferay.com/lcectl/flags"
 	"liferay.com/lcectl/prereq"
 	"liferay.com/lcectl/spinner"
 )
@@ -28,7 +29,7 @@ var stopCmd = &cobra.Command{
 	Long:  `Stops localdev server and DXP after shutting down all client-extension workloads.`,
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		prereq.Prereq(Verbose)
+		prereq.Prereq(flags.Verbose)
 
 		config := container.Config{
 			Image: "localdev-server",
@@ -47,16 +48,15 @@ var stopCmd = &cobra.Command{
 
 		spinner.Spin(
 			spinner.SpinOptions{
-				Doing: "Stopping", Done: "Stopped", On: "'localdev' extension environment", Enable: Verbose,
+				Doing: "Stopping", Done: "Stopped", On: "'localdev' extension environment", Enable: flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool)) int {
-				return docker.InvokeCommandInLocaldev("localdev-down", config, host, true, Verbose, fior)
+				return docker.InvokeCommandInLocaldev("localdev-down", config, host, true, flags.Verbose, fior)
 			})
 	},
 }
 
 func init() {
-	stopCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "enable verbose output")
 	extCmd.AddCommand(stopCmd)
 
 	wd, err := os.Getwd()
