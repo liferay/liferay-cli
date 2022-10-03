@@ -2,140 +2,74 @@
 
 Tool for performing Liferay Client Extension related operations from the command line.
 
+## Prerequisits
+
+* Docker (Desktop)
+* `make` (GNU Make 3.8+, `xcode-select --install`)
+* install a git client
+* `wget` or `curl`
+
 ## Install
 
-_TODO_
+* Clone the CLI repo: `git clone https://github.com/rotty3000/lcectl $CLI_SOURCES`
+* `cd $CLI_SOURCES`
+* `make install`
 
-## Commands
+### CLI updates
+If a CLI update is required
+* return to `$CLI_SOURCES` dir
+* `git pull`
+* `make install`
 
-See `lcectl`
+## Onboarding steps
 
-## Building
+* `lcectl ext start --dir ${demodir} --browser --demo`
+* LIVE CODING IS NOW ACTIVE! --> sitting [Tilt UI](http://localhost:10350/r/(all)/overview)
 
-* install `make`
-  * Linux
-    * (Debian flavours) `sudo apt install build-essential`
-  * Windows ([Reference](https://www.technewstoday.com/install-and-use-make-in-windows/))
+### Reproducing what just happened with the `--demo` flag
+* Go to [DXP Resource](http://localhost:10350/r/dxp.localdev.me/overview)
+* Click the `dxp.localdev.me` link
+* Login (`test@dxp.localdev.me`/`test`)
+* Define the Object Definition
+* Define an Action on the Object definition (use groovy as a placeholder)
+* Create an Object defintion client extension project: `lcectl ext create --name=? --type=?`
+* Export the Object definition JSON file using the link in the Tilt UI `dxp.localdev.me` resource (e.g. `https://dxp.localdev.me/...`) and save the file into the Object defintion client extension project `src` directory
+* Create the Object action client extension project: `lcectl ext create --name=? --type=?`
+* Update the Object definition JSON in the Object defintion client extension project with the object action ID (e.g. `"objectActionExecutorKey": "function#<object-action-id>"`)
 
-    * Open the command line and run `winget install --accept-package-agreements --accept-source-agreements gnuwin32.make`
+## Onboarding steps verification
 
-    * Add `C:\Program Files (x86)\GnuWin32\bin` to the system path.
-* Run `make all`
-* to build and run do `go run main.go [command]`
+---
 
-## Running locally
+*locadev DEMO starts here*
 
-To directly run the project:
-* in linux/mac run `./gow run main.go [command]`
-* in windows run `.\gow.cmd run main.go [command]`
+* [Tilt UI](http://localhost:10350/r/(all)/overview) should show all resources are green
+  * DXP Instance
+  * object definition
+  * object action
+* Navigate to `https://dxp.localdev.me`
+* Show the Object UI (coupon) ...
+* Triggering the action by performing an operation on an object entry
+* Edit logic of action (edit java file) (image will be rebuilt and re-deployed)
+* Re-trigger action in DXP by performing an operation on an object entry and show update result of the action
 
-## Adding additional commands
+*localdev DEMO ends here*
 
-`lcectl` uses [`cobra-cli`](https://github.com/spf13/cobra-cli) for generating commands. Before being able to create new commands install `cobra-cli` (it is not required for building):
-* on linux/mac run `./gow install github.com/spf13/cobra-cli@latest`
-* on windows run `.\gow.cmd install github.com/spf13/cobra-cli@latest`
+---
 
-### Root command
-To add a root command run:
-* linux/mac:
-  ```bash
-  ./cobra-cliw add <command>
-  ```
-* windows:
-  ```bash
-  .\cobra-cliw.cmd add <command>
-  ```
+## How to customize the DXP Image used in localdev
 
-_e.g._ to add the command
-  ```bash
-  lcectl init
-  ```
-  run:
-  * linux/mac:
-    ```bash
-    ./cobra-cliw add init
-    ```
-  * windows:
-    ```bash
-    .\cobra-cliw.cmd add init
-    ```
+* Run `LOCALDEV_RESOURCES_DIR=$(lcectl config get localdev.resources.dir)` to obtain the path where localdev resources are synced
+* Edit `${LOCALDEV_RESOURCES_DIR}/docker/images/localdev-server/workspace/gradle.properties` file to set the the docker image or product key.
+* If localdev runtime is already started
+  * Run `lcectl ext refresh`
+* If localdev runtime is not already started
+  * Run `lcectl ext start`
 
+## Getting productive with Tilt
 
-### Sub-command
-To add a sub-command run:
-* linux/mac:
-  ```bash
-  ./cobra-cliw add <subcommand> -p <parent>Cmd
-  ```
-* windows:
-  ```bash
-  .\cobra-cliw.cmd add <subcommand> -p <parent>Cmd
-  ```
-
-_e.g._ to add the sub-command
-  ```bash
-  lcectl init extension
-  ```
-  run:
-  * linux/mac:
-    ```bash
-    ./cobra-cliw add extension -p initCmd
-    ```
-  * windows:
-    ```bash
-    .\cobra-cliw.cmd add extension -p initCmd
-    ```
-
-### Using cobra
-
-See [the cobra documentation here](https://github.com/spf13/cobra/blob/main/user_guide.md#using-the-cobra-library).
-
-### Using viper
-
-See [the viper documentation here](https://github.com/spf13/viper#readme)
-
-## Planned Commands
-
-#### commands
-
-* `config` - show config help **DONE**
-  * `get KEY` - get a config value **DONE**
-  * `set KEY VALUE` - set a config value **DONE**
-  * `delete KEY` - delete a value **DONE**
-  * `list` - show current keys and values **DONE**
-* `runtime` - shows runtime help
-  * `create` - creates (if not already) and starts (if not already) the runtime **DONE**
-    * `-n|--no-start`
-    * `-v|--verbose` **DONE**
-  * `start` - starts already created runtime
-  * `stop` - stops the runtime without deleting it **DONE**
-    * `-v|--verbose` **DONE**
-  * `delete` - deletes the runtime and all resources **DONE**
-    * `-v|--verbose` **DONE**
-  * `status` - shows the status of runtime resources
-* `ext(ension)` - (context/directory sensitive) shows extension help
-  * `create` - create a new extension using a wizard
-  * `build [extension]` - build extention(s)
-  * `up` - brings up the extension(s) watcher (requires a running runtime) **DONE**
-    * `-b|--browser` - (default is false) opens the browser
-    * `-s|--stream` - (default is false) stay connected to streamed logs
-    * `-v|--verbose` **DONE**
-  * `down` - brings down the extension(s) watcher (requires a running runtime) **DONE**
-    * `-v|--verbose` **DONE**
-  * `refresh` - (temporary) until we have a live refresh **DONE**
-    * `-v|--verbose` **DONE**
-  * `status` - shows the status of extensions
-    * `-w|--watch`
-* `lxc/auth` - shows lxc help
-  * `login` - login to an lxc account, creates the profile if not already present
-  * `logout` - logout of the lxc account
-  * `status` - show the current login profile details
-  * `deploy` - deploy an extension to a specific env
-  * `delete` - delete a login profile
-
-### Notes
-
-Mounting a directory in windows:
-
-* `mkdir client-extensions`
-* `lcectl ext start --dir %cd%\client-extensions`
+* show logs
+* refreshing resources
+* disabling resources
+* status bars
+* ...
