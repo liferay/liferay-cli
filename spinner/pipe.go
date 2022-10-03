@@ -6,10 +6,11 @@ import (
 	"io"
 	"os"
 	"strings"
-	"unicode"
 
 	"github.com/briandowns/spinner"
 	"github.com/docker/docker/pkg/stdcopy"
+	"liferay.com/lcectl/ansicolor"
+	"liferay.com/lcectl/docker"
 )
 
 func SpinnerPipe(s *spinner.Spinner, prefix string) func(io.ReadCloser, bool) {
@@ -21,18 +22,25 @@ func SpinnerPipe(s *spinner.Spinner, prefix string) func(io.ReadCloser, bool) {
 			go func() {
 				for {
 					msg := <-c
-					s.Suffix = fmt.Sprintf(prefix, msg)
+					if msg != "" {
+						s.FinalMSG = msg
+						s.Suffix = fmt.Sprintf(prefix, truncateText(msg, 80))
+					}
 				}
 			}()
 
 			reader := bufio.NewReader(out)
 			for {
-				str, err := reader.ReadString('\n')
+				bytes, _, err := reader.ReadLine()
+
 				if err != nil {
 					close(c)
 					break
 				} else {
-					c <- removeInvisibleChars(truncateText(strings.TrimSpace(str), 80))
+					c <- ansicolor.StripCodes(
+						strings.TrimSpace(
+							string(
+								docker.TrimLogHeader(bytes))))
 				}
 			}
 		}
@@ -44,13 +52,4 @@ func truncateText(s string, max int) string {
 		return s
 	}
 	return s[:strings.LastIndex(s[:max], " ")]
-}
-
-func removeInvisibleChars(s string) string {
-	return strings.Map(func(r rune) rune {
-		if unicode.IsGraphic(r) || unicode.IsPrint(r) {
-			return r
-		}
-		return -1
-	}, s)
 }

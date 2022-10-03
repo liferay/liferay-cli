@@ -29,7 +29,6 @@ func Spin(options SpinOptions, operation SpinOperation) {
 		s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		s.Color("green")
 		s.Suffix = fmt.Sprintf(" %s %s...", options.On, options.Doing)
-		s.FinalMSG = fmt.Sprintf(ansicolor.Good+" %s %s.\n", options.On, options.Done)
 		s.Start()
 	}
 
@@ -38,9 +37,17 @@ func Spin(options SpinOptions, operation SpinOperation) {
 	signal := operation(pipeSpinner)
 
 	if s != nil {
-		if signal > 0 {
-			s.FinalMSG = fmt.Sprintf(ansicolor.Bad + " Something went wrong...\n")
+		mark := ansicolor.Good
+		msg := options.On + " " + options.Done + "."
+
+		if s.FinalMSG != "" {
+			if signal > 0 {
+				mark = ansicolor.Bad
+			}
+			msg = s.FinalMSG
 		}
+
+		s.FinalMSG = fmt.Sprintf(mark+" %s\n", msg)
 
 		s.Stop()
 	}
