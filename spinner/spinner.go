@@ -32,7 +32,7 @@ func Spin(options SpinOptions, operation SpinOperation) {
 		s.Start()
 	}
 
-	pipeSpinner := SpinnerPipe(s, fmt.Sprintf(" %s %s", options.On, options.Done)+" [%s]")
+	pipeSpinner := SpinnerPipe(s, fmt.Sprintf(" %s %s", options.On, options.Doing)+" [%s]")
 
 	signal := operation(pipeSpinner)
 
