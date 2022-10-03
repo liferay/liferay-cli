@@ -1,5 +1,5 @@
 ## Stuff for Ray and Greg to do
-  * make dir flag creation relative to home if relative path
+  * DONE make dir flag creation relative to home if relative path
   * runtime status
   * `lcectl ext start` should create/start runtime
   * add persist the dir flag value if passed on command
