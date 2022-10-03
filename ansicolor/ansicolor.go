@@ -1,6 +1,9 @@
 package ansicolor
 
-import "fmt"
+import (
+	"fmt"
+	"regexp"
+)
 
 var (
 	Info  = Green
@@ -30,4 +33,12 @@ func Color(colorString string) func(...interface{}) string {
 			fmt.Sprint(args...))
 	}
 	return sprint
+}
+
+const ansi = "[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))"
+
+var re = regexp.MustCompile(ansi)
+
+func StripCodes(input string) string {
+	return re.ReplaceAllString(input, "")
 }
