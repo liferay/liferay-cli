@@ -36,6 +36,14 @@
       "mode": "debug",
       "program": "main.go",
       "args": ["ext", "create"]
+    },
+    {
+      "name": "lcectl ext create -d foo",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "main.go",
+      "args": ["ext", "create", "-d", "foo"]
     }
   ],
   "inputs": [

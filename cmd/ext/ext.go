@@ -30,8 +30,20 @@ var extCmd = &cobra.Command{
 		os.Exit(0)
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		var specifiedDir string
+
+		dirFlag := cmd.Flags().Lookup("dir")
+
+		if dirFlag != nil && dirFlag.Changed {
+			specifiedDir = dirFlag.Value.String()
+		}
+
 		if !viper.GetBool(constants.Const.ExtClientExtensionDirSpecified) {
-			confirmUseOfDefaultDir()
+			specifiedDir = confirmUseOfDefaultDir()
+		}
+
+		if specifiedDir != "" {
+			setClientExtensionDir(specifiedDir)
 		}
 	},
 }
@@ -47,12 +59,12 @@ func init() {
 
 func AddExtCmd(cmd *cobra.Command) {
 	extCmd.PersistentFlags().StringVarP(&flags.ClientExtensionDir, "dir", "d", viper.GetString(constants.Const.ExtClientExtensionDir), "Set the base dir for up command")
-	viper.BindPFlag("dir", extCmd.Flags().Lookup(constants.Const.ExtClientExtensionDir))
+	viper.BindPFlag("dir", extCmd.Flags().Lookup("dir"))
 
 	cmd.AddCommand(extCmd)
 }
 
-func confirmUseOfDefaultDir() {
+func confirmUseOfDefaultDir() string {
 	fmt.Println(ansicolor.Bold("It looks like the default Client Extension directory was never specified. The current default is"), flags.ClientExtensionDir)
 
 	if !lio.IsDirEmpty(flags.ClientExtensionDir) {
@@ -76,7 +88,7 @@ func confirmUseOfDefaultDir() {
 	result, err := useDefaultDirPrompt.Run()
 
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	if result == "" || result == "N" || result == "n" {
@@ -97,34 +109,44 @@ func confirmUseOfDefaultDir() {
 		result, err = clientExtenionDirPrompt.Run()
 
 		if err != nil {
-			fmt.Println(err)
+			log.Fatal(err)
 		}
 
-		if !filepath.IsAbs(result) {
-			dirname, err := os.UserHomeDir()
-
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			result = filepath.Join(dirname, result)
-		}
-
-		if !lio.Exists(result) {
-			err = os.MkdirAll(result, 0644)
-
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-
-		fmt.Println("Specified directory is ", result)
-
-		viper.Set(constants.Const.ExtClientExtensionDir, result)
-
-		flags.ClientExtensionDir = result
+		return result
 	}
 
-	viper.Set(constants.Const.ExtClientExtensionDirSpecified, true)
-	viper.WriteConfig()
+	return ""
+}
+
+func setClientExtensionDir(dir string) {
+	if !filepath.IsAbs(dir) {
+		dirname, err := os.UserHomeDir()
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		dir = filepath.Join(dirname, dir)
+	}
+
+	if !lio.Exists(dir) {
+		err := os.MkdirAll(dir, 0644)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	currentDir := viper.GetString(constants.Const.ExtClientExtensionDir)
+
+	if dir != currentDir {
+		fmt.Println("Specified Client Extension directory is ", dir)
+
+		viper.Set(constants.Const.ExtClientExtensionDir, dir)
+
+		flags.ClientExtensionDir = dir
+
+		viper.Set(constants.Const.ExtClientExtensionDirSpecified, true)
+		viper.WriteConfig()
+	}
 }
