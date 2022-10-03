@@ -35,8 +35,6 @@ var extCmd = &cobra.Command{
 		}
 
 		fmt.Println("CEDir:", flags.ClientExtensionDir)
-
-		os.Exit(0)
 	},
 }
 
