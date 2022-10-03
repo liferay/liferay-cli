@@ -46,6 +46,7 @@ func SyncGit(verbose bool) {
 	}
 
 	repoDir := viper.GetString(constants.Const.RepoDir)
+	remoteUrl := viper.GetString(constants.Const.RepoRemote)
 	repo, err := git.PlainOpen(repoDir)
 
 	cloned := false
@@ -57,7 +58,7 @@ func SyncGit(verbose bool) {
 			Depth:        1,
 			RemoteName:   "origin",
 			SingleBranch: true,
-			URL:          viper.GetString(constants.Const.RepoRemote),
+			URL:          remoteUrl,
 		})
 
 		if err != nil {
@@ -77,6 +78,19 @@ func SyncGit(verbose bool) {
 		}
 
 		cloned = true
+	}
+
+	remote, err := repo.Remote("origin")
+
+	if err != nil {
+		log.Fatalf("'localdev' sources error %s.\n", err)
+	}
+
+	if remote.Config().URLs[0] != remoteUrl {
+		remote.Config().URLs[0] = remoteUrl
+		config := remote.Config()
+		repo.DeleteRemote("origin")
+		repo.CreateRemote(config)
 	}
 
 	if !cloned {

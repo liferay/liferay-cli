@@ -13,21 +13,20 @@
       "args": ["runtime", "create"]
     },
     {
-      "name": "lcectl ext refresh -v",
-      "type": "go",
-      "request": "launch",
-      "mode": "debug",
-      "program": "main.go",
-      "args": ["ext", "refresh", "-v"],
-      "cwd": "${input:workspacePath}"
-    },
-    {
       "name": "lcectl runtime stop -v",
       "type": "go",
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
       "args": ["runtime", "stop", "-v"]
+    },
+    {
+      "name": "lcectl runtime status -v",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "main.go",
+      "args": ["runtime", "status", "-v"]
     },
     {
       "name": "lcectl ext create",
@@ -44,6 +43,15 @@
       "mode": "debug",
       "program": "main.go",
       "args": ["ext", "create", "-d", "foo"]
+    },
+    {
+      "name": "lcectl ext refresh -v",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "main.go",
+      "args": ["ext", "refresh", "-v"],
+      "cwd": "${input:workspacePath}"
     }
   ],
   "inputs": [
