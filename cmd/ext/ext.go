@@ -33,8 +33,6 @@ var extCmd = &cobra.Command{
 		if !viper.GetBool(constants.Const.ExtClientExtensionDirSpecified) {
 			confirmUseOfDefaultDir()
 		}
-
-		fmt.Println("CEDir:", flags.ClientExtensionDir)
 	},
 }
 
