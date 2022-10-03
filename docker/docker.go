@@ -38,6 +38,25 @@ import (
 	"liferay.com/lcectl/constants"
 )
 
+var (
+	STDIN  = [4]byte{0, 0, 0, 0}
+	STDOUT = [4]byte{1, 0, 0, 0}
+	STDERR = [4]byte{2, 0, 0, 0}
+)
+
+func TrimLogHeader(bytes []byte) []byte {
+	header := *(*[4]byte)(bytes[0:4])
+
+	if header == STDIN ||
+		header == STDOUT ||
+		header == STDERR {
+
+		bytes = bytes[8:]
+	}
+
+	return bytes
+}
+
 // lastProgressOutput is the same as progress.Output except
 // that it only output with the last update. It is used in
 // non terminal scenarios to suppress verbose messages
