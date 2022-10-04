@@ -76,19 +76,23 @@ var startCmd = &cobra.Command{
 				return docker.InvokeCommandInLocaldev("localdev-extension-runtime", config, host, false, flags.Verbose, nil)
 			})
 
-		if openBrowser {
-			go func() {
-				time.Sleep(2 * time.Second)
-
-				browser.OpenURL(browserUrl)
-			}()
-		} else {
-			fmt.Printf("The management console can be opened at\n\t\n\t\"%s\"\n\n", browserUrl)
-		}
+		doBrowser()
 	},
 }
 
 func init() {
 	extCmd.AddCommand(startCmd)
 	startCmd.Flags().BoolVarP(&openBrowser, "browser", "b", false, "Open the browser to the management UI")
+}
+
+func doBrowser() {
+	if openBrowser {
+		go func() {
+			time.Sleep(2 * time.Second)
+
+			browser.OpenURL(browserUrl)
+		}()
+	} else {
+		fmt.Printf("The management console can be opened at\n\t\n\t\"%s\"\n\n", browserUrl)
+	}
 }
