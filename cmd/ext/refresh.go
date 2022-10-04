@@ -26,11 +26,8 @@ var refreshCmd = &cobra.Command{
 		prereq.Prereq(flags.Verbose)
 
 		config := container.Config{
-			Image:        "localdev-server",
-			Cmd:          []string{"/repo/scripts/ext/refresh.sh"},
-			AttachStdout: true,
-			AttachStderr: true,
-			Tty:          true,
+			Image: "localdev-server",
+			Cmd:   []string{"/repo/scripts/ext/refresh.sh"},
 		}
 		host := container.HostConfig{
 			Binds: []string{
