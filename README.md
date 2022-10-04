@@ -23,7 +23,7 @@ If a CLI update is required
 
 ## Onboarding steps
 
-* `lcectl ext start --dir ${demodir} --browser --demo`
+* `lcectl ext start -d ${demodir} -b --demo`
 * LIVE CODING IS NOW ACTIVE! --> sitting [Tilt UI](http://localhost:10350/r/(all)/overview)
 
 ### Reproducing what just happened with the `--demo` flag
@@ -48,7 +48,7 @@ If a CLI update is required
   * object definition
   * object action
 * Navigate to `https://dxp.localdev.me`
-* Show the Object UI (coupon) ...
+* Show the Object UI (Firebase-like storage engine)
 * Triggering the action by performing an operation on an object entry
 * Edit logic of action (edit java file) (image will be rebuilt and re-deployed)
 * Re-trigger action in DXP by performing an operation on an object entry and show update result of the action

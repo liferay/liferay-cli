@@ -1,14 +1,14 @@
 ## Stuff for Ray and Greg to do
   * DONE make dir flag creation relative to home if relative path
   * DONE runtime status
+  * DONE add persist the dir flag value if passed on command
   * ext status
   * `lcectl ext start` should create/start runtime
-  * DONEadd persist the dir flag value if passed on command
-  * take care of checking dnsmasq to see if it's working
-  * rename (`repo`) the config properties to `localdev.resources.*`
   * make Tilt rebuild DXP on refresh
   * parameterise docker build
   * parameterise tilt build
+  * rename (`repo`) the config properties to `localdev.resources.*`
+  * take care of checking dnsmasq to see if it's working
 
 ## Building
 
