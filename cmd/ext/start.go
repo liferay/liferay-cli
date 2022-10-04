@@ -103,7 +103,11 @@ var startCmd = &cobra.Command{
 				Doing: "Starting", Done: "started", On: "'localdev' extension environment", Enable: !flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool)) int {
-				return docker.InvokeCommandInLocaldev(containerName, config, host, false, flags.Verbose, fior)
+				useFior := fior
+				if !flags.Verbose {
+					useFior = nil
+				}
+				return docker.InvokeCommandInLocaldev(containerName, config, host, false, flags.Verbose, useFior)
 			})
 
 		doBrowser()
