@@ -45,6 +45,10 @@ var (
 )
 
 func TrimLogHeader(bytes []byte) []byte {
+	if len(bytes) <= 8 {
+		return bytes
+	}
+
 	header := *(*[4]byte)(bytes[0:4])
 
 	if header == STDIN ||
