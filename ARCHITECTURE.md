@@ -2,7 +2,7 @@
   * DONE make dir flag creation relative to home if relative path
   * DONE runtime status
   * DONE add persist the dir flag value if passed on command
-  * ext status
+  * DONE ext status
   * `lcectl ext start` should create/start runtime
   * make Tilt rebuild DXP on refresh
   * parameterise docker build
