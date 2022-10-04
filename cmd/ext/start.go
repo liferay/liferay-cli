@@ -5,15 +5,19 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package ext
 
 import (
+	"context"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"liferay.com/lcectl/ansicolor"
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
 	"liferay.com/lcectl/flags"
@@ -32,6 +36,32 @@ var startCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		prereq.Prereq(flags.Verbose)
+
+		dockerClient, err := docker.GetDockerClient()
+
+		if err != nil {
+			log.Fatalf("%s getting dockerclient", err)
+		}
+
+		ctx := context.Background()
+
+		containers, err := dockerClient.ContainerList(ctx, types.ContainerListOptions{All: true})
+		if err != nil {
+			log.Printf("%s error listing containers\n", err)
+		}
+
+		containerName := "localdev-extension-runtime"
+
+		// if we're already running, short circuit startup
+		for _, container := range containers {
+			for _, name := range container.Names {
+				if name == "/"+containerName && container.State == "running" {
+					fmt.Println(ansicolor.Good + " 'localdev' extension environment is running.")
+					doBrowser()
+					return
+				}
+			}
+		}
 
 		tiltPort, err := nat.NewPort("tcp", "10350")
 
@@ -73,7 +103,7 @@ var startCmd = &cobra.Command{
 				Doing: "Starting", Done: "started", On: "'localdev' extension environment", Enable: flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool)) int {
-				return docker.InvokeCommandInLocaldev("localdev-extension-runtime", config, host, false, flags.Verbose, nil)
+				return docker.InvokeCommandInLocaldev(containerName, config, host, false, flags.Verbose, nil)
 			})
 
 		doBrowser()
