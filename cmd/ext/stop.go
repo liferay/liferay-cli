@@ -29,7 +29,7 @@ var stopCmd = &cobra.Command{
 
 		config := container.Config{
 			Image: "localdev-server",
-			Cmd:   []string{"/repo/scripts/ext/down.sh"},
+			Cmd:   []string{"/repo/scripts/ext/stop.sh"},
 		}
 		host := container.HostConfig{
 			Binds: []string{

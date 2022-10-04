@@ -46,7 +46,7 @@ var startCmd = &cobra.Command{
 
 		config := container.Config{
 			Image:        "localdev-server",
-			Cmd:          []string{"/repo/scripts/ext/up.sh"},
+			Cmd:          []string{"/repo/scripts/ext/start.sh"},
 			ExposedPorts: exposedPorts,
 		}
 		host := container.HostConfig{
@@ -73,7 +73,7 @@ var startCmd = &cobra.Command{
 				Doing: "Starting", Done: "started", On: "'localdev' extension environment", Enable: flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool)) int {
-				return docker.InvokeCommandInLocaldev("localdev-up", config, host, false, flags.Verbose, nil)
+				return docker.InvokeCommandInLocaldev("localdev-extension-runtime", config, host, false, flags.Verbose, nil)
 			})
 
 		if openBrowser {
