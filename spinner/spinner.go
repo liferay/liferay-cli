@@ -25,7 +25,7 @@ type SpinOperation func(func(io.ReadCloser, bool)) int
 func Spin(options SpinOptions, operation SpinOperation) {
 	var s *spinner.Spinner
 
-	if !options.Enable {
+	if options.Enable {
 		s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		s.Color("green")
 		s.Suffix = fmt.Sprintf(" %s %s...", options.On, options.Doing)

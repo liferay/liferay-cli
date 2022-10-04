@@ -100,7 +100,7 @@ var startCmd = &cobra.Command{
 
 		spinner.Spin(
 			spinner.SpinOptions{
-				Doing: "Starting", Done: "started", On: "'localdev' extension environment", Enable: flags.Verbose,
+				Doing: "Starting", Done: "started", On: "'localdev' extension environment", Enable: !flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool)) int {
 				return docker.InvokeCommandInLocaldev(containerName, config, host, false, flags.Verbose, nil)
