@@ -180,7 +180,7 @@ func InvokeCommandInLocaldev(
 
 	ctx := context.Background()
 
-	containers, err := dockerClient.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	containers, err := dockerClient.ContainerList(ctx, types.ContainerListOptions{All: true})
 	if err != nil {
 		log.Printf("%s error listing containers\n", err)
 	}
