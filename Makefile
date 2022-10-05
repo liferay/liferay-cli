@@ -25,6 +25,9 @@ else
 	endif
 endif
 
+VERSION=$(shell git describe --match 'v[0-9]*' --dirty='.m' --always --tags | sed 's/^v//' 2>/dev/null || echo "unknown-version")
+GO_LDFLAGS="-X 'liferay.com/lcectl/cmd.Version=$(VERSION)'"
+
 all: clean build
 
 patches:
@@ -34,13 +37,13 @@ clean:
 	$(RM_CMD)
 
 linux: patches
-	$(GO_CMD_WRAPPER) build -o bin/linux/amd64/lcectl
+	$(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/linux/amd64/lcectl
 
 mac: patches
-	$(GO_CMD_WRAPPER) build -o bin/darwin/amd64/lcectl
+	$(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/darwin/amd64/lcectl
 
 windows: patches
-	$(GO_CMD_WRAPPER) build -o bin/windows/amd64/lcectl.exe
+	$(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/windows/amd64/lcectl.exe
 
 build: linux mac windows
 

@@ -28,12 +28,15 @@ import (
 	"liferay.com/lcectl/flags"
 )
 
+var Version = "development"
+
 // lcectlCmd represents the base command when called without any subcommands
 var lcectlCmd = &cobra.Command{
 	Use:              "lcectl [OPTIONS] COMMAND [ARG...]",
 	Short:            "Tool for performing Liferay Client Extension related operations",
 	SilenceErrors:    true,
 	TraverseChildren: true,
+	Version:          Version,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
