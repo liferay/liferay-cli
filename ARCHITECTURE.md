@@ -3,12 +3,12 @@
   * DONE runtime status
   * DONE add persist the dir flag value if passed on command
   * DONE ext status
-  * `lcectl ext start` should create/start runtime
+  * DONE `lcectl ext start` should create/start runtime
   * make Tilt rebuild DXP on refresh
   * parameterise docker build
   * parameterise tilt build
-  * rename (`repo`) the config properties to `localdev.resources.*`
-  * take care of checking dnsmasq to see if it's working
+  * DONE rename (`repo`) the config properties to `localdev.resources.*`
+  * DONE take care of checking dnsmasq to see if it's working
 
 ## Building
 
