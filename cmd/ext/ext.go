@@ -35,11 +35,9 @@ var extCmd = &cobra.Command{
 
 		dirFlag := cmd.Flags().Lookup("dir")
 
-		if dirFlag != nil && dirFlag.Changed {
+		if dirFlag != nil {
 			specifiedDir = dirFlag.Value.String()
-		}
-
-		if !viper.GetBool(constants.Const.ExtClientExtensionDirSpecified) {
+		} else if !viper.GetBool(constants.Const.ExtClientExtensionDirSpecified) {
 			specifiedDir = confirmUseOfDefaultDir()
 		}
 
