@@ -4,11 +4,12 @@
   * DONE add persist the dir flag value if passed on command
   * DONE ext status
   * DONE `lcectl ext start` should create/start runtime
-  * make Tilt rebuild DXP on refresh
-  * parameterise docker build
-  * parameterise tilt build
+  * DONE make Tilt rebuild DXP on refresh
   * DONE rename (`repo`) the config properties to `localdev.resources.*`
   * DONE take care of checking dnsmasq to see if it's working
+  * parameterise docker build
+  * parameterise tilt build
+  * add support for globs in the runtime: watch: client extension properties
 
 ## Building
 
