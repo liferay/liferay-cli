@@ -12,9 +12,10 @@ import (
 
 // configCmd represents the config command
 var configCmd = &cobra.Command{
-	Use:   "config COMMAND [OPTIONS] [ARG...]",
-	Short: "Operations for configuration of lcectl",
-	Args:  cobra.NoArgs,
+	Use:     "config COMMAND [OPTIONS] [ARG...]",
+	Short:   "Operations for configuration of lcectl",
+	Aliases: []string{"cfg"},
+	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 		os.Exit(0)

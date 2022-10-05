@@ -22,9 +22,10 @@ import (
 
 // extCmd represents the ext command
 var extCmd = &cobra.Command{
-	Use:   "ext COMMAND [OPTIONS] [ARG...]",
-	Short: "Operations to control client extension builds",
-	Args:  cobra.NoArgs,
+	Use:     "extension COMMAND [OPTIONS] [ARG...]",
+	Short:   "Operations to control extension environment",
+	Aliases: []string{"ext"},
+	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 		os.Exit(0)
