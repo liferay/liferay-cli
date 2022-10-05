@@ -26,8 +26,8 @@ var Const = struct {
 	ReleasesEtag:                   "releases.etag",
 	ReleasesFile:                   "releases.file",
 	ReleasesURL:                    "releases.url",
-	RepoDir:                        "repo.dir",
-	RepoRemote:                     "repo.remote",
-	RepoBranch:                     "repo.branch",
-	RepoSync:                       "repo.sync",
+	RepoDir:                        "localdev.resources.dir",
+	RepoRemote:                     "localdev.resources.remote",
+	RepoBranch:                     "localdev.resources.branch",
+	RepoSync:                       "localdev.resources.sync",
 }
