@@ -33,63 +33,6 @@ To directly run the project:
 * in linux/mac run `./gow run main.go [command]`
 * in windows run `.\gow.cmd run main.go [command]`
 
-## Adding additional commands
-
-`lcectl` uses [`cobra-cli`](https://github.com/spf13/cobra-cli) for generating commands. Before being able to create new commands install `cobra-cli` (it is not required for building):
-* on linux/mac run `./gow install github.com/spf13/cobra-cli@latest`
-* on windows run `.\gow.cmd install github.com/spf13/cobra-cli@latest`
-
-### Root command
-To add a root command run:
-* linux/mac:
-  ```bash
-  ./cobra-cliw add <command>
-  ```
-* windows:
-  ```bash
-  .\cobra-cliw.cmd add <command>
-  ```
-
-_e.g._ to add the command
-  ```bash
-  lcectl init
-  ```
-  run:
-  * linux/mac:
-    ```bash
-    ./cobra-cliw add init
-    ```
-  * windows:
-    ```bash
-    .\cobra-cliw.cmd add init
-    ```
-
-
-### Sub-command
-To add a sub-command run:
-* linux/mac:
-  ```bash
-  ./cobra-cliw add <subcommand> -p <parent>Cmd
-  ```
-* windows:
-  ```bash
-  .\cobra-cliw.cmd add <subcommand> -p <parent>Cmd
-  ```
-
-_e.g._ to add the sub-command
-  ```bash
-  lcectl init extension
-  ```
-  run:
-  * linux/mac:
-    ```bash
-    ./cobra-cliw add extension -p initCmd
-    ```
-  * windows:
-    ```bash
-    .\cobra-cliw.cmd add extension -p initCmd
-    ```
-
 ### Using cobra
 
 See [the cobra documentation here](https://github.com/spf13/cobra/blob/main/user_guide.md#using-the-cobra-library).
@@ -141,8 +84,10 @@ See [the viper documentation here](https://github.com/spf13/viper#readme)
 
 Mounting a directory in windows:
 
-* `mkdir client-extensions`
-* `lcectl ext start --dir %cd%\client-extensions`
+```bash
+mkdir client-extensions
+lcectl ext start --dir %cd%\client-extensions
+```
 
 ### Built in demo
 
