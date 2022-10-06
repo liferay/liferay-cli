@@ -40,13 +40,13 @@ clean:
 	$(RM_CMD)
 
 linux: patches
-	$(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/linux/amd64/lcectl
+	GOOS=linux GOARCH=amd64 $(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/linux/amd64/lcectl
 
 mac: patches
-	$(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/darwin/amd64/lcectl
+	GOOS=darwin GOARCH=amd64 $(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/darwin/amd64/lcectl
 
 windows: patches
-	$(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/windows/amd64/lcectl.exe
+	GOOS=windows GOARCH=amd64 $(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/windows/amd64/lcectl.exe
 
 build: linux mac windows
 
