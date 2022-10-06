@@ -1,7 +1,7 @@
 ifeq ($(OS),Windows_NT)
 	GO_CMD_WRAPPER=gow.cmd
 	RM_CMD=if exist bin rd /s /q bin
-	
+
 	VERSION=$(shell git describe --match 'v[0-9]*' --dirty=.m --always --tags || echo "unknown-version")
 	GO_LDFLAGS="-X 'liferay.com/lcectl/cmd.Version=$(VERSION)'"
 
@@ -13,7 +13,7 @@ ifeq ($(OS),Windows_NT)
 else
 	GO_CMD_WRAPPER=./gow
 	RM_CMD=rm -rf bin
-	
+
 	VERSION=$(shell git describe --match 'v[0-9]*' --dirty='.m' --always --tags | sed 's/^v//' 2>/dev/null || echo "unknown-version")
 	GO_LDFLAGS="-X 'liferay.com/lcectl/cmd.Version=$(VERSION)'"
 
@@ -45,10 +45,13 @@ linux: patches
 mac: patches
 	GOOS=darwin GOARCH=amd64 $(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/darwin/amd64/lcectl
 
+mac_m1: patches
+	GOOS=darwin GOARCH=arm64 $(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/darwin/arm64/lcectl
+
 windows: patches
 	GOOS=windows GOARCH=amd64 $(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/windows/amd64/lcectl.exe
 
-build: linux mac windows
+build: linux mac mac_m1 windows
 
 install: $(INSTALL_DEPS)
 	$(INSTALL_CMD)
