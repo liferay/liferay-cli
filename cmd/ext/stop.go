@@ -46,8 +46,8 @@ var stopCmd = &cobra.Command{
 			spinner.SpinOptions{
 				Doing: "Stopping", Done: "stopped", On: "'localdev' extension environment", Enable: !flags.Verbose,
 			},
-			func(fior func(io.ReadCloser, bool)) int {
-				return docker.InvokeCommandInLocaldev("localdev-down", config, host, true, flags.Verbose, fior)
+			func(fior func(io.ReadCloser, bool, string) int) int {
+				return docker.InvokeCommandInLocaldev("localdev-down", config, host, true, flags.Verbose, fior, "")
 			})
 	},
 }

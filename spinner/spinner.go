@@ -20,7 +20,7 @@ type SpinOptions struct {
 	Enable bool
 }
 
-type SpinOperation func(func(io.ReadCloser, bool)) int
+type SpinOperation func(func(io.ReadCloser, bool, string) int) int
 
 func Spin(options SpinOptions, operation SpinOperation) {
 	var s *spinner.Spinner

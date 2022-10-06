@@ -102,12 +102,8 @@ var startCmd = &cobra.Command{
 			spinner.SpinOptions{
 				Doing: "Starting", Done: "started", On: "'localdev' extension environment", Enable: !flags.Verbose,
 			},
-			func(fior func(io.ReadCloser, bool)) int {
-				useFior := fior
-				if !flags.Verbose {
-					useFior = nil
-				}
-				return docker.InvokeCommandInLocaldev(containerName, config, host, false, flags.Verbose, useFior)
+			func(fior func(io.ReadCloser, bool, string) int) int {
+				return docker.InvokeCommandInLocaldev(containerName, config, host, false, flags.Verbose, fior, "^Tilt started .*")
 			})
 
 		doBrowser()

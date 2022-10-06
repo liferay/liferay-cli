@@ -44,8 +44,8 @@ var statusCmd = &cobra.Command{
 			spinner.SpinOptions{
 				Doing: "Status", Done: "is running", On: "'localdev' extension environment", Enable: !flags.Verbose,
 			},
-			func(fior func(io.ReadCloser, bool)) int {
-				return docker.InvokeCommandInLocaldev("localdev-status", config, host, true, flags.Verbose, fior)
+			func(fior func(io.ReadCloser, bool, string) int) int {
+				return docker.InvokeCommandInLocaldev("localdev-status", config, host, true, flags.Verbose, fior, "")
 			})
 	},
 }
