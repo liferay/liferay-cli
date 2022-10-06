@@ -23,7 +23,12 @@ If a CLI update is required
 
 ## Onboarding steps
 
-* `lcectl ext start -d ${demodir} -b --demo`
+* Install the developer ROOT CA into your browser
+  * We add a ROOT cert in order to support a self signed certificate for *.localdev.me so that as we add new client extensions we can give them valid "local" domains.
+  * **Chrome:** Settings  > Privacy and security > Security > Manage Certificates > Authorities > Import > `$HOME/.lcectl/sources/localdev/k8s/tls/ca.crt`
+  * **Firefox:** Settings > Privacy & Security > Security > View Certificates... > Authorities > Import > `$HOME/.lcectl/sources/localdev/k8s/tls/ca.crt`
+* linux/mac: `lcectl ext start -d ${demodir} -b --demo`
+* windows: ``
 * LIVE CODING IS NOW ACTIVE! --> sitting [Tilt UI](http://localhost:10350/r/(all)/overview)
 
 ### Reproducing what just happened with the `--demo` flag
