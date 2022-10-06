@@ -148,7 +148,8 @@ func BuildImage(
 
 	response, err := dockerClient.ImageBuild(
 		ctx, buildCtx, types.ImageBuildOptions{
-			Tags: []string{imageTag},
+			Tags:       []string{imageTag},
+			PullParent: true,
 		})
 
 	if err != nil {
