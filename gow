@@ -96,7 +96,7 @@ fi
 # This allows using the go-wrapper in projects that prohibit checking in binary data.
 ##########################################################################################
 
-goVersionUrl="https://golang.org/dl/"
+goVersionUrl="https://go.dev/dl/"
 goWrapperPath="$BASE_DIR/.go/wrapper"
 goWrapperProperties="$goWrapperPath/go-wrapper.properties"
 goInstallPath="$goWrapperPath/go"
@@ -155,6 +155,7 @@ get_local_go() {
         if [ -f "$goWrapperProperties" ]; then
             while IFS="=" read key value  || [ "$key" ]; do
               case "$key" in (distributionUrl) goUrl=`echo "$value" | sed 's/ *$//g'`; break ;;
+                             (goVersion) go_version=$value; break ;;
               esac
             done < "$goWrapperProperties"
         fi
@@ -164,6 +165,7 @@ get_local_go() {
               echo "Found wget ... using wget"
             fi
             if [ -z "$goUrl" ]; then
+              if [ -z "$go_version" ]; then
                 if [ ! -f "$goVersionPath" ]; then
                     if [ -z "$GOW_USERNAME" ] || [ -z "$GOW_PASSWORD" ]; then
                         wget "$goVersionUrl" -O "$goVersionPath"
@@ -172,7 +174,8 @@ get_local_go() {
                     fi
                 fi
                 go_version=`retrieve_version "$goVersionPath"`
-                goUrl="$GOW_REPOURL/go$go_version.$os-$arch.$extension"
+              fi
+              goUrl="$GOW_REPOURL/go$go_version.$os-$arch.$extension"
             fi
             if [ "$GOW_VERBOSE" = true ]; then
               echo "Downloading from: $goUrl"
@@ -188,6 +191,7 @@ get_local_go() {
               echo "Found curl ... using curl"
             fi
             if [ -z "$goUrl" ]; then
+              if [ -z "$go_version" ]; then
                 if [ ! -f "$goVersionPath" ]; then
                     if [ -z "$GOW_USERNAME" ] || [ -z "$GOW_PASSWORD" ]; then
                         curl -o "$goVersionPath" "$goVersionUrl" -f -s
@@ -196,7 +200,8 @@ get_local_go() {
                     fi
                 fi
                 go_version=`retrieve_version "$goVersionPath"`
-                goUrl="$GOW_REPOURL/go$go_version.$os-$arch.$extension"
+              fi
+              goUrl="$GOW_REPOURL/go$go_version.$os-$arch.$extension"
             fi
             if [ "$GOW_VERBOSE" = true ]; then
               echo "Downloading from: $goUrl"
@@ -221,19 +226,36 @@ if [ -z "$GOROOT" ]; then
     GOROOT="$goInstallPath"
 fi
 
+# Set GOPATH in case there is none 
+if [ -z "$GOPATH" ]; then
+    GOPATH=`$GOROOT/bin/go env GOPATH`
+fi
+
 # For Cygwin, switch paths to Windows format before running go
 if $cygwin; then
   [ -n "$GOROOT" ] &&
     GOROOT=`cygpath --path --windows "$GOROOT"`
+  [ -n "$GOPATH" ] &&
+    GOPATH=`cygpath --path --windows "$GOPATH"`
 fi
-
-export GOBIN="$GOROOT/bin"
 
 # Provide a "standardized" way to retrieve the CLI args that will
 # work with both Windows and non-Windows executions.
 GO_CMD_LINE_ARGS="$@"
 export GO_CMD_LINE_ARGS
 
-GOCMD=${GOCMD:-go}
+# Export Go Variables for downstream executions
+export GOROOT
+export GOPATH
+export PATH="$GOROOT/bin:$GOPATH/bin:$PATH"
 
-exec "$GOROOT/bin/$GOCMD" "$@"
+if [ "$1" = "printenv" ]; then 
+  echo "export GOROOT=\"$GOROOT\""
+  echo "export GOPATH=\"$GOPATH\""
+  echo "export PATH=\"\$GOROOT/bin:\$GOPATH/bin:\$PATH\""
+  echo ''
+  echo '# Run this command to configure your shell:'
+  echo '# eval "$(./gow printenv)"'
+else
+  exec "$GOROOT/bin/go" "$@"
+fi

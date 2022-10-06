@@ -81,7 +81,7 @@ set GO_WRAPPER_PROPERTIES=%GO_PROJECTBASEDIR%\.go\wrapper\go-wrapper.properties
 set GO_INSTALL_PATH=%GO_PROJECTBASEDIR%\.go\wrapper\go
 set GO_TMP_PATH="%GO_PROJECTBASEDIR%\.go\wrapper\tmp"
 set GO_WRAPPER_DATE="%GO_PROJECTBASEDIR%\.go\wrapper\go\go.date"
-set GO_VERSION_URL="https://golang.org/dl/"
+set GO_VERSION_URL="https://go.dev/dl/"
 set GO_VERSION_PATH="%GO_PROJECTBASEDIR%\.go\wrapper\tmp\go.version"
 set GO_ZIP_PATH="%GO_PROJECTBASEDIR%\.go\wrapper\tmp\go.zip"
 
@@ -91,6 +91,7 @@ set DOWNLOAD_URL=%DOWNLOAD_URL%
 if not exist "%GO_WRAPPER_PROPERTIES%" goto extension
 FOR /F "tokens=1,2 delims==" %%A IN (%GO_WRAPPER_PROPERTIES%) DO (
     IF "%%A"=="distributionUrl" SET DOWNLOAD_URL=%%B
+    IF "%%A"=="goVersion" SET GO_LATEST_VERSION=%%B
 )
 
 @REM Extension to allow automatically downloading GO
@@ -109,6 +110,7 @@ if "%GOW_VERBOSE%" == "true" (
 
 if exist %GO_ZIP_PATH% goto goZipDownloaded
 if not "%DOWNLOAD_URL%" == "" goto goZipDownloadUrlReady
+if not "%GO_LATEST_VERSION%" == "" goto buildDownloadUrl
 
 @REM BAD Hack to retrieve latest version
 
@@ -131,7 +133,7 @@ set GO_LATEST_VERSION=%GO_LATEST_VERSION:~3,-2%
 DEL %GO_VERSION_PATH%.tmp
 DEL %GO_VERSION_PATH%
 
-
+:buildDownloadUrl
 set GO_DOWNLOAD_ARCH=amd64
 echo %PROCESSOR_ARCHITECTURE% | find /i "x86" > nul
 if %ERRORLEVEL%==0 set GO_DOWNLOAD_ARCH=386
@@ -166,8 +168,11 @@ if "%GOW_VERBOSE%" == "true" (
 )
 
 set GOROOT=%GO_INSTALL_PATH%
-set GOBIN=%GOROOT%\bin
 
+@REM Set GOPATH in case there is none 
+if "%GOPATH%" == "" (
+    for /f %%i in ('%GOROOT%\bin\go env GOPATH') do set GOPATH=%%i
+)
 @REM End of extension
 
 @REM Provide a "standardized" way to retrieve the CLI args that will
@@ -175,10 +180,19 @@ set GOBIN=%GOROOT%\bin
 :run
 set GO_CMD_LINE_ARGS=%*
 
-IF NOT DEFINED GOCMD SET GOCMD=go
-set PATH=%PATH%;%GOROOT%\bin
+@REM Export Go Variables for downstream executions
+set "PATH=%GOROOT%\bin;%GOPATH%\bin;%PATH%"
 
-%GOROOT%\bin\%GOCMD% %*
+if "%1" == "printenv" (
+    echo set GOROOT=%GOROOT%
+    echo set GOPATH=%GOPATH%
+    echo set PATH=%%GOROOT%%\bin;%%GOPATH%%\bin;%%PATH%%
+    echo:
+    echo # Run this command to configure your shell: copy and paste the above values into your command prompt
+) else (
+    %GOROOT%\bin\go %*
+)
+
 if ERRORLEVEL 1 goto error
 goto end
 
