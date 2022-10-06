@@ -27,7 +27,7 @@ If a CLI update is required
 ## Onboarding steps
 
 * Install the developer ROOT CA into your browser
-  * We add a ROOT cert in order to support a self signed certificate for *.localdev.me so that as we add new client extensions we can give them valid "local" domains.
+  * We add a ROOT cert in order to support a self signed certificate for *.localdev.me so that as we add new client extensions we can give them valid "local" domains and those will work in your browser without causing warnings.
   * **Chrome:** Settings  > Privacy and security > Security > Manage Certificates > Authorities > Import > `$HOME/.lcectl/sources/localdev/k8s/tls/ca.crt`
   * **Firefox:** Settings > Privacy & Security > Security > View Certificates... > Authorities > Import > `$HOME/.lcectl/sources/localdev/k8s/tls/ca.crt`
 * linux/mac: `lcectl ext start -d ${demodir} -b --demo`
