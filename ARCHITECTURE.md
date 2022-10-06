@@ -7,6 +7,9 @@
   * DONE make Tilt rebuild DXP on refresh
   * DONE rename (`repo`) the config properties to `localdev.resources.*`
   * DONE take care of checking dnsmasq to see if it's working
+  * DONE handle the case where a registry (kind) is already running on port 5000
+  * DONE handle the case where docker-desktop managed kubernetes is already running
+  * DONE switch default registry port to higher port so won't conflict
   * parameterise docker build
   * parameterise tilt build
   * add support for globs in the runtime: watch: client extension properties
