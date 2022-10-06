@@ -13,13 +13,16 @@ Tool for performing Liferay Client Extension related operations from the command
 
 * Clone the CLI repo: `git clone https://github.com/rotty3000/lcectl $CLI_SOURCES`
 * `cd $CLI_SOURCES`
-* `make install`
+* `make all`
+* add the correct binary to your local shell path
+  * Linux/Mac `export PATH=$PATH:$(pwd)/bin/$(./gow env GOOS)/$(./gow env GOARCH)`
+  * Windows `set PATH=%PATH%;%cd%\bin\windows\amd64`
 
 ### CLI updates
 If a CLI update is required
 * return to `$CLI_SOURCES` dir
 * `git pull`
-* `make install`
+* `make all`
 
 ## Onboarding steps
 
