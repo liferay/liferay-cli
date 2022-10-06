@@ -73,3 +73,16 @@ If a CLI update is required
 * disabling resources
 * status bars
 * ...
+
+
+## Cleanup lcectl
+
+* linux/mac:
+  ```
+  rm -rf ~/.lcect*
+  ```
+* windows:
+  ```
+  del /q /s %homedrive%%homepath%\.lcectl.yaml
+  rd /q /s %homedrive%%homepath%\.lcectl
+  ```
