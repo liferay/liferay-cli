@@ -5,7 +5,8 @@ ifeq ($(OS),Windows_NT)
 	VERSION=$(shell git describe --match 'v[0-9]*' --dirty=.m --always --tags || echo "unknown-version")
 	GO_LDFLAGS="-X 'liferay.com/lcectl/cmd.Version=$(VERSION)'"
 
-	GIT_GO_PATCH=patches\issues-305.patch
+	GIT_GO_PATCH_1=patches\issues-305.patch --directory=vendor/github.com/go-git/go-git/v5
+	GIT_GO_PATCH_2=patches\issues-gitgo2.patch
 
 	INSTALL_DEPS=windows
 	INSTALL_SRC=bin\windows\amd64\lcectl.exe
@@ -17,7 +18,8 @@ else
 	VERSION=$(shell git describe --match 'v[0-9]*' --dirty='.m' --always --tags | sed 's/^v//' 2>/dev/null || echo "unknown-version")
 	GO_LDFLAGS="-X 'liferay.com/lcectl/cmd.Version=$(VERSION)'"
 
-	GIT_GO_PATCH=patches\issues-305.patch
+	GIT_GO_PATCH_1=patches/issues-305.patch --directory=vendor/github.com/go-git/go-git/v5
+	GIT_GO_PATCH_2=patches/issues-gitgo2.patch
 
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Darwin)
@@ -33,8 +35,11 @@ endif
 
 all: clean build
 
+.PHONY: patches
+
 patches:
-	git apply $(GIT_GO_PATCH) --directory=vendor/github.com/go-git/go-git/v5
+	-git apply $(GIT_GO_PATCH_1)
+	-git apply $(GIT_GO_PATCH_2)
 
 clean:
 	$(RM_CMD)

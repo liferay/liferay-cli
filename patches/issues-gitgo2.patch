@@ -1,0 +1,26 @@
+From 3836713f244f5eba2abcbdf532ed41eeb59918a9 Mon Sep 17 00:00:00 2001
+From: Raymond Augé <raymond.auge@liferay.com>
+Date: Fri, 7 Oct 2022 08:54:12 -0400
+Subject: go-git patch #2
+
+
+diff --git a/vendor/github.com/go-git/go-git/v5/remote.go b/vendor/github.com/go-git/go-git/v5/remote.go
+index 418cb29..e213447 100644
+--- a/vendor/github.com/go-git/go-git/v5/remote.go
++++ b/vendor/github.com/go-git/go-git/v5/remote.go
+@@ -691,6 +691,15 @@ func getHavesFromRef(
+ 	toVisit := maxHavesToVisitPerRef
+ 	return walker.ForEach(func(c *object.Commit) error {
+ 		haves[c.Hash] = true
++
++		if s, _ := s.Shallow(); len(s) > 0 {
++			for _, sh := range s {
++				if sh == c.Hash {
++					return storer.ErrStop
++				}
++			}
++		}
++
+ 		toVisit--
+ 		// If toVisit starts out at 0 (indicating there is no
+ 		// max), then it will be negative here and we won't stop
