@@ -104,6 +104,7 @@ func SyncGit(verbose bool) {
 		}
 
 		if err = repo.Fetch(&git.FetchOptions{
+			Depth:      1,
 			RemoteName: "origin",
 			RefSpecs: []config.RefSpec{
 				config.RefSpec("+refs/heads/*:refs/remotes/origin/*")},
