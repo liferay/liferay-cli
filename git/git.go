@@ -9,6 +9,7 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport"
 	"github.com/spf13/viper"
@@ -45,6 +46,7 @@ func SyncGit(verbose bool) {
 		defer s.Stop()
 	}
 
+	repoBranch := viper.GetString(constants.Const.RepoBranch)
 	repoDir := viper.GetString(constants.Const.RepoDir)
 	remoteUrl := viper.GetString(constants.Const.RepoRemote)
 	repo, err := git.PlainOpen(repoDir)
@@ -55,10 +57,11 @@ func SyncGit(verbose bool) {
 		os.MkdirAll(repoDir, os.ModePerm)
 
 		repo, err = git.PlainClone(repoDir, false, &git.CloneOptions{
-			Depth:        1,
-			RemoteName:   "origin",
-			SingleBranch: true,
-			URL:          remoteUrl,
+			Depth:         1,
+			RemoteName:    "origin",
+			SingleBranch:  true,
+			URL:           remoteUrl,
+			ReferenceName: plumbing.ReferenceName(fmt.Sprintf("refs/heads/%s", repoBranch)),
 		})
 
 		if err != nil {
@@ -100,14 +103,26 @@ func SyncGit(verbose bool) {
 			log.Fatal("worktree error: ", err)
 		}
 
-		if err = worktree.Pull(&git.PullOptions{
+		if err = repo.Fetch(&git.FetchOptions{
+			RemoteName: "origin",
+			RefSpecs: []config.RefSpec{
+				config.RefSpec("+refs/heads/*:refs/remotes/origin/*")},
 			Force: true,
-			ReferenceName: plumbing.ReferenceName(
-				"refs/heads/" + viper.GetString(constants.Const.RepoBranch)),
-			RemoteName:   "origin",
-			SingleBranch: true,
 		}); err != nil {
+			if err != git.NoErrAlreadyUpToDate && err != transport.ErrEmptyUploadPackRequest {
+				log.Fatalf("Fetch error %s\n", err)
+			}
+		}
 
+		hash, err := repo.ResolveRevision(plumbing.Revision(fmt.Sprintf("refs/remotes/origin/%s", repoBranch)))
+		if err != nil {
+			log.Fatalf("Error resolving name %s", err)
+		}
+
+		if err = worktree.Reset(&git.ResetOptions{
+			Commit: *hash,
+			Mode:   git.HardReset,
+		}); err != nil {
 			if err == git.NoErrAlreadyUpToDate || err == transport.ErrEmptyUploadPackRequest {
 				if s != nil {
 					s.FinalMSG = fmt.Sprintf(ansicolor.Good+" 'localdev' sources %s.\n", git.NoErrAlreadyUpToDate)
