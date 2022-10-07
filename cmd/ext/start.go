@@ -77,6 +77,7 @@ var startCmd = &cobra.Command{
 		config := container.Config{
 			Image:        "localdev-server",
 			Cmd:          []string{"/repo/scripts/ext/start.sh"},
+			Env:          []string{"LOCALDEV_REPO=/repo"},
 			ExposedPorts: exposedPorts,
 		}
 		host := container.HostConfig{

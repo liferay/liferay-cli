@@ -28,6 +28,7 @@ var refreshCmd = &cobra.Command{
 		config := container.Config{
 			Image: "localdev-server",
 			Cmd:   []string{"/repo/scripts/ext/refresh.sh"},
+			Env:   []string{"LOCALDEV_REPO=/repo"},
 		}
 		host := container.HostConfig{
 			Binds: []string{

@@ -31,6 +31,7 @@ var stopCmd = &cobra.Command{
 		config := container.Config{
 			Image: "localdev-server",
 			Cmd:   []string{"/repo/scripts/runtime/stop.sh"},
+			Env:   []string{"LOCALDEV_REPO=/repo"},
 		}
 		host := container.HostConfig{
 			Binds: []string{

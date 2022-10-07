@@ -31,6 +31,7 @@ var deleteCmd = &cobra.Command{
 		config := container.Config{
 			Image: "localdev-server",
 			Cmd:   []string{"/repo/scripts/runtime/delete.sh"},
+			Env:   []string{"LOCALDEV_REPO=/repo"},
 		}
 		host := container.HostConfig{
 			Binds: []string{
