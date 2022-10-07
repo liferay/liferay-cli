@@ -2,7 +2,7 @@ ifeq ($(OS),Windows_NT)
 	GO_CMD_WRAPPER=gow.cmd
 	RM_CMD=if exist bin rd /s /q bin
 
-	VERSION=$(shell git describe --match 'v[0-9]*' --dirty=.m --always --tags || echo "unknown-version")
+	VERSION=$(shell git describe --match 'v[0-9\.]*' --dirty=.m --always --tags || echo "unknown-version")
 	GO_LDFLAGS="-X 'liferay.com/lcectl/cmd.Version=$(VERSION)'"
 
 	GIT_GO_PATCH_1=patches\issues-305.patch --directory=vendor/github.com/go-git/go-git/v5
@@ -15,7 +15,7 @@ else
 	GO_CMD_WRAPPER=./gow
 	RM_CMD=rm -rf bin
 
-	VERSION=$(shell git describe --match 'v[0-9]*' --dirty='.m' --always --tags | sed 's/^v//' 2>/dev/null || echo "unknown-version")
+	VERSION=$(shell git describe --match 'v[0-9\.]*' --dirty='.m' --always --tags | sed 's/^v//' 2>/dev/null || echo "unknown-version")
 	GO_LDFLAGS="-X 'liferay.com/lcectl/cmd.Version=$(VERSION)'"
 
 	GIT_GO_PATCH_1=patches/issues-305.patch --directory=vendor/github.com/go-git/go-git/v5
