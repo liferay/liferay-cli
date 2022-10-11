@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -118,11 +119,17 @@ func init() {
 
 func doBrowser() {
 	if openBrowser {
-		go func() {
-			time.Sleep(2 * time.Second)
+		var d net.Dialer
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+		defer cancel()
 
-			browser.OpenURL(browserUrl)
-		}()
+		conn, err := d.DialContext(ctx, "tcp", "localhost:10350")
+		if err != nil {
+			log.Fatalf("%s trying to dial localdev server", err)
+		}
+		defer conn.Close()
+
+		browser.OpenURL(browserUrl)
 	} else {
 		fmt.Printf("The management console can be opened at\n\t\n\t\"%s\"\n\n", browserUrl)
 	}
