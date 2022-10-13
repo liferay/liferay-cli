@@ -224,11 +224,11 @@ func InvokeCommandInLocaldev(
 	}
 
 	if logPipe != nil {
-		retval := logPipe(out, verbose, exitPattern)
+		go func() {
+			code := logPipe(out, verbose, exitPattern)
 
-		if retval == 300 {
-			return 0
-		}
+			statusChan <- code
+		}()
 
 		return <-statusChan
 	}
@@ -269,7 +269,7 @@ func trimBuildFilesFromExcludes(excludes []string, dockerfile string, dockerfile
 	return excludes
 }
 
-func waitExitOrRemoved(ctx context.Context, dockerClient *client.Client, containerID string, waitRemove bool) <-chan int {
+func waitExitOrRemoved(ctx context.Context, dockerClient *client.Client, containerID string, waitRemove bool) chan int {
 	condition := container.WaitConditionNextExit
 	if waitRemove {
 		condition = container.WaitConditionRemoved

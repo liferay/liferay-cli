@@ -19,23 +19,14 @@ func SpinnerPipe(s *spinner.Spinner, prefix string) func(io.ReadCloser, bool, st
 		if verbose {
 			stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 		} else if s != nil {
-			c := make(chan (string))
-			go func() {
-				for {
-					msg := <-c
-					if msg != "" {
-						s.FinalMSG = msg
-						s.Suffix = fmt.Sprintf(prefix, truncateText(msg, 80))
-					}
-				}
-			}()
-
 			reader := bufio.NewReader(out)
+
 			for {
 				bytes, _, err := reader.ReadLine()
 
-				if err != nil {
-					close(c)
+				if err == io.EOF {
+					return 0
+				} else if err != nil {
 					return 1
 				} else {
 					msg := ansicolor.StripCodes(
@@ -43,12 +34,15 @@ func SpinnerPipe(s *spinner.Spinner, prefix string) func(io.ReadCloser, bool, st
 							string(
 								docker.TrimLogHeader(bytes))))
 
-					c <- msg
+					if msg != "" {
+						s.FinalMSG = msg
+						s.Suffix = fmt.Sprintf(prefix, truncateText(msg, 80))
+					}
 
-					if !verbose && exitPattern != "" {
+					if exitPattern != "" {
 						match, _ := regexp.MatchString(exitPattern, msg)
 						if match {
-							return 300
+							return 0
 						}
 					}
 				}

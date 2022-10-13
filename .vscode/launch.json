@@ -21,6 +21,14 @@
       "args": ["runtime", "delete"]
     },
     {
+      "name": "lcectl runtime stop",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "main.go",
+      "args": ["runtime", "stop"]
+    },
+    {
       "name": "lcectl runtime stop -v",
       "type": "go",
       "request": "launch",
@@ -59,6 +67,15 @@
       "mode": "debug",
       "program": "main.go",
       "args": ["ext", "create", "-d", "foo"]
+    },
+    {
+      "name": "lcectl ext start",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "main.go",
+      "args": ["ext", "start"]
+    },
     },
     {
       "name": "lcectl ext start -b",
