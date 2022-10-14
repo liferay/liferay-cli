@@ -28,20 +28,8 @@ func BuildImages(verbose bool) {
 	var g errgroup.Group
 
 	g.Go(func() error {
-		return BuildImage("dxp-server", filepath.Join(
-			viper.GetString(constants.Const.RepoDir), "docker", "images", "dxp-server"),
-			verbose)
-	})
-
-	g.Go(func() error {
 		return BuildImage("localdev-server", filepath.Join(
 			viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-server"),
-			verbose)
-	})
-
-	g.Go(func() error {
-		return BuildImage("localdev-dnsmasq", filepath.Join(
-			viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-dnsmasq"),
 			verbose)
 	})
 
