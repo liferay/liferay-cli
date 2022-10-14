@@ -53,8 +53,8 @@ func SpinnerPipe(s *spinner.Spinner, prefix string) func(io.ReadCloser, bool, st
 }
 
 func truncateText(s string, max int) string {
-	if max > len(s) {
+	if len(s) <= max {
 		return s
 	}
-	return s[:strings.LastIndex(s[:max], " ")]
+	return s[:max]
 }

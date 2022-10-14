@@ -102,6 +102,14 @@
       "args": ["ext", "status"]
     },
     {
+      "name": "lcectl ext stop",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "main.go",
+      "args": ["ext", "stop"]
+    },
+    {
       "name": "lcectl ext refresh -v",
       "type": "go",
       "request": "launch",
