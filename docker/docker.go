@@ -224,21 +224,13 @@ func InvokeCommandInLocaldev(
 	}
 
 	if logPipe != nil {
-		pipeChan := make(chan (int))
 		go func() {
 			code := logPipe(out, verbose, exitPattern)
-			pipeChan <- code
+
+			statusChan <- code
 		}()
 
-		statusCode := <-statusChan
-		pipeCode := <-pipeChan
-
-		if statusCode != 0 {
-			return statusCode
-		}
-		if pipeCode != 0 {
-			return pipeCode
-		}
+		return <-statusChan
 	}
 
 	return 0

@@ -22,7 +22,7 @@ type SpinOptions struct {
 
 type SpinOperation func(func(io.ReadCloser, bool, string) int) int
 
-func Spin(options SpinOptions, operation SpinOperation) int {
+func Spin(options SpinOptions, operation SpinOperation) {
 	var s *spinner.Spinner
 
 	if options.Enable {
@@ -52,5 +52,4 @@ func Spin(options SpinOptions, operation SpinOperation) int {
 		s.Stop()
 	}
 
-	return signal
 }

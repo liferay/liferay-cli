@@ -7,7 +7,6 @@ package runtime
 import (
 	"fmt"
 	"io"
-	"os"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
@@ -42,14 +41,13 @@ var deleteCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		exitCode := spinner.Spin(
+		spinner.Spin(
 			spinner.SpinOptions{
 				Doing: "Deleting", Done: "deleted", On: "'localdev' runtime environment", Enable: !flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool, string) int) int {
 				return lcectldocker.InvokeCommandInLocaldev("localdev-delete", config, host, true, flags.Verbose, fior, "")
 			})
-		os.Exit(exitCode)
 	},
 }
 
