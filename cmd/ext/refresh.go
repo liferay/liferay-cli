@@ -15,7 +15,6 @@ import (
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
 	"liferay.com/lcectl/flags"
-	"liferay.com/lcectl/prereq"
 	"liferay.com/lcectl/spinner"
 )
 
@@ -24,8 +23,6 @@ var refreshCmd = &cobra.Command{
 	Use:   "refresh",
 	Short: "Refreshes client-extension workload resources in localdev server",
 	Run: func(cmd *cobra.Command, args []string) {
-		prereq.Prereq(flags.Verbose)
-
 		config := container.Config{
 			Image: "localdev-server",
 			Cmd:   []string{"/repo/scripts/ext/refresh.sh"},

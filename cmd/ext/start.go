@@ -23,7 +23,6 @@ import (
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
 	"liferay.com/lcectl/flags"
-	"liferay.com/lcectl/prereq"
 	"liferay.com/lcectl/spinner"
 )
 
@@ -37,8 +36,6 @@ var startCmd = &cobra.Command{
 	Long:  "Starts up localdev server including DXP server and monitors client-extension workspace to build and deploy workloads",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		prereq.Prereq(flags.Verbose)
-
 		dockerClient, err := docker.GetDockerClient()
 
 		if err != nil {

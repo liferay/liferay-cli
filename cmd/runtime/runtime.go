@@ -12,8 +12,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"liferay.com/lcectl/constants"
+	"liferay.com/lcectl/flags"
 	lio "liferay.com/lcectl/io"
 	"liferay.com/lcectl/mkcert"
+	"liferay.com/lcectl/prereq"
 )
 
 // runtimeCmd represents the runtime command
@@ -27,6 +29,8 @@ var runtimeCmd = &cobra.Command{
 		os.Exit(0)
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		prereq.Prereq(flags.Verbose)
+
 		if cmd.Name() != "mkcert" {
 			lfrdevCrtFile := path.Join(viper.GetString(constants.Const.RepoDir), "/k8s/tls/lfrdev.crt")
 			lfrdevKeyFile := path.Join(viper.GetString(constants.Const.RepoDir), "/k8s/tls/lfrdev.key")

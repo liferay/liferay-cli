@@ -18,6 +18,7 @@ import (
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/flags"
 	lio "liferay.com/lcectl/io"
+	"liferay.com/lcectl/prereq"
 )
 
 // extCmd represents the ext command
@@ -31,6 +32,8 @@ var extCmd = &cobra.Command{
 		os.Exit(0)
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		prereq.Prereq(flags.Verbose)
+
 		var specifiedDir string
 
 		dirFlag := cmd.Flags().Lookup("dir")

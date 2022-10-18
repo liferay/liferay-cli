@@ -15,7 +15,6 @@ import (
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
 	"liferay.com/lcectl/flags"
-	"liferay.com/lcectl/prereq"
 	"liferay.com/lcectl/spinner"
 )
 
@@ -24,8 +23,6 @@ var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Returns the status of the extension environment",
 	Run: func(cmd *cobra.Command, args []string) {
-		prereq.Prereq(flags.Verbose)
-
 		config := container.Config{
 			Image: "localdev-server",
 			Cmd:   []string{"/repo/scripts/ext/status.sh"},

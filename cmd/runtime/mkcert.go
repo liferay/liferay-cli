@@ -6,9 +6,7 @@ package runtime
 
 import (
 	"github.com/spf13/cobra"
-	"liferay.com/lcectl/flags"
 	"liferay.com/lcectl/mkcert"
-	"liferay.com/lcectl/prereq"
 )
 
 var install bool
@@ -20,7 +18,6 @@ var mkcertCmd = &cobra.Command{
 	Short: "Uses mkcert package to make locally-trusted development certificates.",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		prereq.Prereq(flags.Verbose)
 		mkcert.VerifyRootCALoaded()
 
 		if uninstall {

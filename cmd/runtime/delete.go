@@ -17,7 +17,6 @@ import (
 	"liferay.com/lcectl/docker"
 	lcectldocker "liferay.com/lcectl/docker"
 	"liferay.com/lcectl/flags"
-	"liferay.com/lcectl/prereq"
 	"liferay.com/lcectl/spinner"
 )
 
@@ -27,8 +26,6 @@ var deleteCmd = &cobra.Command{
 	Short: "Delete the runtime environment for Liferay Client Extension development",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		prereq.Prereq(flags.Verbose)
-
 		config := container.Config{
 			Image: "localdev-server",
 			Cmd:   []string{"/repo/scripts/runtime/delete.sh"},
