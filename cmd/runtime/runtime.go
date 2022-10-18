@@ -8,9 +8,10 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"liferay.com/lcectl/docker"
 	"liferay.com/lcectl/flags"
+	"liferay.com/lcectl/git"
 	"liferay.com/lcectl/mkcert"
-	"liferay.com/lcectl/prereq"
 )
 
 // runtimeCmd represents the runtime command
@@ -24,10 +25,10 @@ var runtimeCmd = &cobra.Command{
 		os.Exit(0)
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		prereq.Prereq(flags.Verbose)
-
+		git.SyncGit(flags.Verbose)
 		if cmd.Name() != "mkcert" {
 			mkcert.CopyCerts(flags.Verbose)
+			docker.BuildImages(flags.Verbose)
 		}
 	},
 }
