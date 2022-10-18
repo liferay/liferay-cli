@@ -1,3 +1,4 @@
+.DS_Store
 .go/wrapper/go
 .go/wrapper/tmp
 bin/
