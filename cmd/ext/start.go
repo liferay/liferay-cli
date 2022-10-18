@@ -77,9 +77,12 @@ var startCmd = &cobra.Command{
 		}
 
 		config := container.Config{
-			Image:        "localdev-server",
-			Cmd:          []string{"/repo/scripts/ext/start.sh"},
-			Env:          []string{"LOCALDEV_REPO=/repo"},
+			Image: "localdev-server",
+			Cmd:   []string{"/repo/scripts/ext/start.sh"},
+			Env: []string{
+				"LOCALDEV_REPO=/repo",
+				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
+			},
 			ExposedPorts: exposedPorts,
 		}
 		host := container.HostConfig{

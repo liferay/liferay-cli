@@ -21,7 +21,7 @@ import (
 	"liferay.com/lcectl/spinner"
 )
 
-// createCmd represents the create command
+// startCmd represents the start command
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Starts a stopped runtime environment for Liferay Client Extension development",
@@ -32,7 +32,10 @@ var startCmd = &cobra.Command{
 		config := container.Config{
 			Image: "localdev-server",
 			Cmd:   []string{"/repo/scripts/runtime/start.sh"},
-			Env:   []string{"LOCALDEV_REPO=/repo"},
+			Env: []string{
+				"LOCALDEV_REPO=/repo",
+				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
+			},
 		}
 		host := container.HostConfig{
 			Binds: []string{

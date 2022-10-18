@@ -32,7 +32,10 @@ var stopCmd = &cobra.Command{
 		config := container.Config{
 			Image: "localdev-server",
 			Cmd:   []string{"/repo/scripts/runtime/stop.sh"},
-			Env:   []string{"LOCALDEV_REPO=/repo"},
+			Env: []string{
+				"LOCALDEV_REPO=/repo",
+				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
+			},
 		}
 		host := container.HostConfig{
 			Binds: []string{
