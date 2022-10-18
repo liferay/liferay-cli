@@ -18,6 +18,7 @@ import (
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/flags"
 	lio "liferay.com/lcectl/io"
+	"liferay.com/lcectl/mkcert"
 	"liferay.com/lcectl/prereq"
 )
 
@@ -33,6 +34,7 @@ var extCmd = &cobra.Command{
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		prereq.Prereq(flags.Verbose)
+		mkcert.CopyCerts()
 
 		var specifiedDir string
 

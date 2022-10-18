@@ -20,13 +20,12 @@ var mkcertCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		mkcert.VerifyRootCALoaded()
 
-		if uninstall {
-			mkcert.UninstallRootCA()
-			return
-		}
-
 		if install {
 			mkcert.InstallRootCA()
+			return
+		} else if uninstall {
+			mkcert.UninstallRootCA()
+			return
 		}
 
 		mkcert.MakeCert()

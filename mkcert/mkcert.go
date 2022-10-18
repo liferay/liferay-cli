@@ -33,21 +33,55 @@ func VerifyRootCALoaded() {
 }
 
 func InstallRootCA() {
-	var m = &mkcert{}
-	m.loadCA()
+	var (
+		installFlag   = flag.Bool("install", true, "")
+		uninstallFlag = flag.Bool("uninstall", false, "")
+		pkcs12Flag    = flag.Bool("pkcs12", false, "")
+		ecdsaFlag     = flag.Bool("ecdsa", false, "")
+		clientFlag    = flag.Bool("client", false, "")
+		csrFlag       = flag.String("csr", "", "")
+		certFileFlag  = flag.String("cert-file", "", "")
+		keyFileFlag   = flag.String("key-file", "", "")
+		p12FileFlag   = flag.String("p12-file", "", "")
+	)
+
+	var m = &mkcert{
+		installMode: *installFlag, uninstallMode: *uninstallFlag, csrPath: *csrFlag,
+		pkcs12: *pkcs12Flag, ecdsa: *ecdsaFlag, client: *clientFlag,
+		certFile: *certFileFlag, keyFile: *keyFileFlag, p12File: *p12FileFlag,
+	}
+
+	args := []string{}
 	log.Println("In order to install your local CA into your truststores one-time admin privileges are needed.")
-	m.install()
+	m.Run(args)
 }
 
 func UninstallRootCA() {
-	var m = &mkcert{}
-	m.loadCA()
-	log.Println("In order to uninstall your local CA from your truststores one-time admin privileges are needed.")
-	m.uninstall()
+	var (
+		installFlag   = flag.Bool("install", false, "")
+		uninstallFlag = flag.Bool("uninstall", true, "")
+		pkcs12Flag    = flag.Bool("pkcs12", false, "")
+		ecdsaFlag     = flag.Bool("ecdsa", false, "")
+		clientFlag    = flag.Bool("client", false, "")
+		csrFlag       = flag.String("csr", "", "")
+		certFileFlag  = flag.String("cert-file", "", "")
+		keyFileFlag   = flag.String("key-file", "", "")
+		p12FileFlag   = flag.String("p12-file", "", "")
+	)
+
+	var m = &mkcert{
+		installMode: *installFlag, uninstallMode: *uninstallFlag, csrPath: *csrFlag,
+		pkcs12: *pkcs12Flag, ecdsa: *ecdsaFlag, client: *clientFlag,
+		certFile: *certFileFlag, keyFile: *keyFileFlag, p12File: *p12FileFlag,
+	}
+
+	args := []string{}
+	log.Println("In order to uninstall your local CA into your truststores one-time admin privileges are needed.")
+	m.Run(args)
 }
 
 func MakeCert() {
-	repoDir := viper.GetString(constants.Const.RepoDir)
+	caroot := getCAROOT()
 	lfrdevDomain := viper.GetString(constants.Const.TlsLfrdevDomain)
 
 	var (
@@ -57,8 +91,8 @@ func MakeCert() {
 		ecdsaFlag     = flag.Bool("ecdsa", false, "")
 		clientFlag    = flag.Bool("client", false, "")
 		csrFlag       = flag.String("csr", "", "")
-		certFileFlag  = flag.String("cert-file", path.Join(repoDir, "/k8s/tls/lfrdev.crt"), "")
-		keyFileFlag   = flag.String("key-file", path.Join(repoDir, "/k8s/tls/lfrdev.key"), "")
+		certFileFlag  = flag.String("cert-file", path.Join(caroot, lfrdevDomain+".crt"), "")
+		keyFileFlag   = flag.String("key-file", path.Join(caroot, lfrdevDomain+".key"), "")
 		p12FileFlag   = flag.String("p12-file", "", "")
 	)
 
@@ -71,23 +105,38 @@ func MakeCert() {
 	}
 
 	m.Run(args)
-	copyRootCA()
 }
 
-func copyRootCA() {
-	repoDir := viper.GetString(constants.Const.RepoDir)
+func CopyCerts() {
 	caroot := getCAROOT()
+	lfrdevDomain := viper.GetString(constants.Const.TlsLfrdevDomain)
+	repoDir := viper.GetString(constants.Const.RepoDir)
 
-	lio.Copy(path.Join(caroot, rootName), path.Join(repoDir, "/k8s/tls/", rootName), 1024)
-	lio.Copy(path.Join(caroot, rootName), path.Join(repoDir, "/docker/images/dxp-server/", rootName), 1024)
-	lio.Copy(path.Join(caroot, rootName), path.Join(repoDir, "/docker/images/localdev-server/", rootName), 1024)
+	lfrdevCrtFile := path.Join(caroot, lfrdevDomain+".crt")
+	lfrdevKeyFile := path.Join(caroot, lfrdevDomain+".key")
+	lfrdevRootCA := path.Join(caroot, rootName)
+
+	if !lio.Exists(lfrdevCrtFile) || !lio.Exists(lfrdevKeyFile) || !lio.Exists(lfrdevRootCA) {
+		log.Fatalf("Missing one or more local certificates.  Execute 'runtime mkcert' command to generate one.")
+	}
+
+	crt, key, err := loadX509KeyPair(lfrdevCrtFile, lfrdevKeyFile)
+	if crt == nil || key == nil || err != nil {
+		log.Fatalf("Could not load x509 key pair: %s", err)
+	}
+	lrdevDomain := viper.GetString(constants.Const.TlsLfrdevDomain)
+	if crt.DNSNames[0] != "*."+lrdevDomain {
+		log.Fatalf("Generated certificate DNSName does not match configured domain: %s != %s\nPlease run 'runtime mkcert' command again.", crt.DNSNames[0], lrdevDomain)
+	}
+
+	lio.Copy(lfrdevCrtFile, path.Join(repoDir, fmt.Sprintf("/k8s/tls/%s.crt", lfrdevDomain)), 1024)
+	lio.Copy(lfrdevKeyFile, path.Join(repoDir, fmt.Sprintf("/k8s/tls/%s.key", lfrdevDomain)), 1024)
+	lio.Copy(lfrdevRootCA, path.Join(repoDir, "/k8s/tls/", rootName), 1024)
+	lio.Copy(lfrdevRootCA, path.Join(repoDir, "/docker/images/dxp-server/", rootName), 1024)
+	lio.Copy(lfrdevRootCA, path.Join(repoDir, "/docker/images/localdev-server/", rootName), 1024)
 }
 
-func GetRootName() string {
-	return rootName
-}
-
-func LoadX509KeyPair(certFile, keyFile string) (*x509.Certificate, any, error) {
+func loadX509KeyPair(certFile, keyFile string) (*x509.Certificate, any, error) {
 	cf, e := ioutil.ReadFile(certFile)
 	if e != nil {
 		fmt.Println("cfload:", e.Error())
