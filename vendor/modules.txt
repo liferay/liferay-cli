@@ -60,8 +60,6 @@ github.com/briandowns/spinner
 # github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
 ## explicit
 github.com/chzyer/readline
-# github.com/cilium/ebpf v0.7.0
-## explicit; go 1.16
 # github.com/containerd/cgroups v1.0.3
 ## explicit; go 1.16
 github.com/containerd/cgroups/stats/v1
@@ -69,12 +67,6 @@ github.com/containerd/cgroups/stats/v1
 ## explicit; go 1.17
 github.com/containerd/containerd/pkg/userns
 github.com/containerd/containerd/sys
-# github.com/cosiner/argv v0.1.0
-## explicit; go 1.13
-# github.com/cpuguy83/go-md2man/v2 v2.0.2
-## explicit; go 1.11
-# github.com/derekparker/trie v0.0.0-20200317170641-1fdf38b7b0e9
-## explicit
 # github.com/docker/distribution v2.8.1+incompatible
 ## explicit
 github.com/docker/distribution/digestset
@@ -133,10 +125,6 @@ github.com/fatih/color
 # github.com/fsnotify/fsnotify v1.5.4
 ## explicit; go 1.16
 github.com/fsnotify/fsnotify
-# github.com/go-delve/delve v1.9.1
-## explicit; go 1.16
-# github.com/go-delve/liner v1.2.3-0.20220127212407-d32d89dd2a5d
-## explicit
 # github.com/go-git/gcfg v1.5.0
 ## explicit
 github.com/go-git/gcfg
@@ -151,8 +139,6 @@ github.com/go-git/go-billy/v5/helper/polyfill
 github.com/go-git/go-billy/v5/memfs
 github.com/go-git/go-billy/v5/osfs
 github.com/go-git/go-billy/v5/util
-# github.com/go-git/go-git v4.7.0+incompatible
-## explicit
 # github.com/go-git/go-git/v5 v5.4.2
 ## explicit; go 1.13
 github.com/go-git/go-git/v5
@@ -205,10 +191,6 @@ github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 # github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
 ## explicit
 github.com/golang/groupcache/lru
-# github.com/google/go-dap v0.6.0
-## explicit; go 1.13
-# github.com/hashicorp/golang-lru v0.5.4
-## explicit; go 1.12
 # github.com/hashicorp/hcl v1.0.0
 ## explicit
 github.com/hashicorp/hcl
@@ -241,16 +223,12 @@ github.com/magiconair/properties
 github.com/manifoldco/promptui
 github.com/manifoldco/promptui/list
 github.com/manifoldco/promptui/screenbuf
-# github.com/marwan-at-work/mod v0.4.3
-## explicit; go 1.14
 # github.com/mattn/go-colorable v0.1.12
 ## explicit; go 1.13
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.14
 ## explicit; go 1.12
 github.com/mattn/go-isatty
-# github.com/mattn/go-runewidth v0.0.13
-## explicit; go 1.9
 # github.com/mitchellh/go-homedir v1.1.0
 ## explicit
 github.com/mitchellh/go-homedir
@@ -298,10 +276,6 @@ github.com/pkg/browser
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
-# github.com/rivo/uniseg v0.2.0
-## explicit; go 1.12
-# github.com/russross/blackfriday/v2 v2.1.0
-## explicit
 # github.com/sergi/go-diff v1.1.0
 ## explicit; go 1.12
 github.com/sergi/go-diff/diffmatchpatch
@@ -335,8 +309,6 @@ github.com/spf13/viper/internal/encoding/javaproperties
 github.com/spf13/viper/internal/encoding/json
 github.com/spf13/viper/internal/encoding/toml
 github.com/spf13/viper/internal/encoding/yaml
-# github.com/src-d/gcfg v1.4.0
-## explicit
 # github.com/subosito/gotenv v1.4.1
 ## explicit; go 1.18
 github.com/subosito/gotenv
@@ -350,10 +322,6 @@ go.opencensus.io/internal
 go.opencensus.io/trace
 go.opencensus.io/trace/internal
 go.opencensus.io/trace/tracestate
-# go.starlark.net v0.0.0-20220816155156-cfacd8902214
-## explicit; go 1.13
-# golang.org/x/arch v0.0.0-20190927153633-4e8777c89be4
-## explicit; go 1.11
 # golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 ## explicit; go 1.17
 golang.org/x/crypto/blowfish
@@ -364,6 +332,7 @@ golang.org/x/crypto/curve25519/internal/field
 golang.org/x/crypto/ed25519
 golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/internal/subtle
+golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/agent
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
@@ -374,6 +343,7 @@ golang.org/x/mod/semver
 # golang.org/x/net v0.0.0-20220722155237-a158d28d115b
 ## explicit; go 1.17
 golang.org/x/net/context
+golang.org/x/net/idna
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
 # golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
@@ -388,7 +358,9 @@ golang.org/x/sys/unix
 golang.org/x/sys/windows
 # golang.org/x/text v0.3.7
 ## explicit; go 1.17
+golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
+golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 # golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac
 ## explicit
@@ -412,10 +384,6 @@ golang.org/x/tools/internal/typesinternal
 # gopkg.in/ini.v1 v1.67.0
 ## explicit
 gopkg.in/ini.v1
-# gopkg.in/src-d/go-billy.v4 v4.3.2
-## explicit
-# gopkg.in/src-d/go-git.v4 v4.13.1
-## explicit
 # gopkg.in/warnings.v0 v0.1.2
 ## explicit
 gopkg.in/warnings.v0
@@ -425,3 +393,10 @@ gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
+# howett.net/plist v1.0.0
+## explicit; go 1.12
+howett.net/plist
+# software.sslmate.com/src/go-pkcs12 v0.2.0
+## explicit; go 1.15
+software.sslmate.com/src/go-pkcs12
+software.sslmate.com/src/go-pkcs12/internal/rc2
