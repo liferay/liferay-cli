@@ -117,6 +117,22 @@
       "program": "main.go",
       "args": ["ext", "refresh", "-v"],
       "cwd": "${input:workspacePath}"
+    },
+    {
+      "name": "lcectl runtime mkcert",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "main.go",
+      "args": ["runtime", "mkcert"]
+    },
+    {
+      "name": "lcectl runtime mkcert --install",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "main.go",
+      "args": ["runtime", "mkcert", "--install"]
     }
   ],
   "inputs": [
