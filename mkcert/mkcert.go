@@ -107,7 +107,7 @@ func MakeCert() {
 	m.Run(args)
 }
 
-func CopyCerts() {
+func CopyCerts(verbose bool) {
 	caroot := getCAROOT()
 	lfrdevDomain := viper.GetString(constants.Const.TlsLfrdevDomain)
 	repoDir := viper.GetString(constants.Const.RepoDir)
@@ -129,11 +129,11 @@ func CopyCerts() {
 		log.Fatalf("Generated certificate DNSName does not match configured domain: %s != %s\nPlease run 'runtime mkcert' command again.", crt.DNSNames[0], lrdevDomain)
 	}
 
-	lio.Copy(lfrdevCrtFile, path.Join(repoDir, fmt.Sprintf("/k8s/tls/%s.crt", lfrdevDomain)), 1024)
-	lio.Copy(lfrdevKeyFile, path.Join(repoDir, fmt.Sprintf("/k8s/tls/%s.key", lfrdevDomain)), 1024)
-	lio.Copy(lfrdevRootCA, path.Join(repoDir, "/k8s/tls/", rootName), 1024)
-	lio.Copy(lfrdevRootCA, path.Join(repoDir, "/docker/images/dxp-server/", rootName), 1024)
-	lio.Copy(lfrdevRootCA, path.Join(repoDir, "/docker/images/localdev-server/", rootName), 1024)
+	lio.Copy(lfrdevCrtFile, path.Join(repoDir, fmt.Sprintf("/k8s/tls/%s.crt", lfrdevDomain)), 1024, verbose)
+	lio.Copy(lfrdevKeyFile, path.Join(repoDir, fmt.Sprintf("/k8s/tls/%s.key", lfrdevDomain)), 1024, verbose)
+	lio.Copy(lfrdevRootCA, path.Join(repoDir, "/k8s/tls/", rootName), 1024, verbose)
+	lio.Copy(lfrdevRootCA, path.Join(repoDir, "/docker/images/dxp-server/", rootName), 1024, verbose)
+	lio.Copy(lfrdevRootCA, path.Join(repoDir, "/docker/images/localdev-server/", rootName), 1024, verbose)
 }
 
 func loadX509KeyPair(certFile, keyFile string) (*x509.Certificate, any, error) {

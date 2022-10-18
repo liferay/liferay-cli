@@ -34,7 +34,7 @@ var extCmd = &cobra.Command{
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		prereq.Prereq(flags.Verbose)
-		mkcert.CopyCerts()
+		mkcert.CopyCerts(flags.Verbose)
 
 		var specifiedDir string
 

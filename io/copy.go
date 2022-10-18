@@ -3,10 +3,11 @@ package io
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 )
 
-func Copy(src, dst string, BUFFERSIZE int64) error {
+func Copy(src, dst string, BUFFERSIZE int64, verbose bool) error {
 	sourceFileStat, err := os.Stat(src)
 	if err != nil {
 		return err
@@ -50,6 +51,9 @@ func Copy(src, dst string, BUFFERSIZE int64) error {
 		if _, err := destination.Write(buf[:n]); err != nil {
 			return err
 		}
+	}
+	if verbose {
+		log.Println("Copied " + src + " to " + dst)
 	}
 	return err
 }

@@ -27,7 +27,7 @@ var runtimeCmd = &cobra.Command{
 		prereq.Prereq(flags.Verbose)
 
 		if cmd.Name() != "mkcert" {
-			mkcert.CopyCerts()
+			mkcert.CopyCerts(flags.Verbose)
 		}
 	},
 }
