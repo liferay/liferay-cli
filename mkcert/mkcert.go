@@ -19,7 +19,7 @@ func init() {
 	viper.SetDefault(constants.Const.TlsLfrdevDomain, "lfr.dev")
 }
 
-func VerifyRootCALoaded() {
+func VerifyRootCALoaded(verbose bool) {
 	log.SetFlags(0)
 	var m = &mkcert{}
 
@@ -29,7 +29,9 @@ func VerifyRootCALoaded() {
 	}
 	fatalIfErr(os.MkdirAll(m.CAROOT, 0755), "failed to create the CAROOT")
 	m.loadCA()
-	log.Printf("Successfully loaded certicate authority. Issuer=[%s]", m.caCert.Issuer.String())
+	if verbose {
+		log.Printf("Successfully loaded certicate authority. Issuer=[%s]", m.caCert.Issuer.String())
+	}
 }
 
 func InstallRootCA() {
@@ -53,6 +55,7 @@ func InstallRootCA() {
 
 	args := []string{}
 	log.Println("In order to install your local CA into your truststores one-time admin privileges are needed.")
+	log.Println("(Password prompt may occur multiple times)")
 	m.Run(args)
 }
 
@@ -76,7 +79,7 @@ func UninstallRootCA() {
 	}
 
 	args := []string{}
-	log.Println("In order to uninstall your local CA into your truststores one-time admin privileges are needed.")
+	log.Println("In order to uninstall your local CA from your truststores one-time admin privileges are needed.")
 	m.Run(args)
 }
 
@@ -117,13 +120,14 @@ func CopyCerts(verbose bool) {
 	lfrdevRootCA := path.Join(caroot, rootName)
 
 	if !lio.Exists(lfrdevCrtFile) || !lio.Exists(lfrdevKeyFile) || !lio.Exists(lfrdevRootCA) {
-		log.Fatalf("Missing one or more local certificates.  Execute 'runtime mkcert' command to generate one.")
+		log.Fatalf("Missing one or more local certificates.  Execute 'lcectl runtime mkcert' command to generate localdev certificates.")
 	}
 
 	crt, key, err := loadX509KeyPair(lfrdevCrtFile, lfrdevKeyFile)
 	if crt == nil || key == nil || err != nil {
 		log.Fatalf("Could not load x509 key pair: %s", err)
 	}
+
 	lrdevDomain := viper.GetString(constants.Const.TlsLfrdevDomain)
 	if crt.DNSNames[0] != "*."+lrdevDomain {
 		log.Fatalf("Generated certificate DNSName does not match configured domain: %s != %s\nPlease run 'runtime mkcert' command again.", crt.DNSNames[0], lrdevDomain)

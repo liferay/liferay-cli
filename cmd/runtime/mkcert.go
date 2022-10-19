@@ -6,6 +6,7 @@ package runtime
 
 import (
 	"github.com/spf13/cobra"
+	"liferay.com/lcectl/flags"
 	"liferay.com/lcectl/mkcert"
 )
 
@@ -18,7 +19,7 @@ var mkcertCmd = &cobra.Command{
 	Short: "Uses mkcert package to make locally-trusted development certificates.",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		mkcert.VerifyRootCALoaded()
+		mkcert.VerifyRootCALoaded(flags.Verbose)
 
 		if install {
 			mkcert.InstallRootCA()
@@ -34,6 +35,7 @@ var mkcertCmd = &cobra.Command{
 
 func init() {
 	runtimeCmd.AddCommand(mkcertCmd)
-	mkcertCmd.Flags().BoolVarP(&install, "install", "i", false, "Install the local CA in the system trust store.")
-	mkcertCmd.Flags().BoolVarP(&uninstall, "uninstall", "u", false, "Uninstall the local CA (but do not delete it).")
+	mkcertCmd.Flags().BoolVarP(&install, "caroot", "", false, "Install the local CA in the system trust store.")
+	mkcertCmd.Flags().BoolVarP(&install, "install", "", false, "Install the local CA in the system trust store.")
+	mkcertCmd.Flags().BoolVarP(&uninstall, "uninstall", "", false, "Uninstall the local CA (but do not delete it).")
 }
