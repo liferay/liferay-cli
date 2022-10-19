@@ -16,7 +16,6 @@ import (
 	"liferay.com/lcectl/docker"
 	lcectldocker "liferay.com/lcectl/docker"
 	"liferay.com/lcectl/flags"
-	"liferay.com/lcectl/prereq"
 	"liferay.com/lcectl/spinner"
 )
 
@@ -26,12 +25,13 @@ var stopCmd = &cobra.Command{
 	Short: "Stops the runtime environment for Liferay Client Extension development",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		prereq.Prereq(flags.Verbose)
-
 		config := container.Config{
 			Image: "localdev-server",
 			Cmd:   []string{"/repo/scripts/runtime/stop.sh"},
-			Env:   []string{"LOCALDEV_REPO=/repo"},
+			Env: []string{
+				"LOCALDEV_REPO=/repo",
+				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
+			},
 		}
 		host := container.HostConfig{
 			Binds: []string{

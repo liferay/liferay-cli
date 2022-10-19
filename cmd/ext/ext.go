@@ -16,8 +16,11 @@ import (
 	"github.com/spf13/viper"
 	"liferay.com/lcectl/ansicolor"
 	"liferay.com/lcectl/constants"
+	"liferay.com/lcectl/docker"
 	"liferay.com/lcectl/flags"
+	"liferay.com/lcectl/git"
 	lio "liferay.com/lcectl/io"
+	"liferay.com/lcectl/mkcert"
 )
 
 // extCmd represents the ext command
@@ -31,6 +34,10 @@ var extCmd = &cobra.Command{
 		os.Exit(0)
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		git.SyncGit(flags.Verbose)
+		mkcert.CopyCerts(flags.Verbose)
+		docker.BuildImages(flags.Verbose)
+
 		var specifiedDir string
 
 		dirFlag := cmd.Flags().Lookup("dir")

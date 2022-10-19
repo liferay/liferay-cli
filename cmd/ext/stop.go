@@ -14,7 +14,6 @@ import (
 	"liferay.com/lcectl/constants"
 	"liferay.com/lcectl/docker"
 	"liferay.com/lcectl/flags"
-	"liferay.com/lcectl/prereq"
 	"liferay.com/lcectl/spinner"
 )
 
@@ -25,12 +24,13 @@ var stopCmd = &cobra.Command{
 	Long:  `Stops localdev server and DXP after shutting down all client-extension workloads.`,
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		prereq.Prereq(flags.Verbose)
-
 		config := container.Config{
 			Image: "localdev-server",
 			Cmd:   []string{"/repo/scripts/ext/stop.sh"},
-			Env:   []string{"LOCALDEV_REPO=/repo"},
+			Env: []string{
+				"LOCALDEV_REPO=/repo",
+				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
+			},
 		}
 		host := container.HostConfig{
 			Binds: []string{

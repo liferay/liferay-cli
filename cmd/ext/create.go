@@ -13,7 +13,6 @@ import (
 	"github.com/spf13/cobra"
 	"liferay.com/lcectl/cetypes"
 	"liferay.com/lcectl/flags"
-	"liferay.com/lcectl/prereq"
 )
 
 var whitespace = regexp.MustCompile(`\s`)
@@ -23,8 +22,6 @@ var createCmd = &cobra.Command{
 	Use:   "create [OPTIONS] [FLAGS]",
 	Short: "Creates new Client Extensions using a wizard-like interface",
 	Run: func(cmd *cobra.Command, args []string) {
-		prereq.Prereq(flags.Verbose)
-
 		validate := func(input string) error {
 			if len(input) <= 0 {
 				return errors.New("Project Name must not be empty")
