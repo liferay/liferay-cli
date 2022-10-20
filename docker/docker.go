@@ -35,7 +35,7 @@ import (
 	"github.com/docker/docker/pkg/progress"
 	"github.com/docker/docker/pkg/streamformatter"
 	"github.com/spf13/viper"
-	"liferay.com/lcectl/constants"
+	"liferay.com/liferay/cli/constants"
 )
 
 var (

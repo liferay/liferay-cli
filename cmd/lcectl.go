@@ -21,11 +21,11 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"liferay.com/lcectl/cmd/config"
-	"liferay.com/lcectl/cmd/ext"
-	"liferay.com/lcectl/cmd/runtime"
-	"liferay.com/lcectl/docker"
-	"liferay.com/lcectl/flags"
+	"liferay.com/liferay/cli/cmd/config"
+	"liferay.com/liferay/cli/cmd/ext"
+	"liferay.com/liferay/cli/cmd/runtime"
+	"liferay.com/liferay/cli/docker"
+	"liferay.com/liferay/cli/flags"
 )
 
 var Version = "development"

@@ -11,8 +11,8 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
-	"liferay.com/lcectl/cetypes"
-	"liferay.com/lcectl/flags"
+	"liferay.com/liferay/cli/cetypes"
+	"liferay.com/liferay/cli/flags"
 )
 
 var whitespace = regexp.MustCompile(`\s`)

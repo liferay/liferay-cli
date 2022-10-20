@@ -13,8 +13,8 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport"
 	"github.com/spf13/viper"
-	"liferay.com/lcectl/ansicolor"
-	"liferay.com/lcectl/constants"
+	"liferay.com/liferay/cli/ansicolor"
+	"liferay.com/liferay/cli/constants"
 )
 
 func init() {

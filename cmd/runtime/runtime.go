@@ -8,10 +8,10 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"liferay.com/lcectl/docker"
-	"liferay.com/lcectl/flags"
-	"liferay.com/lcectl/git"
-	"liferay.com/lcectl/mkcert"
+	"liferay.com/liferay/cli/docker"
+	"liferay.com/liferay/cli/flags"
+	"liferay.com/liferay/cli/git"
+	"liferay.com/liferay/cli/mkcert"
 )
 
 // runtimeCmd represents the runtime command

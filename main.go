@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "liferay.com/lcectl/cmd"
+import "liferay.com/liferay/cli/cmd"
 
 func main() {
 	cmd.Execute()

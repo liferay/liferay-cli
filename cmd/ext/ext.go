@@ -14,13 +14,13 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"liferay.com/lcectl/ansicolor"
-	"liferay.com/lcectl/constants"
-	"liferay.com/lcectl/docker"
-	"liferay.com/lcectl/flags"
-	"liferay.com/lcectl/git"
-	lio "liferay.com/lcectl/io"
-	"liferay.com/lcectl/mkcert"
+	"liferay.com/liferay/cli/ansicolor"
+	"liferay.com/liferay/cli/constants"
+	"liferay.com/liferay/cli/docker"
+	"liferay.com/liferay/cli/flags"
+	"liferay.com/liferay/cli/git"
+	"liferay.com/liferay/cli/io"
+	"liferay.com/liferay/cli/mkcert"
 )
 
 // extCmd represents the ext command
@@ -73,7 +73,7 @@ func AddExtCmd(cmd *cobra.Command) {
 func confirmUseOfDefaultDir() string {
 	fmt.Println(ansicolor.Bold("It looks like the default Client Extension directory was never specified. The current default is"), flags.ClientExtensionDir)
 
-	if !lio.IsDirEmpty(flags.ClientExtensionDir) {
+	if !io.IsDirEmpty(flags.ClientExtensionDir) {
 		fmt.Println(ansicolor.Bold("However, this directory is not empty. It would be preferrable to start with an empty directory."))
 	}
 
@@ -135,7 +135,7 @@ func setClientExtensionDir(dir string) {
 		dir = filepath.Join(dirname, dir)
 	}
 
-	if !lio.Exists(dir) {
+	if !io.Exists(dir) {
 		err := os.MkdirAll(dir, 0644)
 
 		if err != nil {

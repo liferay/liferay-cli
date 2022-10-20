@@ -11,8 +11,8 @@ import (
 	"path"
 
 	"github.com/spf13/viper"
-	"liferay.com/lcectl/constants"
-	lio "liferay.com/lcectl/io"
+	"liferay.com/liferay/cli/constants"
+	lio "liferay.com/liferay/cli/io"
 )
 
 func init() {

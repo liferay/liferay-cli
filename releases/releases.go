@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/viper"
-	"liferay.com/lcectl/constants"
-	"liferay.com/lcectl/http"
+	"liferay.com/liferay/cli/constants"
+	"liferay.com/liferay/cli/http"
 )
 
 type Releases struct {
