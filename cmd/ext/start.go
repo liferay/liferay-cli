@@ -33,7 +33,7 @@ var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Starts all client-extension workloads",
 	Long:  "Starts up localdev server including DXP server and monitors client-extension workspace to build and deploy workloads",
-	Args:  cobra.NoArgs,
+	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		dockerClient, err := docker.GetDockerClient()
 
@@ -72,9 +72,11 @@ var startCmd = &cobra.Command{
 			tiltPort: {},
 		}
 
+		cmdArgs := append([]string{"/repo/scripts/ext/start.sh"}, args...)
+
 		config := container.Config{
 			Image: "localdev-server",
-			Cmd:   []string{"/repo/scripts/ext/start.sh"},
+			Cmd:   cmdArgs,
 			Env: []string{
 				"LOCALDEV_REPO=/repo",
 				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
@@ -88,6 +90,7 @@ var startCmd = &cobra.Command{
 				fmt.Sprintf("%s:/workspace/client-extensions", flags.ClientExtensionDir),
 				"localdevGradleCache:/root/.gradle",
 				"localdevLiferayCache:/root/.liferay",
+				"localdevNodeModulesCache:/workspace/node_modules_cache",
 			},
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 			PortBindings: nat.PortMap{
