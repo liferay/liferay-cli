@@ -13,7 +13,7 @@ import (
 // configCmd represents the config command
 var configCmd = &cobra.Command{
 	Use:     "config COMMAND [OPTIONS] [ARG...]",
-	Short:   "Operations for configuration of lcectl",
+	Short:   "Operations for configuration of liferay cli",
 	Aliases: []string{"cfg"},
 	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {

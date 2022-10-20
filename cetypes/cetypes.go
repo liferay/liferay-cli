@@ -20,7 +20,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	viper.SetDefault(constants.Const.CETypesFile, filepath.Join(dirname, ".lcectl", "client-extension-types.json"))
+	viper.SetDefault(constants.Const.CETypesFile, filepath.Join(dirname, ".liferay", "cli", "client-extension-types.json"))
 	viper.SetDefault(constants.Const.CETypesURL, "https://raw.githubusercontent.com/liferay/liferay-portal/%s/modules/apps/client-extension/client-extension-type-api/src/main/resources/com/liferay/client/extension/type/dependencies/client-extension-types.json")
 }
 

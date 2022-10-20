@@ -24,7 +24,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	viper.SetDefault(constants.Const.RepoDir, filepath.Join(dirname, ".lcectl", "sources", "localdev"))
+	viper.SetDefault(constants.Const.RepoDir, filepath.Join(dirname, ".liferay", "cli", "sources", "localdev"))
 	viper.SetDefault(constants.Const.RepoRemote, "https://github.com/gamerson/lxc-localdev")
 	viper.SetDefault(constants.Const.RepoBranch, "master")
 	viper.SetDefault(constants.Const.RepoSync, true)

@@ -18,6 +18,7 @@ package cmd
 import (
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -30,9 +31,9 @@ import (
 
 var Version = "development"
 
-// lcectlCmd represents the base command when called without any subcommands
-var lcectlCmd = &cobra.Command{
-	Use:              "lcectl [OPTIONS] COMMAND [ARG...]",
+// liferayCmd represents the base command when called without any subcommands
+var liferayCmd = &cobra.Command{
+	Use:              "liferay [OPTIONS] COMMAND [ARG...]",
 	Short:            "Tool for performing Liferay Client Extension related operations",
 	SilenceErrors:    true,
 	TraverseChildren: true,
@@ -42,7 +43,7 @@ var lcectlCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	err := lcectlCmd.Execute()
+	err := liferayCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
@@ -61,13 +62,13 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	lcectlCmd.PersistentFlags().StringVar(&flags.ConfigFile, "config", "", "config file (default is $HOME/.lcectl.yaml)")
-	lcectlCmd.PersistentFlags().BoolVarP(&flags.Verbose, "verbose", "v", false, "enable verbose output")
+	liferayCmd.PersistentFlags().StringVar(&flags.ConfigFile, "config", "", "config file (default is $HOME/.liferay/cli.yaml)")
+	liferayCmd.PersistentFlags().BoolVarP(&flags.Verbose, "verbose", "v", false, "enable verbose output")
 
 	// add sub-commands
-	config.AddConfigCmd(lcectlCmd)
-	runtime.AddRuntimeCmd(lcectlCmd)
-	ext.AddExtCmd(lcectlCmd)
+	config.AddConfigCmd(liferayCmd)
+	runtime.AddRuntimeCmd(liferayCmd)
+	ext.AddExtCmd(liferayCmd)
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -80,10 +81,10 @@ func initConfig() {
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
-		// Search config in home directory with name ".lcectl" (without extension).
-		viper.AddConfigPath(home)
+		// Search config in home directory with name ".liferay/cli.yaml".
+		viper.AddConfigPath(filepath.Join(home, ".liferay"))
 		viper.SetConfigType("yaml")
-		viper.SetConfigName(".lcectl")
+		viper.SetConfigName("cli")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

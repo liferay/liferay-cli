@@ -21,7 +21,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	viper.SetDefault(constants.Const.ReleasesFile, filepath.Join(dirname, ".lcectl", "releases.json"))
+	viper.SetDefault(constants.Const.ReleasesFile, filepath.Join(dirname, ".liferay", "cli", "releases.json"))
 	viper.SetDefault(constants.Const.ReleasesURL, "https://releases-cdn.liferay.com/tools/workspace/.product_info.json")
 }
 
