@@ -73,16 +73,18 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	// Find home directory.
+	home, err := os.UserHomeDir()
+	liferayPath := filepath.Join(home, ".liferay")
+
 	if flags.ConfigFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(flags.ConfigFile)
 	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
 		// Search config in home directory with name ".liferay/cli.yaml".
-		viper.AddConfigPath(filepath.Join(home, ".liferay"))
+		viper.AddConfigPath(liferayPath)
 		viper.SetConfigType("yaml")
 		viper.SetConfigName("cli")
 	}
@@ -90,9 +92,11 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
-	err := viper.ReadInConfig()
+	err = viper.ReadInConfig()
 
 	if err != nil {
+		// ensure .liferay directory exists
+		os.MkdirAll(liferayPath, os.ModePerm)
 		err = viper.SafeWriteConfig()
 
 		if err != nil {
