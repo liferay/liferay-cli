@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/briandowns/spinner"
-	"liferay.com/lcectl/ansicolor"
+	"liferay.com/liferay/cli/ansicolor"
 )
 
 type SpinOptions struct {

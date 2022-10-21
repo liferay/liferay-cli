@@ -12,11 +12,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"liferay.com/lcectl/constants"
-	"liferay.com/lcectl/docker"
-	lcectldocker "liferay.com/lcectl/docker"
-	"liferay.com/lcectl/flags"
-	"liferay.com/lcectl/spinner"
+	"liferay.com/liferay/cli/constants"
+	"liferay.com/liferay/cli/docker"
+	"liferay.com/liferay/cli/flags"
+	"liferay.com/liferay/cli/spinner"
 )
 
 // startCmd represents the start command
@@ -46,7 +45,7 @@ var startCmd = &cobra.Command{
 				Doing: "Starting", Done: "started", On: "'localdev' runtime environment", Enable: !flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool, string) int) int {
-				return lcectldocker.InvokeCommandInLocaldev("localdev-start", config, host, true, flags.Verbose, fior, "")
+				return docker.InvokeCommandInLocaldev("localdev-start", config, host, true, flags.Verbose, fior, "")
 			})
 	},
 }

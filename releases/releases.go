@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/viper"
-	"liferay.com/lcectl/constants"
-	"liferay.com/lcectl/http"
+	"liferay.com/liferay/cli/constants"
+	"liferay.com/liferay/cli/http"
 )
 
 type Releases struct {
@@ -21,7 +21,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	viper.SetDefault(constants.Const.ReleasesFile, filepath.Join(dirname, ".lcectl", "releases.json"))
+	viper.SetDefault(constants.Const.ReleasesFile, filepath.Join(dirname, ".liferay", "cli", "releases.json"))
 	viper.SetDefault(constants.Const.ReleasesURL, "https://releases-cdn.liferay.com/tools/workspace/.product_info.json")
 }
 

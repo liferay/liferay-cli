@@ -6,8 +6,8 @@ package runtime
 
 import (
 	"github.com/spf13/cobra"
-	"liferay.com/lcectl/flags"
-	"liferay.com/lcectl/mkcert"
+	"liferay.com/liferay/cli/flags"
+	"liferay.com/liferay/cli/mkcert"
 )
 
 var install bool

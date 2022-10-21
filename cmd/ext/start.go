@@ -18,11 +18,11 @@ import (
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"liferay.com/lcectl/ansicolor"
-	"liferay.com/lcectl/constants"
-	"liferay.com/lcectl/docker"
-	"liferay.com/lcectl/flags"
-	"liferay.com/lcectl/spinner"
+	"liferay.com/liferay/cli/ansicolor"
+	"liferay.com/liferay/cli/constants"
+	"liferay.com/liferay/cli/docker"
+	"liferay.com/liferay/cli/flags"
+	"liferay.com/liferay/cli/spinner"
 )
 
 var openBrowser bool

@@ -1,4 +1,4 @@
-module liferay.com/lcectl
+module liferay.com/liferay/cli
 
 go 1.18
 

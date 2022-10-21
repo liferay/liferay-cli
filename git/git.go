@@ -13,8 +13,8 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport"
 	"github.com/spf13/viper"
-	"liferay.com/lcectl/ansicolor"
-	"liferay.com/lcectl/constants"
+	"liferay.com/liferay/cli/ansicolor"
+	"liferay.com/liferay/cli/constants"
 )
 
 func init() {
@@ -24,9 +24,9 @@ func init() {
 		log.Fatal(err)
 	}
 
-	viper.SetDefault(constants.Const.RepoDir, filepath.Join(dirname, ".lcectl", "sources", "localdev"))
-	viper.SetDefault(constants.Const.RepoRemote, "https://github.com/gamerson/lxc-localdev")
-	viper.SetDefault(constants.Const.RepoBranch, "master")
+	viper.SetDefault(constants.Const.RepoDir, filepath.Join(dirname, ".liferay", "cli", "sources", "localdev"))
+	viper.SetDefault(constants.Const.RepoRemote, "https://github.com/liferay/liferay-localdev.git")
+	viper.SetDefault(constants.Const.RepoBranch, "main")
 	viper.SetDefault(constants.Const.RepoSync, true)
 }
 

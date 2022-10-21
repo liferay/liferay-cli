@@ -8,8 +8,8 @@ import (
 
 	"github.com/magiconair/properties"
 	"github.com/spf13/viper"
-	"liferay.com/lcectl/constants"
-	"liferay.com/lcectl/releases"
+	"liferay.com/liferay/cli/constants"
+	"liferay.com/liferay/cli/releases"
 )
 
 func GetProductVersion() (string, error) {

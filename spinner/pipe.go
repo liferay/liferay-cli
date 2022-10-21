@@ -10,8 +10,8 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/docker/docker/pkg/stdcopy"
-	"liferay.com/lcectl/ansicolor"
-	"liferay.com/lcectl/docker"
+	"liferay.com/liferay/cli/ansicolor"
+	"liferay.com/liferay/cli/docker"
 )
 
 func SpinnerPipe(s *spinner.Spinner, prefix string) func(io.ReadCloser, bool, string) int {

@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/viper"
-	"liferay.com/lcectl/constants"
-	"liferay.com/lcectl/http"
-	"liferay.com/lcectl/workspace"
+	"liferay.com/liferay/cli/constants"
+	"liferay.com/liferay/cli/http"
+	"liferay.com/liferay/cli/workspace"
 )
 
 func init() {
@@ -20,7 +20,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	viper.SetDefault(constants.Const.CETypesFile, filepath.Join(dirname, ".lcectl", "client-extension-types.json"))
+	viper.SetDefault(constants.Const.CETypesFile, filepath.Join(dirname, ".liferay", "cli", "client-extension-types.json"))
 	viper.SetDefault(constants.Const.CETypesURL, "https://raw.githubusercontent.com/liferay/liferay-portal/%s/modules/apps/client-extension/client-extension-type-api/src/main/resources/com/liferay/client/extension/type/dependencies/client-extension-types.json")
 }
 

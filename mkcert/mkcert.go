@@ -11,8 +11,8 @@ import (
 	"path"
 
 	"github.com/spf13/viper"
-	"liferay.com/lcectl/constants"
-	lio "liferay.com/lcectl/io"
+	"liferay.com/liferay/cli/constants"
+	lio "liferay.com/liferay/cli/io"
 )
 
 func init() {
@@ -120,7 +120,7 @@ func CopyCerts(verbose bool) {
 	lfrdevRootCA := path.Join(caroot, rootName)
 
 	if !lio.Exists(lfrdevCrtFile) || !lio.Exists(lfrdevKeyFile) || !lio.Exists(lfrdevRootCA) {
-		log.Fatalf("Missing one or more local certificates.  Execute 'lcectl runtime mkcert' command to generate localdev certificates.")
+		log.Fatalf("Missing one or more local certificates.  Execute 'liferay runtime mkcert' command to generate localdev certificates.")
 	}
 
 	crt, key, err := loadX509KeyPair(lfrdevCrtFile, lfrdevKeyFile)

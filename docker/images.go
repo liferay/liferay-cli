@@ -9,8 +9,8 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/spf13/viper"
 	"golang.org/x/sync/errgroup"
-	"liferay.com/lcectl/ansicolor"
-	"liferay.com/lcectl/constants"
+	"liferay.com/liferay/cli/ansicolor"
+	"liferay.com/liferay/cli/constants"
 )
 
 func BuildImages(verbose bool) {

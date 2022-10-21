@@ -3,7 +3,7 @@
   * DONE runtime status
   * DONE add persist the dir flag value if passed on command
   * DONE ext status
-  * DONE `lcectl ext start` should create/start runtime
+  * DONE `liferay ext start` should create/start runtime
   * DONE make Tilt rebuild DXP on refresh
   * DONE rename (`repo`) the config properties to `localdev.resources.*`
   * DONE take care of checking dnsmasq to see if it's working
@@ -86,7 +86,7 @@ Mounting a directory in windows:
 
 ```bash
 mkdir client-extensions
-lcectl ext start --dir %cd%\client-extensions
+liferay ext start --dir %cd%\client-extensions
 ```
 
 ### Built in demo
