@@ -11,10 +11,10 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"liferay.com/lcectl/constants"
-	"liferay.com/lcectl/docker"
-	"liferay.com/lcectl/flags"
-	"liferay.com/lcectl/spinner"
+	"liferay.com/liferay/cli/constants"
+	"liferay.com/liferay/cli/docker"
+	"liferay.com/liferay/cli/flags"
+	"liferay.com/liferay/cli/spinner"
 )
 
 var buildCmd = &cobra.Command{
