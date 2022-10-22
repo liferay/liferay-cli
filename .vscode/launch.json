@@ -21,20 +21,20 @@
       "args": ["runtime", "delete"]
     },
     {
-      "name": "liferay runtime stop",
+      "name": "liferay runtime mkcert",
       "type": "go",
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["runtime", "stop"]
+      "args": ["runtime", "mkcert"]
     },
     {
-      "name": "liferay runtime stop -v",
+      "name": "liferay runtime mkcert --install",
       "type": "go",
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["runtime", "stop", "-v"]
+      "args": ["runtime", "mkcert", "--install"]
     },
     {
       "name": "liferay runtime status",
@@ -53,6 +53,22 @@
       "args": ["runtime", "status", "-v"]
     },
     {
+      "name": "liferay runtime stop",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "main.go",
+      "args": ["runtime", "stop"]
+    },
+    {
+      "name": "liferay runtime stop -v",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "main.go",
+      "args": ["runtime", "stop", "-v"]
+    },
+    {
       "name": "liferay ext create",
       "type": "go",
       "request": "launch",
@@ -69,13 +85,21 @@
       "args": ["ext", "create", "-d", "foo"]
     },
     {
+      "name": "liferay ext refresh -v",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "main.go",
+      "args": ["ext", "refresh", "-v"],
+      "cwd": "${input:workspacePath}"
+    },
+    {
       "name": "liferay ext start",
       "type": "go",
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
       "args": ["ext", "start"]
-    },
     },
     {
       "name": "liferay ext start -b",
@@ -108,31 +132,6 @@
       "mode": "debug",
       "program": "main.go",
       "args": ["ext", "stop"]
-    },
-    {
-      "name": "liferay ext refresh -v",
-      "type": "go",
-      "request": "launch",
-      "mode": "debug",
-      "program": "main.go",
-      "args": ["ext", "refresh", "-v"],
-      "cwd": "${input:workspacePath}"
-    },
-    {
-      "name": "liferay runtime mkcert",
-      "type": "go",
-      "request": "launch",
-      "mode": "debug",
-      "program": "main.go",
-      "args": ["runtime", "mkcert"]
-    },
-    {
-      "name": "liferay runtime mkcert --install",
-      "type": "go",
-      "request": "launch",
-      "mode": "debug",
-      "program": "main.go",
-      "args": ["runtime", "mkcert", "--install"]
     }
   ],
   "inputs": [
