@@ -10,7 +10,7 @@ ifeq ($(OS),Windows_NT)
 
 	INSTALL_DEPS=windows
 	INSTALL_SRC=bin\windows\amd64\liferay.exe
-	INSTALL_CMD=@echo off & echo ==== Copy $(INSTALL_SRC) onto your %%PATH%%, or into %windir%
+	INSTALL_CMD=copy /B /Y $(INSTALL_SRC) $(GOPATH)\bin
 else
 	GO_CMD_WRAPPER=./gow
 	RM_CMD=rm -rf bin
@@ -33,9 +33,9 @@ else
 	endif
 endif
 
-all: clean build
+.PHONY: all clean patches
 
-.PHONY: patches
+all: clean build
 
 patches:
 	-git apply $(GIT_GO_PATCH_1)
@@ -44,17 +44,25 @@ patches:
 clean:
 	$(RM_CMD)
 
+linux: export GOOS=linux
+linux: export GOARCH=amd64
 linux: patches
-	GOOS=linux GOARCH=amd64 $(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/linux/amd64/liferay
+	$(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/linux/amd64/liferay
 
+mac: export GOOS=darwin
+mac: export GOARCH=amd64
 mac: patches
-	GOOS=darwin GOARCH=amd64 $(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/darwin/amd64/liferay
+	$(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/darwin/amd64/liferay
 
+mac_m1: export GOOS=darwin
+mac_m1: export GOARCH=arm64
 mac_m1: patches
-	GOOS=darwin GOARCH=arm64 $(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/darwin/arm64/liferay
+	$(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/darwin/arm64/liferay
 
+windows: export GOOS=windows
+windows: export GOARCH=amd64
 windows: patches
-	GOOS=windows GOARCH=amd64 $(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/windows/amd64/liferay.exe
+	$(GO_CMD_WRAPPER) build -ldflags=$(GO_LDFLAGS) -o bin/windows/amd64/liferay.exe
 
 build: linux mac mac_m1 windows
 
