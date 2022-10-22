@@ -25,6 +25,7 @@ import (
 	"liferay.com/liferay/cli/cmd/config"
 	"liferay.com/liferay/cli/cmd/ext"
 	"liferay.com/liferay/cli/cmd/runtime"
+	"liferay.com/liferay/cli/cmd/sync"
 	"liferay.com/liferay/cli/docker"
 	"liferay.com/liferay/cli/flags"
 )
@@ -67,8 +68,9 @@ func init() {
 
 	// add sub-commands
 	config.AddConfigCmd(liferayCmd)
-	runtime.AddRuntimeCmd(liferayCmd)
 	ext.AddExtCmd(liferayCmd)
+	runtime.AddRuntimeCmd(liferayCmd)
+	sync.AddSyncCmd(liferayCmd)
 }
 
 // initConfig reads in config file and ENV variables if set.
