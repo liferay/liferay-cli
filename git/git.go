@@ -83,6 +83,20 @@ func SyncGit(verbose bool) {
 		cloned = true
 	}
 
+	repoConfig, err := repo.Config()
+
+	if err != nil {
+		log.Fatalf("'localdev' sources error %s.\n", err)
+	}
+
+	coreSection := repoConfig.Raw.Section("core")
+
+	if !coreSection.HasOption("autocrlf") || !coreSection.HasOption("filemode") {
+		coreSection.SetOption("autocrlf", "false")
+		coreSection.SetOption("filemode", "false")
+		repo.SetConfig(repoConfig)
+	}
+
 	remote, err := repo.Remote("origin")
 
 	if err != nil {
@@ -91,9 +105,9 @@ func SyncGit(verbose bool) {
 
 	if remote.Config().URLs[0] != remoteUrl {
 		remote.Config().URLs[0] = remoteUrl
-		config := remote.Config()
+		remoteConfig := remote.Config()
 		repo.DeleteRemote("origin")
-		repo.CreateRemote(config)
+		repo.CreateRemote(remoteConfig)
 	}
 
 	if !cloned {
