@@ -19,21 +19,22 @@ Tool for performing Liferay Client Extension related operations from the command
 * install
   * if you install `go` outside of the build the following should work:
     *  `make install`
-  * if you don't have `go` installed outside the build add the go binary that was built (under `bin`) into your system `PATH` variable
+  * if you don't have `go` installed outside the build add the binary built for your platform (under `bin`) into your system `PATH` variable
 
 ## Onboarding steps
 
+* create a new directory (say the path of that directory is stored in `${client_extension_dir}`)
 * execute `liferay ext start -d ${client_extension_dir} -b`
-* LIVE CODING IS NOW ACTIVE! --> sitting [Tilt UI](http://localhost:10350/r/(all)/overview)
+* LIVE CODING IS NOW ACTIVE!
+* Open the [Tilt UI](http://localhost:10350/r/(all)/overview) (http://localhost:10350/r/(all)/overview)
 
 ### A basic workflow after `ext start`
-* Go to the [admin console](http://localhost:10350/r/dxp.lfr.dev/overview) (http://localhost:10350/r/dxp.lfr.dev/overview)
-* Click the `dxp.lfr.dev` resource in the left menu
-* Wait for DXP to be started
+* From the [Tilt UI](http://localhost:10350/r/dxp.lfr.dev/overview) click the `dxp.lfr.dev` resource in the left menu
 * Once DXP is started click the `dxp.lfr.dev` link found near the top of the page
 * Login (`test@dxp.lfr.dev`/`test`)
-* Create an Object Definition (see [Creating and Managing Objects](https://learn.liferay.com/dxp/latest/en/building-applications/objects/creating-and-managing-objects.html) at [learn.liferay.com](https://learn.liferay.com))
-* Add an Action on the Object definition (use groovy as a placeholder)
+* Create an Object Definition (see [Creating and Managing Objects](https://learn.liferay.com/dxp/latest/en/building-applications/objects/creating-and-managing-objects.html))
+* Add an Action on the Object definition (see [Defining Object Actions](https://learn.liferay.com/dxp/latest/en/building-applications/objects/creating-and-managing-objects/defining-object-actions.html))
+  * use groovy as a placeholder
 * In your `${client_extension_dir}` create an Object **defintion** client extension project:
   * `liferay ext create --name=? --type=?`
 * Export the Object definition JSON file from DXP into the Object defintion client extension project `src` directory
