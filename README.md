@@ -1,69 +1,45 @@
-# Liferay Client Extension Control CLI
+# `liferay` - Liferay Client Extension Control CLI
 
 Tool for performing Liferay Client Extension related operations from the command line.
 
-## Prerequisits
+## Run Prerequisits
 
 * Docker (Desktop)
-* `make` (GNU Make 3.8+, `xcode-select --install`)
-* install a git client
-* `wget` or `curl`
+* the `liferay` platform specific binary
 
-## Install
+### Build Prerequisits
+* `git` client
+* `go` >= 1.18 (you don't absolutely need this but it simplifies debugging and installing the binary you build)
+* `make` (GNU Make 3.8+, `xcode-select --install`)
+
+## Build
 
 * Clone the CLI repo: `git clone https://github.com/liferay/liferay-cli $CLI_SOURCES`
 * `cd $CLI_SOURCES`
-* `make all`
-* add the correct binary to your local shell path
-  * Linux/Mac `export PATH=$PATH:$(pwd)/bin/$(./gow env GOOS)/$(./gow env GOARCH)`
-  * Windows `set PATH=%PATH%;%cd%\bin\windows\amd64`
-
-### CLI updates
-If a CLI update is required
-* return to `$CLI_SOURCES` dir
-* `git pull`
-* `make all`
+* install
+  * if you install `go` outside of the build the following should work:
+    *  `make install`
+  * if you don't have `go` installed outside the build add the go binary that was built (under `bin`) into your system `PATH` variable
 
 ## Onboarding steps
 
-* Install the developer ROOT CA into your browser
-  * We add a ROOT cert in order to support a self signed certificate for *.localdev.me so that as we add new client extensions we can give them valid "local" domains and those will work in your browser without causing warnings.
-  * **Chrome:** Settings  > Privacy and security > Security > Manage Certificates > Authorities > Import > `$HOME/.liferay/cli/sources/localdev/k8s/tls/ca.crt`
-  * **Firefox:** Settings > Privacy & Security > Security > View Certificates... > Authorities > Import > `$HOME/.liferay/cli/sources/localdev/k8s/tls/ca.crt`
-* linux/mac: `liferay ext start -d ${demodir} -b --demo`
-* windows: ``
+* execute `liferay ext start -d ${client_extension_dir} -b`
 * LIVE CODING IS NOW ACTIVE! --> sitting [Tilt UI](http://localhost:10350/r/(all)/overview)
 
-### Reproducing what just happened with the `--demo` flag
-* Go to [DXP Resource](http://localhost:10350/r/dxp.localdev.me/overview)
-* Click the `dxp.localdev.me` link
-* Login (`test@dxp.localdev.me`/`test`)
-* Define the Object Definition
-* Define an Action on the Object definition (use groovy as a placeholder)
-* Create an Object defintion client extension project: `liferay ext create --name=? --type=?`
-* Export the Object definition JSON file using the link in the Tilt UI `dxp.localdev.me` resource (e.g. `https://dxp.localdev.me/...`) and save the file into the Object defintion client extension project `src` directory
-* Create the Object action client extension project: `liferay ext create --name=? --type=?`
-* Update the Object definition JSON in the Object defintion client extension project with the object action ID (e.g. `"objectActionExecutorKey": "function#<object-action-id>"`)
-
-## Onboarding steps verification
-
----
-
-*locadev DEMO starts here*
-
-* [Tilt UI](http://localhost:10350/r/(all)/overview) should show all resources are green
-  * DXP Instance
-  * object definition
-  * object action
-* Navigate to `https://dxp.localdev.me`
-* Show the Object UI (Firebase-like storage engine)
-* Triggering the action by performing an operation on an object entry
-* Edit logic of action (edit java file) (image will be rebuilt and re-deployed)
-* Re-trigger action in DXP by performing an operation on an object entry and show update result of the action
-
-*localdev DEMO ends here*
-
----
+### A basic workflow after `ext start`
+* Go to the [admin console](http://localhost:10350/r/dxp.lfr.dev/overview) (http://localhost:10350/r/dxp.lfr.dev/overview)
+* Click the `dxp.lfr.dev` resource in the left menu
+* Wait for DXP to be started
+* Once DXP is started click the `dxp.lfr.dev` link found near the top of the page
+* Login (`test@dxp.lfr.dev`/`test`)
+* Create an Object Definition (see [Creating and Managing Objects](https://learn.liferay.com/dxp/latest/en/building-applications/objects/creating-and-managing-objects.html) at [learn.liferay.com](https://learn.liferay.com))
+* Add an Action on the Object definition (use groovy as a placeholder)
+* In your `${client_extension_dir}` create an Object **defintion** client extension project:
+  * `liferay ext create --name=? --type=?`
+* Export the Object definition JSON file from DXP into the Object defintion client extension project `src` directory
+* In your `${client_extension_dir}` create an Object **action** client extension project:
+  * `liferay ext create --name=? --type=?`
+* Update the Object definition JSON in the Object **defintion** client extension project with the object action ID (e.g. `"objectActionExecutorKey": "function#<object-action-id>"`)
 
 ## How to customize the DXP Image used in localdev
 
@@ -81,7 +57,6 @@ If a CLI update is required
 * disabling resources
 * status bars
 * ...
-
 
 ## Cleanup liferay/cli
 
