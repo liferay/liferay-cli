@@ -510,10 +510,10 @@ ohai "Downloading and installing liferay cli..."
       LIFERAY_CLI_BINARY="liferay-darwin-amd64"
     fi
   else
-    if  [[ "${UNAME_MACHINE}" != "aarch64" ]]
+    if  [[ "${UNAME_MACHINE}" == "aarch64" ]]
     then
       LIFERAY_CLI_BINARY="liferay-linux-arm64"
-    elif [[ "${UNAME_MACHINE}" != "x86_64" ]]
+    elif [[ "${UNAME_MACHINE}" == "x86_64" ]]
     then
       LIFERAY_CLI_BINARY="liferay-linux-amd64"
     fi
