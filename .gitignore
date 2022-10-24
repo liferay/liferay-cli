@@ -2,4 +2,5 @@
 .go/wrapper/go
 .go/wrapper/tmp
 bin/
+dist/
 liferay
