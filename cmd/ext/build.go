@@ -7,6 +7,7 @@ package ext
 import (
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
@@ -44,13 +45,15 @@ var buildCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		spinner.Spin(
+		exitCode := spinner.Spin(
 			spinner.SpinOptions{
 				Doing: "Build", Done: "is running", On: "'localdev' extension environment", Enable: !flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool, string) int) int {
 				return docker.InvokeCommandInLocaldev("localdev-build", config, host, true, flags.Verbose, fior, "")
 			})
+
+		os.Exit(exitCode)
 	},
 }
 

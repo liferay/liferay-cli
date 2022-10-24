@@ -2,12 +2,14 @@
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 
 */
-package ext
+package runtime
 
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
@@ -18,36 +20,39 @@ import (
 	"liferay.com/liferay/cli/spinner"
 )
 
-// refreshCmd represents the refresh command
-var refreshCmd = &cobra.Command{
-	Use:   "refresh",
-	Short: "Refreshes client-extension workload resources in localdev server",
+// kubeconfigCmd represents the kubeconfig command
+var kubeconfigCmd = &cobra.Command{
+	Use:   "kubeconfig",
+	Short: "Generates the kubeconfig necessary to talk to k8s cluster context",
 	Run: func(cmd *cobra.Command, args []string) {
+		userHomeDir, err := os.UserHomeDir()
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		config := container.Config{
 			Image: "localdev-server",
-			Cmd:   []string{"/repo/scripts/ext/refresh.sh"},
+			Cmd:   []string{"/repo/scripts/runtime/kubeconfig.sh"},
 			Env: []string{
 				"LOCALDEV_REPO=/repo",
-				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
+				"KUBECONFIG=/var/run/.kube/config",
 			},
 		}
 		host := container.HostConfig{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
 				docker.GetDockerSocket() + ":/var/run/docker.sock",
-				fmt.Sprintf("%s:/workspace/client-extensions", flags.ClientExtensionDir),
-				"localdevGradleCache:/root/.gradle",
-				"localdevLiferayCache:/root/.liferay",
+				filepath.Join(userHomeDir, ".kube") + ":/var/run/.kube",
 			},
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
 		exitCode := spinner.Spin(
 			spinner.SpinOptions{
-				Doing: "Refreshing", Done: "refreshed", On: "'localdev' extension environment", Enable: !flags.Verbose,
+				Doing: "Writing", Done: "was written", On: "'kubeconfig' config file", Enable: !flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool, string) int) int {
-				return docker.InvokeCommandInLocaldev("localdev-refresh", config, host, true, flags.Verbose, fior, "")
+				return docker.InvokeCommandInLocaldev("localdev-kubeconfig", config, host, true, flags.Verbose, fior, "")
 			})
 
 		os.Exit(exitCode)
@@ -55,5 +60,5 @@ var refreshCmd = &cobra.Command{
 }
 
 func init() {
-	extCmd.AddCommand(refreshCmd)
+	runtimeCmd.AddCommand(kubeconfigCmd)
 }

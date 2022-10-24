@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"os"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -103,7 +104,7 @@ var startCmd = &cobra.Command{
 			},
 		}
 
-		spinner.Spin(
+		exitCode := spinner.Spin(
 			spinner.SpinOptions{
 				Doing: "Starting", Done: "started", On: "'localdev' extension environment", Enable: !flags.Verbose,
 			},
@@ -112,6 +113,8 @@ var startCmd = &cobra.Command{
 			})
 
 		doBrowser()
+
+		os.Exit(exitCode)
 	},
 }
 
