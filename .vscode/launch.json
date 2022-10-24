@@ -45,6 +45,14 @@
       "args": ["runtime", "mkcert", "--install"]
     },
     {
+      "name": "liferay runtime kubeconfig",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "main.go",
+      "args": ["runtime", "kubeconfig"]
+    },
+    {
       "name": "liferay runtime status",
       "type": "go",
       "request": "launch",
