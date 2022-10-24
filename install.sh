@@ -527,6 +527,8 @@ ohai "Downloading and installing liferay cli..."
   if [[ "${LIFERAY_CLI_BINARY_SUM}" == "${LIFERAY_CLI_CHECKSUM}" ]]
   then
     execute_sudo "${INSTALL[@]}" "/tmp/${LIFERAY_CLI_BINARY}" "${LIFERAY_CLI_PREFIX}/bin/liferay"
+
+    rm "/tmp/${LIFERAY_CLI_BINARY}"
   else
 
     abort "$(
