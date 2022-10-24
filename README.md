@@ -2,10 +2,20 @@
 
 Tool for performing Liferay Client Extension related operations from the command line.
 
+## Install
+
+### On Mac/Linux
+  ```bash
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/liferay/liferay-cli/HEAD/install.sh)"
+  ```
+### On Windows
+  *TODO*
+
 ## Run Prerequisits
 
 * Docker (Desktop)
 * the `liferay` platform specific binary
+
 
 ### Build Prerequisits
 * `git` client
