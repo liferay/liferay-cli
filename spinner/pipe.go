@@ -42,7 +42,7 @@ func SpinnerPipe(s *spinner.Spinner, prefix string) func(io.ReadCloser, bool, st
 					if exitPattern != "" {
 						match, _ := regexp.MatchString(exitPattern, msg)
 						if match {
-							return 0
+							return -1
 						}
 					}
 				}
