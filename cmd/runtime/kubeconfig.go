@@ -47,13 +47,15 @@ var kubeconfigCmd = &cobra.Command{
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
 
-		spinner.Spin(
+		exitCode := spinner.Spin(
 			spinner.SpinOptions{
 				Doing: "Writing", Done: "was written", On: "'kubeconfig' config file", Enable: !flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool, string) int) int {
 				return docker.InvokeCommandInLocaldev("localdev-kubeconfig", config, host, true, flags.Verbose, fior, "")
 			})
+
+		os.Exit(exitCode)
 	},
 }
 
