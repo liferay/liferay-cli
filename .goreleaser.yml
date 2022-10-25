@@ -104,6 +104,7 @@ changelog:
     # the changelog
     # Default is empty
     exclude:
+      - '^chore:'
       - '^docs:'
       - '^unused'
       - '^wordsmith'
