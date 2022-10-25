@@ -137,7 +137,6 @@ func CopyCerts(verbose bool) {
 	lio.Copy(lfrdevKeyFile, path.Join(repoDir, fmt.Sprintf("/k8s/tls/%s.key", lfrdevDomain)), 1024, verbose)
 	lio.Copy(lfrdevRootCA, path.Join(repoDir, "/k8s/tls/", rootName), 1024, verbose)
 	lio.Copy(lfrdevRootCA, path.Join(repoDir, "/docker/images/dxp-server/", rootName), 1024, verbose)
-	lio.Copy(lfrdevRootCA, path.Join(repoDir, "/docker/images/localdev-server/", rootName), 1024, verbose)
 }
 
 func loadX509KeyPair(certFile, keyFile string) (*x509.Certificate, any, error) {
