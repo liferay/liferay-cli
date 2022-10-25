@@ -42,6 +42,7 @@ brews:
       owner: liferay
       name: liferay-cli
     folder: Formula
+    name: liferay
     homepage:  https://github.com/liferay/liferay-cli
     description: Tool for building and running Liferay Client Extensions
     license: Apache-2.0
@@ -57,6 +58,12 @@ brews:
     test: |
       system "#{bin}/liferay --version"
     install: |-
+      inreplace "./" do |s|
+        s.gsub!(/-amd64/, "")
+        s.gsub!(/-arm64/, "")
+        s.gsub!(/-darwin/, "")
+        s.gsub!(/-linux/, "")
+      end
       bin.install "liferay"
       bash_completion.install "completions/liferay.bash" => "liferay"
       zsh_completion.install "completions/liferay.zsh" => "_liferay"
