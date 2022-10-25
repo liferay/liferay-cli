@@ -58,16 +58,20 @@ brews:
     test: |
       system "#{bin}/liferay --version"
     install: |-
-      inreplace "./" do |s|
-        s.gsub!(/-amd64/, "")
-        s.gsub!(/-arm64/, "")
-        s.gsub!(/-darwin/, "")
-        s.gsub!(/-linux/, "")
+      replaces = ["-amd64", "-arm64", "-darwin", "-linux"]
+      Dir.glob("./*").sort.each do |entry|
+        origin = File.basename(entry, File.extname(entry))
+        printf "Before File: %s\n", entry
+        newEntry = origin
+        replaces.each do |rep|
+          if newEntry.include?(rep)
+            newEntry = newEntry.gsub(rep, "")
+          end
+        end
+        printf "After File: %s\n", newEntry
+        File.rename(entry, newEntry)
       end
       bin.install "liferay"
-      bash_completion.install "completions/liferay.bash" => "liferay"
-      zsh_completion.install "completions/liferay.zsh" => "_liferay"
-      fish_completion.install "completions/liferay.fish"
 
 checksum:
   name_template: 'checksums.txt'
