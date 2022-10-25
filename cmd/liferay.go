@@ -35,7 +35,7 @@ var Version = "development"
 // liferayCmd represents the base command when called without any subcommands
 var liferayCmd = &cobra.Command{
 	Use:              "liferay [OPTIONS] COMMAND [ARG...]",
-	Short:            "Tool for performing Liferay Client Extension related operations",
+	Short:            "Tool for building and running Liferay Client Extensions",
 	SilenceErrors:    true,
 	TraverseChildren: true,
 	Version:          Version,
