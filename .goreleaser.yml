@@ -1,8 +1,11 @@
-# This is an example .goreleaser.yml file with some sane defaults.
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # Make sure to check the documentation at http://goreleaser.com
+
 before:
   hooks:
     - go mod tidy
+    - ./scripts/completions.sh
+
 builds:
   - env:
       - CGO_ENABLED=0
@@ -13,37 +16,65 @@ builds:
     goarch:
       - amd64
       - arm64
-    main: ./main.go
     binary: liferay-{{ .Os }}-{{ .Arch }}
-
+    mod_timestamp: '{{ .CommitTimestamp }}'
     flags:
       - -trimpath
-
     ldflags:
       - -X liferay.com/liferay/cli/cmd.Version={{ .Version }}
 
 archives:
-  - format: binary
-    name_template: "{{ .Binary }}"
+  - name_template: "{{ .Binary }}"
+    format: binary
     replacements:
       darwin: Darwin
       linux: Linux
       windows: Windows
       amd64: x86_64
+    files:
+      - README.md
+      - LICENSE.md
+      - completions/*
+      - manpages/*
+
+brews:
+  - tap:
+      owner: liferay
+      name: liferay-cli
+    folder: Formula
+    homepage:  https://github.com/liferay/liferay-cli
+    description: Tool for building and running Liferay Client Extensions
+    license: Apache-2.0
+
+    # Setting this will prevent goreleaser to actually try to commit the updated
+    # formula - instead, the formula file will be stored on the dist folder only,
+    # leaving the responsibility of publishing it to the user.
+    # If set to auto, the release will not be uploaded to the homebrew tap
+    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
+    # Default is false.
+    skip_upload: "true"
+
+    test: |
+      system "#{bin}/liferay --version"
+    install: |-
+      bin.install "liferay"
+      bash_completion.install "completions/liferay.bash" => "liferay"
+      zsh_completion.install "completions/liferay.zsh" => "_liferay"
+      fish_completion.install "completions/liferay.fish"
+
 checksum:
   name_template: 'checksums.txt'
   algorithm: sha256
   disable: false
+
 snapshot:
   name_template: "{{ .Tag }}-next"
+
 release:
   # Repo in which the release will be created.
   github:
     owner: liferay
     name: liferay-cli
-
-  # If set to true, will not auto-publish the release.
-  #draft: true
 
   # If set to auto, will mark the release as not ready for production
   # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
@@ -74,4 +105,22 @@ changelog:
     # Default is empty
     exclude:
       - '^docs:'
+      - '^unused'
+      - '^wordsmith'
       - typo
+      - Merge pull request
+  groups:
+    - title: Dependency updates
+      regexp: "^.*(feat|fix)\\(deps\\)*:+.*$"
+      order: 300
+    - title: 'New Features'
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 100
+    - title: 'Bug fixes'
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 200
+    - title: 'Documentation updates'
+      regexp: "^.*docs[(\\w)]*:+.*$"
+      order: 400
+    - title: Other work
+      order: 9999
