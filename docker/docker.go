@@ -148,8 +148,9 @@ func BuildImage(
 
 	response, err := dockerClient.ImageBuild(
 		ctx, buildCtx, types.ImageBuildOptions{
-			Tags:       []string{imageTag},
-			PullParent: true,
+			Tags:        []string{imageTag},
+			PullParent:  true,
+			NetworkMode: viper.GetString(constants.Const.DockerNetwork),
 		})
 
 	if err != nil {
