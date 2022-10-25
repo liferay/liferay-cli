@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# We don't need return codes for "$(command)", only stdout is needed.
-# Allow `[[ -n "$(command)" ]]`, `func "$(command)"`, pipes, etc.
-# shellcheck disable=SC2312
-
 set -u
 
 abort() {
@@ -13,7 +9,6 @@ abort() {
 
 # Fail fast with a concise message when not using bash
 # Single brackets are needed here for POSIX compatibility
-# shellcheck disable=SC2292
 if [ -z "${BASH_VERSION:-}" ]
 then
   abort "Bash is required to interpret this script."
@@ -27,7 +22,6 @@ fi
 
 # Check if both `INTERACTIVE` and `NONINTERACTIVE` are set
 # Always use single-quoted strings with `exp` expressions
-# shellcheck disable=SC2016
 if [[ -n "${INTERACTIVE-}" && -n "${NONINTERACTIVE-}" ]]
 then
   abort 'Both `$INTERACTIVE` and `$NONINTERACTIVE` are set. Please unset at least one variable and try again.'
@@ -46,6 +40,7 @@ then
 else
   tty_escape() { :; }
 fi
+
 tty_mkbold() { tty_escape "1;$1"; }
 tty_underline="$(tty_escape "4;39")"
 tty_blue="$(tty_mkbold 34)"
@@ -79,7 +74,6 @@ warn() {
 # Check if script is run non-interactively (e.g. CI)
 # If it is run non-interactively we should not prompt for passwords.
 # Always use single-quoted strings with `exp` expressions
-# shellcheck disable=SC2016
 if [[ -z "${NONINTERACTIVE-}" ]]
 then
   if [[ -n "${CI-}" ]]
@@ -234,23 +228,6 @@ wait_for_user() {
   fi
 }
 
-major_minor() {
-  echo "${1%%.*}.$(
-    x="${1#*.}"
-    echo "${x%%.*}"
-  )"
-}
-
-version_gt() {
-  [[ "${1%.*}" -gt "${2%.*}" ]] || [[ "${1%.*}" -eq "${2%.*}" && "${1#*.}" -gt "${2#*.}" ]]
-}
-version_ge() {
-  [[ "${1%.*}" -gt "${2%.*}" ]] || [[ "${1%.*}" -eq "${2%.*}" && "${1#*.}" -ge "${2#*.}" ]]
-}
-version_lt() {
-  [[ "${1%.*}" -lt "${2%.*}" ]] || [[ "${1%.*}" -eq "${2%.*}" && "${1#*.}" -lt "${2#*.}" ]]
-}
-
 check_run_command_as_root() {
   [[ "${EUID:-${UID}}" == "0" ]] || return
 
@@ -259,18 +236,6 @@ check_run_command_as_root() {
   [[ -f /proc/1/cgroup ]] && grep -E "azpl_job|actions_job|docker|garden|kubepods" -q /proc/1/cgroup && return
 
   abort "Don't run this as root!"
-}
-
-get_permission() {
-  "${STAT_PRINTF[@]}" "${PERMISSION_FORMAT}" "$1"
-}
-
-user_only_chmod() {
-  [[ -d "$1" ]] && [[ "$(get_permission "$1")" != 75[0145] ]]
-}
-
-exists_but_not_writable() {
-  [[ -e "$1" ]] && ! [[ -r "$1" && -w "$1" && -x "$1" ]]
 }
 
 get_owner() {
@@ -289,42 +254,10 @@ file_not_grpowned() {
   [[ " $(id -G "${USER}") " != *" $(get_group "$1") "* ]]
 }
 
-test_curl() {
-  if [[ ! -x "$1" ]]
-  then
-    return 1
-  fi
-
-  local curl_version_output curl_name_and_version
-  curl_version_output="$("$1" --version 2>/dev/null)"
-  curl_name_and_version="${curl_version_output%% (*}"
-  version_ge "$(major_minor "${curl_name_and_version##* }")" "$(major_minor "${REQUIRED_CURL_VERSION}")"
-}
-
 # Search for the given executable in PATH (avoids a dependency on the `which` command)
 which() {
   # Alias to Bash built-in command `type -P`
   type -P "$@"
-}
-
-# Search PATH for the specified program that satisfies Homebrew requirements
-# function which is set above
-# shellcheck disable=SC2230
-find_tool() {
-  if [[ $# -ne 1 ]]
-  then
-    return 1
-  fi
-
-  local executable
-  while read -r executable
-  do
-    if "test_$1" "${executable}"
-    then
-      echo "${executable}"
-      break
-    fi
-  done < <(which -a "$1")
 }
 
 # Invalidate sudo timestamp before exiting (if it wasn't active before).
@@ -334,7 +267,6 @@ then
 fi
 
 ####################################################################### script
-# shellcheck disable=SC2016
 ohai 'Checking for `sudo` access (which may request your password)...'
 
 if [[ -n "${LIFERAY_CLI_ON_MACOS-}" ]]
