@@ -5,79 +5,95 @@
 class Liferay < Formula
   desc "Tool for building and running Liferay Client Extensions"
   homepage "https://github.com/liferay/liferay-cli"
-  version "0.0.4"
+  version "0.0.5"
   license "Apache-2.0"
 
   on_macos do
-    if Hardware::CPU.arm?
-      url "https://github.com/liferay/liferay-cli/releases/download/v0.0.4/liferay-darwin-arm64"
-      sha256 "d58a532ab7ac0bbea8cea56a0df541da79a69b14491a8dff0d18937a39319da0"
+    if Hardware::CPU.intel?
+      url "https://github.com/liferay/liferay-cli/releases/download/v0.0.5/liferay-darwin-amd64"
+      sha256 "49bab32f11c2b74377b53fc9da3104cba716b6e0ca46eb8b991cce72b4916da8"
 
       def install
-        inreplace "./" do |s|
-          s.gsub!(/-amd64/, "")
-          s.gsub!(/-arm64/, "")
-          s.gsub!(/-darwin/, "")
-          s.gsub!(/-linux/, "")
+        replaces = ["-amd64", "-arm64", "-darwin", "-linux"]
+        Dir.glob("./*").sort.each do |entry|
+          origin = File.basename(entry, File.extname(entry))
+          printf "Before File: %s\n", entry
+          newEntry = origin
+          replaces.each do |rep|
+            if newEntry.include?(rep)
+              newEntry = newEntry.gsub(rep, "")
+            end
+          end
+          printf "After File: %s\n", newEntry
+          File.rename(entry, newEntry)
         end
         bin.install "liferay"
-        bash_completion.install "completions/liferay.bash" => "liferay"
-        zsh_completion.install "completions/liferay.zsh" => "_liferay"
-        fish_completion.install "completions/liferay.fish"
       end
     end
-    if Hardware::CPU.intel?
-      url "https://github.com/liferay/liferay-cli/releases/download/v0.0.4/liferay-darwin-amd64"
-      sha256 "2b46547eac571d7469b7380dfd2ccd3c13ecbcefb5262682cd29cc350cf39b05"
+    if Hardware::CPU.arm?
+      url "https://github.com/liferay/liferay-cli/releases/download/v0.0.5/liferay-darwin-arm64"
+      sha256 "edab95e21486308c09793e34001b50d3ea4aa5812798aadab7dc03442636026a"
 
       def install
-        inreplace "./" do |s|
-          s.gsub!(/-amd64/, "")
-          s.gsub!(/-arm64/, "")
-          s.gsub!(/-darwin/, "")
-          s.gsub!(/-linux/, "")
+        replaces = ["-amd64", "-arm64", "-darwin", "-linux"]
+        Dir.glob("./*").sort.each do |entry|
+          origin = File.basename(entry, File.extname(entry))
+          printf "Before File: %s\n", entry
+          newEntry = origin
+          replaces.each do |rep|
+            if newEntry.include?(rep)
+              newEntry = newEntry.gsub(rep, "")
+            end
+          end
+          printf "After File: %s\n", newEntry
+          File.rename(entry, newEntry)
         end
         bin.install "liferay"
-        bash_completion.install "completions/liferay.bash" => "liferay"
-        zsh_completion.install "completions/liferay.zsh" => "_liferay"
-        fish_completion.install "completions/liferay.fish"
       end
     end
   end
 
   on_linux do
-    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/liferay/liferay-cli/releases/download/v0.0.4/liferay-linux-arm64"
-      sha256 "c81b5e6f2ddef9287b305f1d823429d9f6990fd02e715fd59cbb2e433db36a6e"
+    if Hardware::CPU.intel?
+      url "https://github.com/liferay/liferay-cli/releases/download/v0.0.5/liferay-linux-amd64"
+      sha256 "dc436cee6785fa6de16694fd4992d92811fa5c8beb6589e1d358371af9ec3dce"
 
       def install
-        inreplace "./" do |s|
-          s.gsub!(/-amd64/, "")
-          s.gsub!(/-arm64/, "")
-          s.gsub!(/-darwin/, "")
-          s.gsub!(/-linux/, "")
+        replaces = ["-amd64", "-arm64", "-darwin", "-linux"]
+        Dir.glob("./*").sort.each do |entry|
+          origin = File.basename(entry, File.extname(entry))
+          printf "Before File: %s\n", entry
+          newEntry = origin
+          replaces.each do |rep|
+            if newEntry.include?(rep)
+              newEntry = newEntry.gsub(rep, "")
+            end
+          end
+          printf "After File: %s\n", newEntry
+          File.rename(entry, newEntry)
         end
         bin.install "liferay"
-        bash_completion.install "completions/liferay.bash" => "liferay"
-        zsh_completion.install "completions/liferay.zsh" => "_liferay"
-        fish_completion.install "completions/liferay.fish"
       end
     end
-    if Hardware::CPU.intel?
-      url "https://github.com/liferay/liferay-cli/releases/download/v0.0.4/liferay-linux-amd64"
-      sha256 "5a1744a7a051df66e2672cb511d05b2eb7d9acfba8ba1b79721341e53d89a15e"
+    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
+      url "https://github.com/liferay/liferay-cli/releases/download/v0.0.5/liferay-linux-arm64"
+      sha256 "ca33d666bc8166b3e262adc40feb10f0edfb583c6225451de795fffce41e04b7"
 
       def install
-        inreplace "./" do |s|
-          s.gsub!(/-amd64/, "")
-          s.gsub!(/-arm64/, "")
-          s.gsub!(/-darwin/, "")
-          s.gsub!(/-linux/, "")
+        replaces = ["-amd64", "-arm64", "-darwin", "-linux"]
+        Dir.glob("./*").sort.each do |entry|
+          origin = File.basename(entry, File.extname(entry))
+          printf "Before File: %s\n", entry
+          newEntry = origin
+          replaces.each do |rep|
+            if newEntry.include?(rep)
+              newEntry = newEntry.gsub(rep, "")
+            end
+          end
+          printf "After File: %s\n", newEntry
+          File.rename(entry, newEntry)
         end
         bin.install "liferay"
-        bash_completion.install "completions/liferay.bash" => "liferay"
-        zsh_completion.install "completions/liferay.zsh" => "_liferay"
-        fish_completion.install "completions/liferay.fish"
       end
     end
   end
