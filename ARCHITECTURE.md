@@ -35,13 +35,25 @@ liferay ext start --dir %homedrive%%homepath%\client-extensions
 ```
 
 ## TODOs
-  * parameterise docker build
-  * parameterise tilt build
-  * add support for globs in the runtime: watch: client extension properties
-  * allow specialized command outputs
-  * move current verbose to second level of verbose (-vv)
-  * move git sync and docker image build output to a first level of verbose (-v)
-  * add an export command which in association with a CasC client extension project can export existing batch models
+  * Release requirments
+    * templates
+      * service
+      * configuration
+      * remote app **
+    * wizard
+    * install & light user docs
+    * set the DXP image to 'u' release (or latest nightly)
+    * add new update check to CLI
+    * validate/support docker desktop sock location change
+
+  * Later
+    * tilt args (harness capability of)
+    * add support for globs in the runtime: watch: client extension properties
+    * move current verbose to second level of verbose (-vv)
+    * move git sync and docker image build output to a first level of verbose (-v)
+    * allow specialized command outputs
+    * add an export command which in association with a CasC client extension project can export existing batch models
+    * acid test using wizard
 
 ### Commands
 
