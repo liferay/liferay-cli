@@ -44,8 +44,6 @@ func ClientExtensionTypeKeys(verbose bool) ([]string, error) {
 }
 
 func ClientExtensionTypesJSON(verbose bool) ([]map[string]interface{}, error) {
-	var dat []map[string]interface{}
-
 	tag, err := workspace.GetProductVersionAsTag(verbose)
 
 	if err != nil {
@@ -62,6 +60,8 @@ func ClientExtensionTypesJSON(verbose bool) ([]map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	var dat []map[string]interface{}
 
 	if err := json.Unmarshal(bytes, &dat); err != nil {
 		return nil, err
