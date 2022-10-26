@@ -10,8 +10,9 @@ var (
 	Warn  = Yellow
 	Fatal = Red
 
-	Good = Info("\u2714")
-	Bad  = Fatal("\u2718")
+	Good        = Info("\u2714")
+	Bad         = Fatal("\u2718")
+	Interesting = Bold("\u2728")
 )
 
 var (
