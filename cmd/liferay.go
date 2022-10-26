@@ -16,18 +16,23 @@ limitations under the License.
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"liferay.com/liferay/cli/ansicolor"
 	"liferay.com/liferay/cli/cmd/config"
 	"liferay.com/liferay/cli/cmd/ext"
 	"liferay.com/liferay/cli/cmd/runtime"
 	"liferay.com/liferay/cli/cmd/sync"
+	"liferay.com/liferay/cli/constants"
 	"liferay.com/liferay/cli/docker"
 	"liferay.com/liferay/cli/flags"
+	"liferay.com/liferay/cli/http"
 )
 
 var Version = "development"
@@ -47,6 +52,35 @@ func Execute() {
 	err := liferayCmd.Execute()
 	if err != nil {
 		os.Exit(1)
+	}
+}
+
+func checkForUpdate() {
+	if Version == "development" {
+		return
+	}
+
+	bytes, err := http.GetOrFetchBytes(http.GetOrFetchBytesOptions{
+		EtagKey: constants.Const.CETypesEtag,
+		FileKey: constants.Const.CETypesFile,
+		URL:     "https://api.github.com/repos/liferay/liferay-cli/releases/latest",
+		Verbose: flags.Verbose,
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	var dat map[string]interface{}
+
+	if err := json.Unmarshal(bytes, &dat); err != nil {
+		panic(err)
+	}
+
+	newestTag := dat["tag_name"].(string)[1:]
+
+	if newestTag > Version {
+		fmt.Println(ansicolor.Interesting, ansicolor.Bold("A new version of liferay is available for download:"), newestTag)
 	}
 }
 
@@ -105,4 +139,6 @@ func initConfig() {
 			log.Fatal("Could not write config", err)
 		}
 	}
+
+	checkForUpdate()
 }
