@@ -142,7 +142,9 @@ Tool for performing Liferay Client Extension related operations from the command
     liferay --version
     ```
 
-### Installation On Mac or Linux using the `install.sh` script
+## Automated Installation
+
+### Installation on Mac or Linux using the `install.sh` script
 
 1. Execute:
     ```bash
