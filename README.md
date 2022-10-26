@@ -1,35 +1,27 @@
+<span align="center">
+
 # `liferay` - Liferay Client Extension Control CLI
 
-Tool for performing Liferay Client Extension related operations from the command line.
+</span>
 
-## Install
+This project provides a tool for performing Liferay Client Extension related operations from the command line.
 
-### On Mac/Linux
+## Getting Started
+
+### Prerequisites
+
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+* [jq](https://stedolan.github.io/jq/)
+
+### How to Install
+
+#### On Mac/Linux
   ```bash
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/liferay/liferay-cli/HEAD/install.sh)"
   ```
-### On Windows
-  *TODO*
+#### On Windows
+  [Download Latest Version](https://github.com/liferay/liferay-cli/releases/latest) and place in your path
 
-## Run Prerequisits
-
-* Docker (Desktop)
-* the `liferay` platform specific binary
-
-
-### Build Prerequisits
-* `git` client
-* `go` >= 1.18 (you don't absolutely need this but it simplifies debugging and installing the binary you build)
-* `make` (GNU Make 3.8+, `xcode-select --install`)
-
-## Build
-
-* Clone the CLI repo: `git clone https://github.com/liferay/liferay-cli $CLI_SOURCES`
-* `cd $CLI_SOURCES`
-* install
-  * if you install `go` outside of the build the following should work:
-    *  `make install`
-  * if you don't have `go` installed outside the build add the binary built for your platform (under `bin`) into your system `PATH` variable
 
 ## Onboarding steps
 
@@ -52,7 +44,9 @@ Tool for performing Liferay Client Extension related operations from the command
   * `liferay ext create --name=? --type=?`
 * Update the Object definition JSON in the Object **defintion** client extension project with the object action ID (e.g. `"objectActionExecutorKey": "function#<object-action-id>"`)
 
-## How to customize the DXP Image used in localdev
+## Managing Client Extension Environment
+
+### How to customize the DXP Image used in localdev
 
 * Run `LOCALDEV_RESOURCES_DIR=$(liferay config get localdev.resources.dir)` to obtain the path where localdev resources are synced
 * Edit `${LOCALDEV_RESOURCES_DIR}/docker/images/localdev-server/workspace/gradle.properties` file to set the the docker image or product key.
@@ -61,7 +55,7 @@ Tool for performing Liferay Client Extension related operations from the command
 * If localdev runtime is not already started
   * Run `liferay ext start`
 
-## Getting productive with Tilt
+### Getting productive with Tilt
 
 * show logs
 * refreshing resources
@@ -69,7 +63,7 @@ Tool for performing Liferay Client Extension related operations from the command
 * status bars
 * ...
 
-## Cleanup liferay/cli
+## How to Uninstall liferay/cli
 
 * linux/mac:
   ```
@@ -80,3 +74,18 @@ Tool for performing Liferay Client Extension related operations from the command
   del /q /s %homedrive%%homepath%\.liferay/cli.yaml
   rd /q /s %homedrive%%homepath%\.liferay/cli
   ```
+
+## How to Build this Project
+
+### Prerequisites
+* `git` client
+* `go` >= 1.18 (you don't absolutely need this but it simplifies debugging and installing the binary you build)
+* `make` (GNU Make 3.8+, `xcode-select --install`)
+
+### Instructions
+* Clone the CLI repo: `git clone https://github.com/liferay/liferay-cli $CLI_SOURCES`
+* `cd $CLI_SOURCES`
+* install
+  * if you install `go` outside of the build the following should work:
+    *  `make install`
+  * if you don't have `go` installed outside the build add the binary built for your platform (under `bin`) into your system `PATH` variable
