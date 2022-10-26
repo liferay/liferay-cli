@@ -9,7 +9,7 @@ Tool for performing Liferay Client Extension related operations from the command
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/liferay/liferay-cli/HEAD/install.sh)"
   ```
 ### On Windows
-  *TODO*
+  `curl.exe -LO https://github.com/liferay/liferay-cli/releases/latest/download/liferay-windows-amd64.exe`
 
 ## Run Prerequisits
 
