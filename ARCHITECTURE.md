@@ -41,9 +41,8 @@ liferay ext start --dir %homedrive%%homepath%\client-extensions
       * configuration
       * remote app **
     * wizard
-    * install & light user docs
+    * light user docs
     * set the DXP image to 'u' release (or latest nightly)
-    * add new update check to CLI
     * validate/support docker desktop sock location change
 
   * Later
