@@ -428,8 +428,10 @@ fi
 
 ohai "Downloading and installing liferay cli..."
 (
-  LIFERAY_CLI_RELEASE=$(curl -fsSL https://api.github.com/repos/liferay/liferay-cli/releases | jq -r 'sort_by(.published_at) | .[-1]')
-  LIFERAY_CLI_CHECKSUMS_FILE=$(jq -r '.assets[] | select(.name=="checksums.txt") | .browser_download_url' <<< $LIFERAY_CLI_RELEASE)
+  LIFERAY_CLI_RELEASE=$(curl -fsSL https://api.github.com/repos/liferay/liferay-cli/releases/latest)
+  LIFERAY_CLI_VERSION=$(grep -Po '"tag_name":.*?[^\\]",' <<< $LIFERAY_CLI_RELEASE)
+  LIFERAY_CLI_VERSION=${LIFERAY_CLI_VERSION:13:-2}
+  LIFERAY_CLI_CHECKSUMS_FILE="https://github.com/liferay/liferay-cli/releases/download/${LIFERAY_CLI_VERSION}/checksums.txt"
   LIFERAY_CLI_CHECKSUMS=$(curl -fsSL $LIFERAY_CLI_CHECKSUMS_FILE)
 
   if [[ -n "${LIFERAY_CLI_ON_MACOS-}" ]]
@@ -451,7 +453,7 @@ ohai "Downloading and installing liferay cli..."
     fi
   fi
 
-  LIFERAY_CLI_BINARY_FILE=$(jq -r ".assets[] | select(.name==\"${LIFERAY_CLI_BINARY}\") | .browser_download_url" <<< $LIFERAY_CLI_RELEASE)
+  LIFERAY_CLI_BINARY_FILE="https://github.com/liferay/liferay-cli/releases/download/${LIFERAY_CLI_VERSION}/${LIFERAY_CLI_BINARY}"
   curl -fsSL "$LIFERAY_CLI_BINARY_FILE" -o "/tmp/${LIFERAY_CLI_BINARY}"
   LIFERAY_CLI_BINARY_SUM=$(cd /tmp && shasum -a 256 "${LIFERAY_CLI_BINARY}")
   LIFERAY_CLI_CHECKSUM=$(echo "$LIFERAY_CLI_CHECKSUMS" | grep "$LIFERAY_CLI_BINARY")
