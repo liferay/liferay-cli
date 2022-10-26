@@ -16,21 +16,6 @@ Tool for performing Liferay Client Extension related operations from the command
 * Docker (Desktop)
 * the `liferay` platform specific binary
 
-
-### Build Prerequisits
-* `git` client
-* `go` >= 1.18 (you don't absolutely need this but it simplifies debugging and installing the binary you build)
-* `make` (GNU Make 3.8+, `xcode-select --install`)
-
-## Build
-
-* Clone the CLI repo: `git clone https://github.com/liferay/liferay-cli $CLI_SOURCES`
-* `cd $CLI_SOURCES`
-* install
-  * if you install `go` outside of the build the following should work:
-    *  `make install`
-  * if you don't have `go` installed outside the build add the binary built for your platform (under `bin`) into your system `PATH` variable
-
 ## Onboarding steps
 
 * create a new directory (say the path of that directory is stored in `${client_extension_dir}`)
