@@ -4,6 +4,9 @@ var Const = struct {
 	CETypesEtag                    string
 	CETypesFile                    string
 	CETypesURL                     string
+	CliReleasesEtag                string
+	CliReleasesFile                string
+	CliReleasesURL                 string
 	DockerLocaldevServerImage      string
 	DockerNetwork                  string
 	ExtClientExtensionDir          string
@@ -20,6 +23,9 @@ var Const = struct {
 	CETypesEtag:                    "cetypes.etag",
 	CETypesFile:                    "cetypes.file",
 	CETypesURL:                     "cetypes.url",
+	CliReleasesEtag:                "cli.releases.etag",
+	CliReleasesFile:                "cli.releases.file",
+	CliReleasesURL:                 "cli.releases.url",
 	DockerLocaldevServerImage:      "docker.localdev.server.image",
 	DockerNetwork:                  "docker.network",
 	ExtClientExtensionDir:          "extension.client-extension.dir",
