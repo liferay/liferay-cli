@@ -24,11 +24,11 @@ func init() {
 	viper.SetDefault(constants.Const.CETypesURL, "https://raw.githubusercontent.com/liferay/liferay-portal/%s/modules/apps/client-extension/client-extension-type-api/src/main/resources/com/liferay/client/extension/type/dependencies/client-extension-types.json")
 }
 
-func ClientExtensionTypeKeys(verbose bool) ([]string, error) {
+func ClientExtensionTypeKeys(verbose bool) []string {
 	dat, err := ClientExtensionTypesJSON(verbose)
 
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
 	keys := make([]string, len(dat))
@@ -40,7 +40,7 @@ func ClientExtensionTypeKeys(verbose bool) ([]string, error) {
 		i++
 	}
 
-	return keys, nil
+	return keys
 }
 
 func ClientExtensionTypesJSON(verbose bool) ([]map[string]interface{}, error) {
