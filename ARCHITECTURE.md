@@ -36,14 +36,14 @@ liferay ext start --dir %homedrive%%homepath%\client-extensions
 
 ## TODOs
   * Release requirments
-    * templates
-      * service
-      * configuration
-      * remote app **
-    * wizard
-    * light user docs
-    * set the DXP image to 'u' release (or latest nightly)
-    * validate/support docker desktop sock location change
+    * integrate gradle workspace plugin (Greg)
+    * batch mode (pass direct arguments to create command) (Ray)
+    * uid+guid for all docker invocations (Ray)
+    * test on M1 (Greg)
+    * test on docker desktop 4.13 M1 (Greg)
+    * light user docs (Greg & Ray)
+    * set the DXP image to 'u' release (or latest nightly) (Ray)
+    * acid test using wizard (Greg)
 
   * Later
     * tilt args (harness capability of)
@@ -52,7 +52,6 @@ liferay ext start --dir %homedrive%%homepath%\client-extensions
     * move git sync and docker image build output to a first level of verbose (-v)
     * allow specialized command outputs
     * add an export command which in association with a CasC client extension project can export existing batch models
-    * acid test using wizard
 
 ### Commands
 
