@@ -46,7 +46,7 @@ var createCmd = &cobra.Command{
 				Doing: "Creating", Done: "created", On: "'localdev' runtime environment", Enable: !flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool, string) int) int {
-				return docker.InvokeCommandInLocaldev("localdev-create", config, host, true, flags.Verbose, fior, "")
+				return docker.InvokeCommandInLocaldev("localdev-runtime-create", config, host, true, flags.Verbose, fior, "")
 			})
 
 		os.Exit(exitCode)
