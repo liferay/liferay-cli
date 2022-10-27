@@ -18,7 +18,9 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -32,7 +34,7 @@ import (
 	"liferay.com/liferay/cli/constants"
 	"liferay.com/liferay/cli/docker"
 	"liferay.com/liferay/cli/flags"
-	"liferay.com/liferay/cli/http"
+	lrhttp "liferay.com/liferay/cli/http"
 )
 
 var Version = "development"
@@ -57,10 +59,17 @@ func Execute() {
 
 func checkForUpdate() {
 	if Version == "development" {
+		resp, err := http.Get(viper.GetString(constants.Const.CliReleasesURL))
+		if err != nil {
+			panic(err)
+		}
+		b, _ := ioutil.ReadAll(resp.Body)
+		log.Println(string(b))
+		defer resp.Body.Close()
 		return
 	}
 
-	bytes, err := http.GetOrFetchBytes(http.GetOrFetchBytesOptions{
+	bytes, err := lrhttp.GetOrFetchBytes(lrhttp.GetOrFetchBytesOptions{
 		EtagKey: constants.Const.CliReleasesEtag,
 		FileKey: constants.Const.CliReleasesFile,
 		URL:     viper.GetString(constants.Const.CliReleasesURL),
