@@ -18,6 +18,7 @@ import (
 	"liferay.com/liferay/cli/docker"
 	"liferay.com/liferay/cli/flags"
 	"liferay.com/liferay/cli/spinner"
+	"liferay.com/liferay/cli/user"
 )
 
 // kubeconfigCmd represents the kubeconfig command
@@ -37,6 +38,7 @@ var kubeconfigCmd = &cobra.Command{
 				"LOCALDEV_REPO=/repo",
 				"KUBECONFIG=/var/run/.kube/config",
 			},
+			User: user.UserUidAndGuidString(),
 		}
 		host := container.HostConfig{
 			Binds: []string{
