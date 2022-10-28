@@ -44,6 +44,9 @@ liferay ext start --dir %homedrive%%homepath%\client-extensions
     * light user docs (Greg & Ray)
     * set the DXP image to 'u' release (or latest nightly) (Ray)
     * acid test using wizard (Greg)
+    * finish template metadata file (Greg)
+    * wizard - collapse categories (Ray)
+    * wizard - tabulation (Ray)
 
   * Later
     * tilt args (harness capability of)
@@ -52,6 +55,7 @@ liferay ext start --dir %homedrive%%homepath%\client-extensions
     * move git sync and docker image build output to a first level of verbose (-v)
     * allow specialized command outputs
     * add an export command which in association with a CasC client extension project can export existing batch models
+    * detect if we need to build images and skip if not
 
 ### Commands
 
