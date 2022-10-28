@@ -21,13 +21,8 @@ import (
 )
 
 func TestGetDockerSocket(t *testing.T) {
-	expectedPrefix := "unix://"
 	expectedSuffix := "docker.sock"
 	socketLocation := GetDockerSocket()
-
-	if !strings.HasPrefix(socketLocation, expectedPrefix) {
-		t.Errorf("expected %q to have %q prefix", socketLocation, expectedPrefix)
-	}
 
 	if !strings.HasSuffix(socketLocation, expectedSuffix) {
 		t.Errorf("expected %q to have %q suffix", socketLocation, expectedSuffix)
