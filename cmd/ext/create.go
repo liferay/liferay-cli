@@ -41,16 +41,130 @@ var createCmd = &cobra.Command{
 
 		switch actionIdx {
 		case 0:
-			createFromSample()
+			createFrom("sample")
 		case 1:
-			createFromTemplate()
+			createFrom("template")
 		case 2:
 			modifyExistingProject()
 		}
 	},
 }
 
-func clientExtentionResourcesJson() []map[string]interface{} {
+func assembleSelectKey(template map[string]interface{}) string {
+	key := ansicolor.Bold(template["name"].(string))
+	if template["description"] != nil {
+		key += " - " + template["description"].(string)
+	}
+	return key
+}
+
+func createFrom(resourceType string) {
+	resources := getTypeSubset(resourceType, getClientExtentionResourcesJson())
+	categories := getCategoriesFromSubset(resources)
+
+	if len(categories) > 1 {
+		listByIdx, _ := selection(fmt.Sprintf("List %ss by", resourceType), []string{
+			ansicolor.Bold("Category"),
+			ansicolor.Bold("Name"),
+		})
+
+		switch listByIdx {
+		case 0:
+			listByCategory(resourceType, categories)
+		case 1:
+			createFromResourceByName(resourceType, resources)
+		}
+	} else {
+		createFromResourceByName(resourceType, resources)
+	}
+}
+
+func createFromResourceByName(resourceType string, resources map[string]map[string]interface{}) {
+	keys := make([]string, 0)
+	for key := range resources {
+		keys = append(keys, key)
+	}
+
+	_, resourceKey := selection(fmt.Sprintf("Choose a %s", resourceType), keys)
+	resource := resources[resourceKey]
+	workspacePath := promptForWorkspacePath(resource["name"].(string))
+
+	args := make([]interface{}, 0)
+
+	if resource["args"] != nil {
+		args = resource["args"].([]interface{})
+	}
+
+	generatorArgs := make([]string, len(args)+2)
+	generatorArgs[0] = fmt.Sprintf("--resource-path=%s", resource["type"].(string)+"/"+resource["name"].(string))
+	generatorArgs[1] = fmt.Sprintf("--workspace-path=%s", workspacePath)
+
+	for _, arg := range args {
+		argEntry := (arg).(map[string]interface{})
+		argDefault := ""
+
+		if argEntry["default"] != nil {
+			argDefault = argEntry["default"].(string)
+		}
+
+		argName := argEntry["name"].(string)
+
+		value := prompt(
+			fmt.Sprintf(argEntry["description"].(string)),
+			fmt.Sprintf("Specify '%s'", argName),
+			argDefault,
+			func(input string) error {
+				if len(input) <= 0 {
+					return errors.New(argName + " must not be empty")
+				}
+				return nil
+			},
+		)
+
+		generatorArgs = append(generatorArgs, fmt.Sprintf("--args=%s=%s", argEntry["name"].(string), value))
+	}
+
+	idx, _ := selection(
+		"Ready to finish",
+		[]string{
+			"Create",
+			"Just show the command",
+		},
+	)
+
+	switch idx {
+	case 0:
+		invokeCreate(generatorArgs)
+	case 1:
+		cmd := "liferay ext create"
+		for _, garg := range generatorArgs {
+			cmd += " " + garg
+		}
+		fmt.Println(cmd)
+	}
+}
+
+func getCategoriesFromSubset(subset map[string]map[string]interface{}) map[string]map[string]map[string]interface{} {
+	categories := make(map[string]map[string]map[string]interface{})
+
+	for _, entry := range subset {
+		category := entry["category"]
+
+		if category == nil {
+			category = "General"
+		}
+
+		if categories[category.(string)] == nil {
+			categories[category.(string)] = make(map[string]map[string]interface{}, 0)
+		}
+
+		categories[category.(string)][assembleSelectKey(entry)] = entry
+	}
+
+	return categories
+}
+
+func getClientExtentionResourcesJson() []map[string]interface{} {
 	bytes, err := os.ReadFile(filepath.Join(viper.GetString(constants.Const.RepoDir), "resources", "client-extension-resources.json"))
 
 	if err != nil {
@@ -64,6 +178,28 @@ func clientExtentionResourcesJson() []map[string]interface{} {
 	}
 
 	return data
+}
+
+func getTypeSubset(subsetType string, clientExtentionResources []map[string]interface{}) map[string]map[string]interface{} {
+	count := 0
+
+	for _, fi := range clientExtentionResources {
+		if fi["type"] != nil && fi["type"].(string) != subsetType {
+			continue
+		}
+		count++
+	}
+
+	subset := make(map[string]map[string]interface{}, count)
+
+	for _, entry := range clientExtentionResources {
+		if entry["type"] != nil && entry["type"].(string) != subsetType {
+			continue
+		}
+		subset[assembleSelectKey(entry)] = entry
+	}
+
+	return subset
 }
 
 func init() {
@@ -107,78 +243,19 @@ func invokeCreate(args []string) {
 	os.Exit(exitCode)
 }
 
-func createFromTemplateByName() {
-	data := clientExtentionResourcesJson()
-
-	i := 0
-	for _, fi := range data {
-		if fi["type"] != nil && fi["type"].(string) == "template" {
-			i++
-		}
+func listByCategory(resourceType string, categories map[string]map[string]map[string]interface{}) {
+	keys := make([]string, 0)
+	for key := range categories {
+		keys = append(keys, key)
 	}
 
-	keys := make([][]string, i)
+	_, categoryKey := selection("Choose a category", keys)
 
-	i = 0
-	for _, fi := range data {
-		if fi["type"] != nil && fi["type"].(string) != "template" {
-			continue
-		}
+	createFromResourceByName(resourceType, categories[categoryKey])
+}
 
-		keys[i] = make([]string, 2)
-		keys[i][0] = fi["name"].(string)
-		keys[i][1] = ""
-		if fi["description"] != nil {
-			keys[i][1] = fi["description"].(string)
-		}
-		i++
-	}
-
-	templateIdx, _ := selection("Choose a template", keys)
-	workspacePath := promptForWorkspacePath(data[templateIdx]["name"].(string))
-
-	args := data[templateIdx]["args"].([]interface{})
-
-	generatorArgs := make([]string, len(args)+2)
-	generatorArgs[0] = fmt.Sprintf("--resource-path=%s", data[templateIdx]["type"].(string)+"/"+data[templateIdx]["name"].(string))
-	generatorArgs[1] = fmt.Sprintf("--workspace-path=%s", workspacePath)
-
-	i = 2
-	for _, arg := range args {
-		argEntry := (arg).(map[string]interface{})
-		argDefault := ""
-
-		if argEntry["default"] != nil {
-			argDefault = argEntry["default"].(string)
-		}
-
-		value := prompt(
-			fmt.Sprintf(argEntry["description"].(string)),
-			fmt.Sprintf("Specify '%s'", argEntry["name"].(string)),
-			argDefault,
-			func(input string) error {
-				if len(input) <= 0 {
-					return errors.New(argEntry["name"].(string) + " must not be empty")
-				}
-				return nil
-			})
-		generatorArgs[i] = fmt.Sprintf("--args=%s=%s", argEntry["name"].(string), value)
-		i++
-	}
-
-	idx, _ := selection("Ready to finish", []string{"Create", "Just show the command"})
-
-	switch idx {
-	case 0:
-		invokeCreate(generatorArgs)
-	case 1:
-		cmd := "liferay ext create "
-		for _, garg := range generatorArgs {
-			cmd += garg + " "
-		}
-		fmt.Println(cmd)
-	}
-
+func modifyExistingProject() {
+	fmt.Println("There are currently no projects. Check back soon!")
 }
 
 func prompt(question string, label string, dflt string, validate func(input string) error) string {
@@ -242,36 +319,4 @@ func selection(label string, items interface{}) (int, string) {
 	}
 
 	return idx, answer
-}
-
-func createFromSample() {
-	listByIdx, _ := selection("List samples by", []string{
-		ansicolor.Bold("Category"),
-		ansicolor.Bold("Name"),
-	})
-
-	switch listByIdx {
-	case 0:
-		fmt.Println("There are currently no categories. Check back soon!")
-	case 1:
-		fmt.Println("There are currently no samples. Check back soon!")
-	}
-}
-
-func createFromTemplate() {
-	listByIdx, _ := selection("List templates by", []string{
-		ansicolor.Bold("Category"),
-		ansicolor.Bold("Name"),
-	})
-
-	switch listByIdx {
-	case 0:
-		fmt.Println("There are currently no categories. Check back soon!")
-	case 1:
-		createFromTemplateByName()
-	}
-}
-
-func modifyExistingProject() {
-	fmt.Println("There are currently no projects. Check back soon!")
 }
