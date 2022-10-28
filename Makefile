@@ -44,6 +44,9 @@ patches:
 clean:
 	$(RM_CMD)
 
+test:
+	$(GO_CMD_WRAPPER) test ./docker
+
 linux: export GOOS=linux
 linux: export GOARCH=amd64
 linux: patches
