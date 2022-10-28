@@ -35,7 +35,7 @@ func GetOrFetchBytes(options GetOrFetchBytesOptions) ([]byte, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 
-	if err != nil || resp.StatusCode == http.StatusNotModified {
+	if err != nil && resp.StatusCode == http.StatusNotModified {
 		f := viper.GetString(options.FileKey)
 		if options.Verbose {
 			fmt.Printf("Not mofified use local %s=%s\n", options.FileKey, f)
