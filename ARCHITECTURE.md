@@ -37,7 +37,6 @@ liferay ext start --dir %homedrive%%homepath%\client-extensions
 ## TODOs
   * Release requirments
     * batch mode (pass direct arguments to create command) (Ray)
-    * uid+guid for all docker invocations (Ray)
     * light user docs (Greg & Ray)
     * set the DXP image to 'u' release (or latest nightly) (Ray)
     * acid test using wizard (Greg)
