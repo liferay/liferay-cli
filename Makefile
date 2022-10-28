@@ -25,11 +25,11 @@ else
 	ifeq ($(UNAME_S),Darwin)
 		INSTALL_DEPS=mac
 		INSTALL_SRC=bin/darwin/amd64/liferay
-		INSTALL_CMD=cp -f $(INSTALL_SRC) $(GOPATH)/bin
+		INSTALL_CMD=cp -f $(INSTALL_SRC) ${GOPATH}/bin
 	else ifeq ($(UNAME_S),Linux)
 		INSTALL_DEPS=linux
 		INSTALL_SRC=bin/linux/amd64/liferay
-		INSTALL_CMD=cp -f $(INSTALL_SRC) $(GOPATH)/bin
+		INSTALL_CMD=cp -f $(INSTALL_SRC) ${GOPATH}/bin
 	endif
 endif
 
