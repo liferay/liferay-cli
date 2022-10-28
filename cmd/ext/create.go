@@ -11,7 +11,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"os/user"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -25,6 +24,7 @@ import (
 	"liferay.com/liferay/cli/docker"
 	"liferay.com/liferay/cli/flags"
 	"liferay.com/liferay/cli/spinner"
+	"liferay.com/liferay/cli/user"
 )
 
 var whitespace = regexp.MustCompile(`\s`)
@@ -207,12 +207,6 @@ func init() {
 }
 
 func invokeCreate(args []string) {
-	user, err := user.Current()
-
-	if err != nil {
-		panic(err)
-	}
-
 	config := container.Config{
 		Image: "localdev-server",
 		Cmd:   []string{"/repo/scripts/ext/create.py"},
@@ -221,7 +215,7 @@ func invokeCreate(args []string) {
 			"LOCALDEV_REPO=/repo",
 			"CREATE_ARGS=" + strings.Join(args, "|"),
 		},
-		User: user.Uid + ":" + user.Gid,
+		User: user.UserUidAndGuidString(),
 	}
 	host := container.HostConfig{
 		Binds: []string{
