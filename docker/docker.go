@@ -96,11 +96,14 @@ func init() {
 }
 
 func GetDockerSocket() string {
-	socketLocation, err := lookupSocketLocationFromContext()
+	/*
+		// TODO reenable this once bugs can be fixed
+		socketLocation, err := lookupSocketLocationFromContext()
 
-	if err == nil {
-		return socketLocation
-	}
+		if err == nil {
+			return socketLocation
+		}
+	*/
 
 	if runtime.GOOS == "windows" {
 		return "//var/run/docker.sock"
