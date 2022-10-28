@@ -25,18 +25,24 @@ func GetOrFetchBytes(options GetOrFetchBytesOptions) ([]byte, error) {
 
 	releasesEtag := viper.GetString(options.EtagKey)
 
-	if releasesEtag != "" {
-		if options.Verbose {
-			fmt.Printf("Using stored Etag for %s=%s\n", options.EtagKey, releasesEtag)
+	f := viper.GetString(options.FileKey)
+
+	_, fileErr := os.Stat(f)
+
+	if fileErr == nil || os.IsExist(fileErr) {
+		if releasesEtag != "" {
+			if options.Verbose {
+				fmt.Printf("Using stored Etag for %s=%s\n", options.EtagKey, releasesEtag)
+			}
+			req.Header.Add("If-None-Match", releasesEtag)
 		}
-		req.Header.Add("If-None-Match", releasesEtag)
 	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 
 	if err != nil || resp.StatusCode == http.StatusNotModified {
-		f := viper.GetString(options.FileKey)
+		//f := viper.GetString(options.FileKey)
 		if options.Verbose {
 			fmt.Printf("Not mofified use local %s=%s\n", options.FileKey, f)
 		}
