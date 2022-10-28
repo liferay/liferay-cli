@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
@@ -38,7 +39,9 @@ var kubeconfigCmd = &cobra.Command{
 				"LOCALDEV_REPO=/repo",
 				"KUBECONFIG=/var/run/.kube/config",
 			},
-			User: user.UserUidAndGuidString(),
+		}
+		if runtime.GOOS == "linux" {
+			config.User = user.UserUidAndGuidString()
 		}
 		host := container.HostConfig{
 			Binds: []string{

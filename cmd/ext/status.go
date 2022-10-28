@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
@@ -31,7 +32,9 @@ var statusCmd = &cobra.Command{
 				"LOCALDEV_REPO=/repo",
 				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
 			},
-			User: user.UserUidAndGuidString(),
+		}
+		if runtime.GOOS == "linux" {
+			config.User = user.UserUidAndGuidString()
 		}
 		host := container.HostConfig{
 			Binds: []string{
