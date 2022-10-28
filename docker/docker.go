@@ -26,6 +26,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -280,8 +281,13 @@ func lookupSocketLocationFromContext() (string, error) {
 	if len(contexts) == 0 {
 		return "", errors.New("unable to find docker contexts")
 	}
+	hostString := contexts[0].Endpoints["docker"].Host
 
-	return contexts[0].Endpoints["docker"].Host, nil
+	if strings.HasPrefix(hostString, "unix://") {
+		return strings.TrimPrefix(hostString, "unix://"), nil
+	}
+
+	return "", errors.New("hostString did not have unix:// prefix")
 }
 
 // ReadDockerignore reads the .dockerignore file in the context directory and
