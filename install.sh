@@ -429,7 +429,7 @@ fi
 ohai "Downloading and installing liferay cli..."
 (
   LIFERAY_CLI_RELEASE=$(curl -fsSL https://api.github.com/repos/liferay/liferay-cli/releases/latest)
-  LIFERAY_CLI_VERSION=$(grep -Po '"tag_name":.*?[^\\]",' <<< $LIFERAY_CLI_RELEASE)
+  LIFERAY_CLI_VERSION=$(egrep -o '"tag_name":.*?[^\\]",' <<< $LIFERAY_CLI_RELEASE)
   LIFERAY_CLI_VERSION=${LIFERAY_CLI_VERSION:13:-2}
   LIFERAY_CLI_CHECKSUMS_FILE="https://github.com/liferay/liferay-cli/releases/download/${LIFERAY_CLI_VERSION}/checksums.txt"
   LIFERAY_CLI_CHECKSUMS=$(curl -fsSL $LIFERAY_CLI_CHECKSUMS_FILE)
