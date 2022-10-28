@@ -36,11 +36,8 @@ liferay ext start --dir %homedrive%%homepath%\client-extensions
 
 ## TODOs
   * Release requirments
-    * integrate gradle workspace plugin (Greg)
     * batch mode (pass direct arguments to create command) (Ray)
     * uid+guid for all docker invocations (Ray)
-    * test on M1 (Greg)
-    * test on docker desktop 4.13 M1 (Greg)
     * light user docs (Greg & Ray)
     * set the DXP image to 'u' release (or latest nightly) (Ray)
     * acid test using wizard (Greg)
