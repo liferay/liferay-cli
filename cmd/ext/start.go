@@ -11,6 +11,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -84,7 +85,9 @@ var startCmd = &cobra.Command{
 				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
 			},
 			ExposedPorts: exposedPorts,
-			User:         user.UserUidAndGuidString(),
+		}
+		if runtime.GOOS == "linux" {
+			config.User = user.UserUidAndGuidString()
 		}
 		host := container.HostConfig{
 			Binds: []string{

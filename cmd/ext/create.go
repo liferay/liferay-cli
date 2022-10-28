@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/docker/docker/api/types/container"
@@ -215,7 +216,9 @@ func invokeCreate(args []string) {
 			"LOCALDEV_REPO=/repo",
 			"CREATE_ARGS=" + strings.Join(args, "|"),
 		},
-		User: user.UserUidAndGuidString(),
+	}
+	if runtime.GOOS == "linux" {
+		config.User = user.UserUidAndGuidString()
 	}
 	host := container.HostConfig{
 		Binds: []string{
