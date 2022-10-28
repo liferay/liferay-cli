@@ -17,10 +17,13 @@ package docker
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 
@@ -92,6 +95,12 @@ func init() {
 }
 
 func GetDockerSocket() string {
+	socketLocation, err := lookupSocketLocationFromContext()
+
+	if err == nil {
+		return socketLocation
+	}
+
 	if runtime.GOOS == "windows" {
 		return "//var/run/docker.sock"
 	}
@@ -242,6 +251,37 @@ func InvokeCommandInLocaldev(
 	}
 
 	return 0
+}
+
+type DockerEndpoints struct {
+	Host string
+}
+
+type DockerContext struct {
+	Name      string
+	Endpoints map[string]DockerEndpoints
+}
+
+func lookupSocketLocationFromContext() (string, error) {
+	// call docker context inspect to get info on sock
+	cmd := exec.Command("docker", "context", "inspect")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return string(output), err
+	}
+
+	var contexts []DockerContext
+	jsonerr := json.Unmarshal([]byte(output), &contexts)
+
+	if jsonerr != nil {
+		return "", jsonerr
+	}
+
+	if len(contexts) == 0 {
+		return "", errors.New("unable to find docker contexts")
+	}
+
+	return contexts[0].Endpoints["docker"].Host, nil
 }
 
 // ReadDockerignore reads the .dockerignore file in the context directory and
