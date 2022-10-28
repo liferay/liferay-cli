@@ -42,8 +42,6 @@ liferay ext start --dir %homedrive%%homepath%\client-extensions
     * set the DXP image to 'u' release (or latest nightly) (Ray)
     * acid test using wizard (Greg)
     * finish template metadata file (Greg)
-    * wizard - collapse categories (Ray)
-    * wizard - tabulation (Ray)
 
   * Later
     * tilt args (harness capability of)
