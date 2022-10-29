@@ -30,11 +30,17 @@ import (
 )
 
 var whitespace = regexp.MustCompile(`\s`)
+var noPrompt bool
 
 var createCmd = &cobra.Command{
 	Use:   "create [OPTIONS] [FLAGS]",
 	Short: "Creates new Client Extensions using a wizard-like interface",
+	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		if noPrompt {
+			invokeCreate(args)
+		}
+
 		actionIdx, _ := selection("How you would like to proceed", []string{
 			ansicolor.Bold("Create") + " project from " + ansicolor.Bold("sample"),
 			ansicolor.Bold("Create") + " project from " + ansicolor.Bold("template"),
@@ -208,6 +214,7 @@ func getTypeSubset(subsetType string, clientExtentionResources []map[string]inte
 
 func init() {
 	extCmd.AddCommand(createCmd)
+	createCmd.Flags().BoolVarP(&noPrompt, "noprompt", "n", false, "Do not show the wizard prompts, just use args")
 }
 
 func invokeCreate(args []string) {
