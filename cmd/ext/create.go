@@ -316,6 +316,7 @@ func selection(label string, items interface{}) (int, string) {
 	prompt := promptui.Select{
 		Label: label,
 		Items: items,
+		Size:  10,
 	}
 
 	idx, answer, err := prompt.Run()
