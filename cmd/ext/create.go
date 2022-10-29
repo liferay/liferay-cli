@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/docker/docker/api/types/container"
@@ -85,6 +86,8 @@ func createFromResourceByName(resourceType string, resources map[string]map[stri
 	for key := range resources {
 		keys = append(keys, key)
 	}
+
+	sort.Strings(keys)
 
 	_, resourceKey := selection(fmt.Sprintf("Choose a %s", resourceType), keys)
 	resource := resources[resourceKey]
@@ -245,6 +248,8 @@ func listByCategory(resourceType string, categories map[string]map[string]map[st
 	for key := range categories {
 		keys = append(keys, key)
 	}
+
+	sort.Strings(keys)
 
 	_, categoryKey := selection("Choose a category", keys)
 
