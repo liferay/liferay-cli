@@ -35,21 +35,11 @@ liferay ext start --dir %homedrive%%homepath%\client-extensions
 ```
 
 ## TODOs
-  * Release requirments
-    * batch mode (pass direct arguments to create command) (Ray)
-    * light user docs (Greg & Ray)
-    * set the DXP image to 'u' release (or latest nightly) (Ray)
-    * acid test using wizard (Greg)
-    * finish template metadata file (Greg)
 
-  * Later
-    * tilt args (harness capability of)
-    * add support for globs in the runtime: watch: client extension properties
-    * move current verbose to second level of verbose (-vv)
-    * move git sync and docker image build output to a first level of verbose (-v)
-    * allow specialized command outputs
-    * add an export command which in association with a CasC client extension project can export existing batch models
-    * detect if we need to build images and skip if not
+* Release requirements
+  * light user docs (Greg & Ray)
+  * smoke test all project/partials/samples (Greg & Ray)
+  * finish functional test using wizard in batch mode (Greg)
 
 ### Commands
 
