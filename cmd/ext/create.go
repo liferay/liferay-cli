@@ -149,9 +149,8 @@ func createFromResourceByName(resourceType string, resources map[string]map[stri
 	case 0:
 		invokeCreate(generatorArgs)
 	case 1:
-		cmd := "liferay ext create"
+		cmd := "liferay ext create --noprompt --"
 		for _, garg := range generatorArgs {
-			log.Println(garg)
 			cmd += argRegex.ReplaceAllString(garg, " --$1=\"$2\"")
 		}
 		fmt.Println(cmd)
