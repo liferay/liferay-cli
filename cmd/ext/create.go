@@ -29,8 +29,9 @@ import (
 	"liferay.com/liferay/cli/user"
 )
 
-var whitespace = regexp.MustCompile(`\s`)
+var argRegex = regexp.MustCompile("^--(.*)=(.*)$")
 var noPrompt bool
+var whitespace = regexp.MustCompile(`\s`)
 
 var createCmd = &cobra.Command{
 	Use:   "create [OPTIONS] [FLAGS]",
@@ -148,7 +149,8 @@ func createFromResourceByName(resourceType string, resources map[string]map[stri
 	case 1:
 		cmd := "liferay ext create"
 		for _, garg := range generatorArgs {
-			cmd += " " + garg
+			log.Println(garg)
+			cmd += argRegex.ReplaceAllString(garg, " --$1=\"$2\"")
 		}
 		fmt.Println(cmd)
 	}
