@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/docker/docker/api/types/container"
@@ -28,12 +29,19 @@ import (
 	"liferay.com/liferay/cli/user"
 )
 
+var argRegex = regexp.MustCompile("^--(.*)=(.*)$")
+var noPrompt bool
 var whitespace = regexp.MustCompile(`\s`)
 
 var createCmd = &cobra.Command{
 	Use:   "create [OPTIONS] [FLAGS]",
 	Short: "Creates new Client Extensions using a wizard-like interface",
+	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		if noPrompt {
+			invokeCreate(args)
+		}
+
 		actionIdx, _ := selection("How you would like to proceed", []string{
 			ansicolor.Bold("Create") + " project from " + ansicolor.Bold("sample"),
 			ansicolor.Bold("Create") + " project from " + ansicolor.Bold("template"),
@@ -86,6 +94,8 @@ func createFromResourceByName(resourceType string, resources map[string]map[stri
 		keys = append(keys, key)
 	}
 
+	sort.Strings(keys)
+
 	_, resourceKey := selection(fmt.Sprintf("Choose a %s", resourceType), keys)
 	resource := resources[resourceKey]
 	workspacePath := promptForWorkspacePath(resource["name"].(string))
@@ -99,6 +109,7 @@ func createFromResourceByName(resourceType string, resources map[string]map[stri
 	generatorArgs := make([]string, len(args)+2)
 	generatorArgs[0] = fmt.Sprintf("--resource-path=%s", resource["type"].(string)+"/"+resource["name"].(string))
 	generatorArgs[1] = fmt.Sprintf("--workspace-path=%s", workspacePath)
+	var argIdx = 2
 
 	for _, arg := range args {
 		argEntry := (arg).(map[string]interface{})
@@ -122,7 +133,8 @@ func createFromResourceByName(resourceType string, resources map[string]map[stri
 			},
 		)
 
-		generatorArgs = append(generatorArgs, fmt.Sprintf("--args=%s=%s", argEntry["name"].(string), value))
+		generatorArgs[argIdx] = fmt.Sprintf("--args=%s=%s", argEntry["name"].(string), value)
+		argIdx++
 	}
 
 	idx, _ := selection(
@@ -139,7 +151,8 @@ func createFromResourceByName(resourceType string, resources map[string]map[stri
 	case 1:
 		cmd := "liferay ext create"
 		for _, garg := range generatorArgs {
-			cmd += " " + garg
+			log.Println(garg)
+			cmd += argRegex.ReplaceAllString(garg, " --$1=\"$2\"")
 		}
 		fmt.Println(cmd)
 	}
@@ -205,6 +218,7 @@ func getTypeSubset(subsetType string, clientExtentionResources []map[string]inte
 
 func init() {
 	extCmd.AddCommand(createCmd)
+	createCmd.Flags().BoolVarP(&noPrompt, "noprompt", "n", false, "Do not show the wizard prompts, just use args")
 }
 
 func invokeCreate(args []string) {
@@ -245,6 +259,8 @@ func listByCategory(resourceType string, categories map[string]map[string]map[st
 	for key := range categories {
 		keys = append(keys, key)
 	}
+
+	sort.Strings(keys)
 
 	_, categoryKey := selection("Choose a category", keys)
 
@@ -304,6 +320,7 @@ func selection(label string, items interface{}) (int, string) {
 	prompt := promptui.Select{
 		Label: label,
 		Items: items,
+		Size:  10,
 	}
 
 	idx, answer, err := prompt.Run()
