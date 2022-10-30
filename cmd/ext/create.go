@@ -109,6 +109,7 @@ func createFromResourceByName(resourceType string, resources map[string]map[stri
 	generatorArgs := make([]string, len(args)+2)
 	generatorArgs[0] = fmt.Sprintf("--resource-path=%s", resource["type"].(string)+"/"+resource["name"].(string))
 	generatorArgs[1] = fmt.Sprintf("--workspace-path=%s", workspacePath)
+	var argIdx = 2
 
 	for _, arg := range args {
 		argEntry := (arg).(map[string]interface{})
@@ -132,7 +133,8 @@ func createFromResourceByName(resourceType string, resources map[string]map[stri
 			},
 		)
 
-		generatorArgs = append(generatorArgs, fmt.Sprintf("--args=%s=%s", argEntry["name"].(string), value))
+		generatorArgs[argIdx] = fmt.Sprintf("--args=%s=%s", argEntry["name"].(string), value)
+		argIdx++
 	}
 
 	idx, _ := selection(
