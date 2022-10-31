@@ -99,6 +99,9 @@ var startCmd = &cobra.Command{
 				},
 			},
 		}
+		if runtime.GOOS == "linux" {
+			host.GroupAdd = []string{"docker"}
+		}
 
 		exitCode := spinner.Spin(
 			spinner.SpinOptions{
