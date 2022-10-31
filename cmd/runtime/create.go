@@ -40,6 +40,9 @@ var createCmd = &cobra.Command{
 			},
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
+		if runtime.GOOS == "linux" {
+			host.GroupAdd = []string{"docker"}
+		}
 
 		exitCode := spinner.Spin(
 			spinner.SpinOptions{
