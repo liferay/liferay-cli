@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -21,6 +22,7 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 	"liferay.com/liferay/cli/ansicolor"
 	"liferay.com/liferay/cli/constants"
 	"liferay.com/liferay/cli/docker"
@@ -32,6 +34,10 @@ import (
 var argRegex = regexp.MustCompile("^--(.*)=(.*)$")
 var noPrompt bool
 var whitespace = regexp.MustCompile(`\s`)
+
+type void struct{}
+
+var novalue void
 
 var createCmd = &cobra.Command{
 	Use:   "create [OPTIONS] [FLAGS]",
@@ -59,6 +65,35 @@ var createCmd = &cobra.Command{
 	},
 }
 
+func applyPartialTo(project string) {
+	resourceType := "partial"
+	resources := getTypeSubset(resourceType, getClientExtentionResourcesJson())
+
+	// TODO filter by matching type
+
+	// Get the template type from the project
+	yaml := readClientExtensionYamlFromProject(project)
+	runtime := yaml["runtime"].(map[interface{}]interface{})
+	projectTemplate := runtime["template"].(string)
+
+	partials := make(map[string]map[string]interface{})
+	for key, partial := range resources {
+		if partial["template"] == projectTemplate {
+			partials[key] = partial
+		}
+	}
+
+	var resource map[string]interface{}
+
+	if len(partials) > 0 {
+		resource = selectResourceByName(resourceType, partials)
+
+		createFromResource(resource, project)
+	} else {
+		fmt.Println("There are no partials that apply to", project)
+	}
+}
+
 func assembleSelectKey(template map[string]interface{}) string {
 	key := ansicolor.Bold(template["name"].(string))
 	if template["description"] != nil {
@@ -70,6 +105,7 @@ func assembleSelectKey(template map[string]interface{}) string {
 func createFrom(resourceType string) {
 	resources := getTypeSubset(resourceType, getClientExtentionResourcesJson())
 	categories := getCategoriesFromSubset(resources)
+	var resource map[string]interface{}
 
 	if len(categories) > 1 {
 		listByIdx, _ := selection(fmt.Sprintf("List %ss by", resourceType), []string{
@@ -79,29 +115,19 @@ func createFrom(resourceType string) {
 
 		switch listByIdx {
 		case 0:
-			listByCategory(resourceType, categories)
+			resource = selectResourceByName(resourceType, listByCategory(resourceType, categories))
 		case 1:
-			createFromResourceByName(resourceType, resources)
+			resource = selectResourceByName(resourceType, resources)
 		}
 	} else {
-		createFromResourceByName(resourceType, resources)
+		resource = selectResourceByName(resourceType, resources)
 	}
+
+	createFromResource(resource, promptForWorkspacePath(resource["name"].(string)))
 }
 
-func createFromResourceByName(resourceType string, resources map[string]map[string]interface{}) {
-	keys := make([]string, 0)
-	for key := range resources {
-		keys = append(keys, key)
-	}
-
-	sort.Strings(keys)
-
-	_, resourceKey := selection(fmt.Sprintf("Choose a %s", resourceType), keys)
-	resource := resources[resourceKey]
-	workspacePath := promptForWorkspacePath(resource["name"].(string))
-
+func createFromResource(resource map[string]interface{}, workspacePath string) {
 	args := make([]interface{}, 0)
-
 	if resource["args"] != nil {
 		args = resource["args"].([]interface{})
 	}
@@ -193,6 +219,33 @@ func getClientExtentionResourcesJson() []map[string]interface{} {
 	return data
 }
 
+func getWorkspaceProjects() []string {
+	workspaceDir := viper.GetString(constants.Const.ExtClientExtensionDir)
+	projectSet := make(map[string]void)
+
+	e := filepath.Walk(
+		workspaceDir,
+		func(path string, info os.FileInfo, err error) error {
+			if err == nil && info.Name() == "client-extension.yaml" {
+				fullPathDir := filepath.Dir(path)
+				projectSet[fullPathDir[len(workspaceDir)+1:]] = novalue
+			}
+			return nil
+		},
+	)
+
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	projects := make([]string, 0)
+	for key := range projectSet {
+		projects = append(projects, key)
+	}
+
+	return projects
+}
+
 func getTypeSubset(subsetType string, clientExtentionResources []map[string]interface{}) map[string]map[string]interface{} {
 	count := 0
 
@@ -253,7 +306,7 @@ func invokeCreate(args []string) {
 	os.Exit(exitCode)
 }
 
-func listByCategory(resourceType string, categories map[string]map[string]map[string]interface{}) {
+func listByCategory(resourceType string, categories map[string]map[string]map[string]interface{}) map[string]map[string]interface{} {
 	keys := make([]string, 0)
 	for key := range categories {
 		keys = append(keys, key)
@@ -263,11 +316,30 @@ func listByCategory(resourceType string, categories map[string]map[string]map[st
 
 	_, categoryKey := selection("Choose a category", keys)
 
-	createFromResourceByName(resourceType, categories[categoryKey])
+	return categories[categoryKey]
 }
 
 func modifyExistingProject() {
-	fmt.Println("There are currently no projects. Check back soon!")
+	projects := getWorkspaceProjects()
+
+	if len(projects) < 1 {
+		fmt.Println("There are no projects.")
+		os.Exit(0)
+	}
+
+	_, project := selection("Select the project", projects)
+
+	actionIdx, _ := selection("What kind of modification will you perform", []string{
+		"Apply a " + ansicolor.Bold("partial"),
+		"Add a " + ansicolor.Bold("client extension"),
+	})
+
+	switch actionIdx {
+	case 0:
+		applyPartialTo(project)
+	case 1:
+		//addClientExtensionTo(project)
+	}
 }
 
 func prompt(question string, label string, dflt string, validate func(input string) error) string {
@@ -315,6 +387,28 @@ func promptForWorkspacePath(dflt string) string {
 		})
 }
 
+func readClientExtensionYamlFromProject(project string) map[string]interface{} {
+	yamlFile, err := ioutil.ReadFile(
+		filepath.Join(
+			viper.GetString(constants.Const.ExtClientExtensionDir),
+			project,
+			"client-extension.yaml",
+		),
+	)
+
+	if err != nil {
+		log.Fatal("Could not read project client-extension.yaml ", err)
+	}
+
+	var data map[string]interface{}
+
+	if err = yaml.Unmarshal(yamlFile, &data); err != nil {
+		log.Fatal("Could not read project client-extension.yaml ", err)
+	}
+
+	return data
+}
+
 func selection(label string, items interface{}) (int, string) {
 	prompt := promptui.Select{
 		Label: label,
@@ -332,4 +426,16 @@ func selection(label string, items interface{}) (int, string) {
 	}
 
 	return idx, answer
+}
+
+func selectResourceByName(resourceType string, resources map[string]map[string]interface{}) map[string]interface{} {
+	keys := make([]string, 0)
+	for key := range resources {
+		keys = append(keys, key)
+	}
+
+	sort.Strings(keys)
+
+	_, resourceKey := selection(fmt.Sprintf("Choose a %s", resourceType), keys)
+	return resources[resourceKey]
 }
