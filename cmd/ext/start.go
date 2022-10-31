@@ -36,11 +36,7 @@ var startCmd = &cobra.Command{
 	Long:  "Starts up localdev server including DXP server and monitors client-extension workspace to build and deploy workloads",
 	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		dockerClient, err := docker.GetDockerClient()
-
-		if err != nil {
-			log.Fatalf("%s getting dockerclient", err)
-		}
+		dockerClient := docker.GetDockerClient()
 
 		ctx := context.Background()
 

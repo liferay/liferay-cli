@@ -112,31 +112,23 @@ func GetDockerSocket() string {
 	return "/var/run/docker.sock"
 }
 
-func GetDockerClient() (*client.Client, error) {
+func GetDockerClient() *client.Client {
 	if dockerClient != nil {
-		return dockerClient, nil
-	}
-
-	if _, exists := os.LookupEnv("DOCKER_HOST"); !exists {
-		os.Setenv("DOCKER_HOST", "unix://"+GetDockerSocket())
+		return dockerClient
 	}
 
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		return nil, err
+		log.Fatal("Could not create docker client", err)
 	}
 
-	return dockerClient, nil
+	return dockerClient
 }
 
 func BuildImage(
 	imageTag string, dockerFileDir string, verbose bool) error {
 
-	dockerClient, err := GetDockerClient()
-
-	if err != nil {
-		return err
-	}
+	dockerClient := GetDockerClient()
 
 	ctx := context.Background()
 
@@ -191,11 +183,7 @@ func BuildImage(
 func InvokeCommandInLocaldev(
 	containerName string, config container.Config, host container.HostConfig, autoremove bool, verbose bool, logPipe func(io.ReadCloser, bool, string) int, exitPattern string) int {
 
-	dockerClient, err := GetDockerClient()
-
-	if err != nil {
-		log.Fatalf("%s getting dockerclient", err)
-	}
+	dockerClient := GetDockerClient()
 
 	ctx := context.Background()
 
