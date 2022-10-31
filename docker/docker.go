@@ -26,7 +26,9 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -40,6 +42,7 @@ import (
 	"github.com/docker/docker/pkg/streamformatter"
 	"github.com/spf13/viper"
 	"liferay.com/liferay/cli/constants"
+	"liferay.com/liferay/cli/user"
 )
 
 var (
@@ -155,11 +158,32 @@ func BuildImage(
 		buildCtx = progress.NewProgressReader(buildCtx, progressOutput, 0, "", "Sending build context to Docker daemon")
 	}
 
+	buildArgs := make(map[string]*string)
+
+	if runtime.GOOS != "windows" {
+		currentUser := user.CurrentUser()
+
+		buildArgs["UID"] = &currentUser.Uid
+		buildArgs["GID"] = &currentUser.Gid
+
+		host := GetDockerClient().DaemonHost()
+
+		if url, _ := client.ParseHostURL(host); url != nil {
+			info, _ := os.Stat(url.Host)
+
+			if stat, ok := info.Sys().(*syscall.Stat_t); ok {
+				gid := strconv.FormatUint(uint64(stat.Gid), 10)
+				buildArgs["DOCKER_GID"] = &gid
+			}
+		}
+	}
+
 	response, err := dockerClient.ImageBuild(
 		ctx, buildCtx, types.ImageBuildOptions{
 			Tags:        []string{imageTag},
 			PullParent:  true,
 			NetworkMode: viper.GetString(constants.Const.DockerNetwork),
+			BuildArgs:   buildArgs,
 		})
 
 	if err != nil {
