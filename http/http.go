@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/viper"
 )
@@ -53,6 +54,11 @@ func GetOrFetchBytes(options GetOrFetchBytesOptions) ([]byte, error) {
 		viper.WriteConfig()
 
 		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		err = os.MkdirAll(filepath.Dir(viper.GetString(options.FileKey)), 0775)
 		if err != nil {
 			return nil, err
 		}
