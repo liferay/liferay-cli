@@ -18,7 +18,7 @@ Tool for performing Liferay Client Extension related operations from the command
 1. Validate the binary (optional)
     Download the checksum file
     ```bash
-    curl -fsSL https://github.com/liferay/liferay-cli/releases/download/v0.0.5/checksums.txt -o checksum.txt
+    curl -fsSL https://github.com/liferay/liferay-cli/releases/latest/download/checksums.txt -o checksum.txt
     ```
     Validate the binary against the checksum file
     1. Apple Silicon
@@ -62,7 +62,7 @@ Tool for performing Liferay Client Extension related operations from the command
 1. Validate the binary (optional)
     Download the checksum file
     ```bash
-    curl -fsSL https://github.com/liferay/liferay-cli/releases/download/v0.0.5/checksums.txt -o checksum.txt
+    curl -fsSL https://github.com/liferay/liferay-cli/releases/latest/download/checksums.txt -o checksum.txt
     ```
     Validate the binary against the checksum file
     ```bash
@@ -106,7 +106,7 @@ Tool for performing Liferay Client Extension related operations from the command
 1. Validate the binary (optional)
     Download the checksum file
     ```bash
-    curl -fsSL https://github.com/liferay/liferay-cli/releases/download/v0.0.5/checksums.txt -o checksum.txt
+    curl -fsSL https://github.com/liferay/liferay-cli/releases/latest/download/checksums.txt -o checksum.txt
     ```
     Validate the binary against the checksum file
     1. Using Command Prompt to manually compare `CertUtil`'s output to the checksum file downloaded:
