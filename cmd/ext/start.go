@@ -11,6 +11,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -24,6 +25,7 @@ import (
 	"liferay.com/liferay/cli/docker"
 	"liferay.com/liferay/cli/flags"
 	"liferay.com/liferay/cli/spinner"
+	"liferay.com/liferay/cli/user"
 )
 
 var openBrowser bool
@@ -79,6 +81,9 @@ var startCmd = &cobra.Command{
 				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
 			},
 			ExposedPorts: exposedPorts,
+		}
+		if runtime.GOOS == "linux" {
+			config.User = user.UserUidAndGuidString()
 		}
 		host := container.HostConfig{
 			Binds: []string{

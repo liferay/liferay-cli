@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
@@ -16,6 +17,7 @@ import (
 	"liferay.com/liferay/cli/docker"
 	"liferay.com/liferay/cli/flags"
 	"liferay.com/liferay/cli/spinner"
+	"liferay.com/liferay/cli/user"
 )
 
 // refreshCmd represents the refresh command
@@ -30,6 +32,9 @@ var refreshCmd = &cobra.Command{
 				"LOCALDEV_REPO=/repo",
 				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
 			},
+		}
+		if runtime.GOOS == "linux" {
+			config.User = user.UserUidAndGuidString()
 		}
 		host := container.HostConfig{
 			Binds: []string{
