@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"sort"
 	"strings"
 
@@ -27,6 +28,7 @@ import (
 	"liferay.com/liferay/cli/docker"
 	"liferay.com/liferay/cli/flags"
 	"liferay.com/liferay/cli/spinner"
+	"liferay.com/liferay/cli/user"
 )
 
 var argRegex = regexp.MustCompile("^--(.*)=(.*)$")
@@ -280,6 +282,9 @@ func invokeCreate(args []string) {
 			"LOCALDEV_REPO=/repo",
 			"CREATE_ARGS=" + strings.Join(args, "|"),
 		},
+	}
+	if runtime.GOOS == "linux" {
+		config.User = user.UserUidAndGuidString()
 	}
 	host := container.HostConfig{
 		Binds: []string{
