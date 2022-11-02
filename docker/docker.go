@@ -117,10 +117,6 @@ func GetDockerClient() (*client.Client, error) {
 		return dockerClient, nil
 	}
 
-	if _, exists := os.LookupEnv("DOCKER_HOST"); !exists {
-		os.Setenv("DOCKER_HOST", "unix://"+GetDockerSocket())
-	}
-
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return nil, err
