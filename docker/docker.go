@@ -26,9 +26,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
-	"syscall"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -169,12 +167,7 @@ func BuildImage(
 		host := GetDockerClient().DaemonHost()
 
 		if url, _ := client.ParseHostURL(host); url != nil {
-			info, _ := os.Stat(url.Host)
-
-			if stat, ok := info.Sys().(*syscall.Stat_t); ok {
-				gid := strconv.FormatUint(uint64(stat.Gid), 10)
-				buildArgs["DOCKER_GID"] = &gid
-			}
+			buildArgs["DOCKER_GID"] = GetOsPathGid(url.Host)
 		}
 	}
 
