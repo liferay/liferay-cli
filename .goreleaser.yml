@@ -37,41 +37,41 @@ archives:
       - completions/*
       - manpages/*
 
-brews:
-  - tap:
-      owner: liferay
-      name: liferay-cli
-    folder: Formula
-    name: liferay
-    homepage:  https://github.com/liferay/liferay-cli
-    description: Tool for building and running Liferay Client Extensions
-    license: Apache-2.0
+# brews:
+#   - tap:
+#       owner: liferay
+#       name: liferay-cli
+#     folder: Formula
+#     name: liferay
+#     homepage:  https://github.com/liferay/liferay-cli
+#     description: Tool for building and running Liferay Client Extensions
+#     license: Apache-2.0
 
-    # Setting this will prevent goreleaser to actually try to commit the updated
-    # formula - instead, the formula file will be stored on the dist folder only,
-    # leaving the responsibility of publishing it to the user.
-    # If set to auto, the release will not be uploaded to the homebrew tap
-    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
-    # Default is false.
-    skip_upload: "auto"
+#     # Setting this will prevent goreleaser to actually try to commit the updated
+#     # formula - instead, the formula file will be stored on the dist folder only,
+#     # leaving the responsibility of publishing it to the user.
+#     # If set to auto, the release will not be uploaded to the homebrew tap
+#     # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
+#     # Default is false.
+#     skip_upload: "auto"
 
-    test: |
-      system "#{bin}/liferay --version"
-    install: |-
-      replaces = ["-amd64", "-arm64", "-darwin", "-linux"]
-      Dir.glob("./*").sort.each do |entry|
-        origin = File.basename(entry, File.extname(entry))
-        printf "Before File: %s\n", entry
-        newEntry = origin
-        replaces.each do |rep|
-          if newEntry.include?(rep)
-            newEntry = newEntry.gsub(rep, "")
-          end
-        end
-        printf "After File: %s\n", newEntry
-        File.rename(entry, newEntry)
-      end
-      bin.install "liferay"
+#     test: |
+#       system "#{bin}/liferay --version"
+#     install: |-
+#       replaces = ["-amd64", "-arm64", "-darwin", "-linux"]
+#       Dir.glob("./*").sort.each do |entry|
+#         origin = File.basename(entry, File.extname(entry))
+#         printf "Before File: %s\n", entry
+#         newEntry = origin
+#         replaces.each do |rep|
+#           if newEntry.include?(rep)
+#             newEntry = newEntry.gsub(rep, "")
+#           end
+#         end
+#         printf "After File: %s\n", newEntry
+#         File.rename(entry, newEntry)
+#       end
+#       bin.install "liferay"
 
 checksum:
   name_template: 'checksums.txt'
