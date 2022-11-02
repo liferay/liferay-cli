@@ -87,11 +87,7 @@ func checkForUpdate() {
 func init() {
 	initConfig()
 
-	_, err := docker.GetDockerClient()
-
-	if err != nil {
-		log.Fatalf("%s getting dockerclient", err)
-	}
+	docker.GetDockerClient()
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
