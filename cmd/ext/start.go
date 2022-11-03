@@ -11,7 +11,6 @@ import (
 	"log"
 	"net"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -25,7 +24,6 @@ import (
 	"liferay.com/liferay/cli/docker"
 	"liferay.com/liferay/cli/flags"
 	"liferay.com/liferay/cli/spinner"
-	"liferay.com/liferay/cli/user"
 )
 
 var openBrowser bool
@@ -82,9 +80,6 @@ var startCmd = &cobra.Command{
 			},
 			ExposedPorts: exposedPorts,
 		}
-		if runtime.GOOS == "linux" {
-			config.User = user.UserUidAndGuidString()
-		}
 		host := container.HostConfig{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
@@ -104,9 +99,7 @@ var startCmd = &cobra.Command{
 				},
 			},
 		}
-		if runtime.GOOS == "linux" {
-			host.GroupAdd = []string{"docker"}
-		}
+		docker.PerformOSSpecificAdjustments(&config, &host)
 
 		exitCode := spinner.Spin(
 			spinner.SpinOptions{

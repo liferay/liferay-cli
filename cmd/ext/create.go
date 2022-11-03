@@ -14,7 +14,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"sort"
 	"strings"
 
@@ -28,7 +27,6 @@ import (
 	"liferay.com/liferay/cli/docker"
 	"liferay.com/liferay/cli/flags"
 	"liferay.com/liferay/cli/spinner"
-	"liferay.com/liferay/cli/user"
 )
 
 var argRegex = regexp.MustCompile("^--(.*)=(.*)$")
@@ -124,8 +122,8 @@ func createFrom(resourceType string) {
 	}
 
 	createFromResource(resource, promptForWorkspacePath(resource["name"].(string)))
-}
 
+}
 func createFromResource(resource map[string]interface{}, workspacePath string) {
 	args := make([]interface{}, 0)
 	if resource["args"] != nil {
@@ -283,9 +281,6 @@ func invokeCreate(args []string) {
 			"CREATE_ARGS=" + strings.Join(args, "|"),
 		},
 	}
-	if runtime.GOOS == "linux" {
-		config.User = user.UserUidAndGuidString()
-	}
 	host := container.HostConfig{
 		Binds: []string{
 			fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
@@ -294,9 +289,7 @@ func invokeCreate(args []string) {
 		},
 		NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 	}
-	if runtime.GOOS == "linux" {
-		host.GroupAdd = []string{"docker"}
-	}
+	docker.PerformOSSpecificAdjustments(&config, &host)
 
 	exitCode := spinner.Spin(
 		spinner.SpinOptions{
