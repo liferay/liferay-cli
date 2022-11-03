@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
@@ -16,6 +17,7 @@ import (
 	"liferay.com/liferay/cli/docker"
 	"liferay.com/liferay/cli/flags"
 	"liferay.com/liferay/cli/spinner"
+	"liferay.com/liferay/cli/user"
 )
 
 // downCmd represents the down command
@@ -33,6 +35,9 @@ var stopCmd = &cobra.Command{
 				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
 			},
 		}
+		if runtime.GOOS == "linux" {
+			config.User = user.UserUidAndGuidString()
+		}
 		host := container.HostConfig{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
@@ -42,6 +47,9 @@ var stopCmd = &cobra.Command{
 				"localdevLiferayCache:/root/.liferay",
 			},
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
+		}
+		if runtime.GOOS == "linux" {
+			host.GroupAdd = []string{"docker"}
 		}
 
 		exitCode := spinner.Spin(

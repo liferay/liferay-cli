@@ -40,6 +40,7 @@ import (
 	"github.com/docker/docker/pkg/streamformatter"
 	"github.com/spf13/viper"
 	"liferay.com/liferay/cli/constants"
+	"liferay.com/liferay/cli/user"
 )
 
 var (
@@ -112,27 +113,23 @@ func GetDockerSocket() string {
 	return "/var/run/docker.sock"
 }
 
-func GetDockerClient() (*client.Client, error) {
+func GetDockerClient() *client.Client {
 	if dockerClient != nil {
-		return dockerClient, nil
+		return dockerClient
 	}
 
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		return nil, err
+		log.Fatal("Could not create docker client", err)
 	}
 
-	return dockerClient, nil
+	return dockerClient
 }
 
 func BuildImage(
 	imageTag string, dockerFileDir string, verbose bool) error {
 
-	dockerClient, err := GetDockerClient()
-
-	if err != nil {
-		return err
-	}
+	dockerClient := GetDockerClient()
 
 	ctx := context.Background()
 
@@ -159,11 +156,27 @@ func BuildImage(
 		buildCtx = progress.NewProgressReader(buildCtx, progressOutput, 0, "", "Sending build context to Docker daemon")
 	}
 
+	buildArgs := make(map[string]*string)
+
+	if runtime.GOOS != "windows" {
+		currentUser := user.CurrentUser()
+
+		buildArgs["UID"] = &currentUser.Uid
+		buildArgs["GID"] = &currentUser.Gid
+
+		host := GetDockerClient().DaemonHost()
+
+		if url, _ := client.ParseHostURL(host); url != nil {
+			buildArgs["DOCKER_GID"] = GetOsPathGid(url.Host)
+		}
+	}
+
 	response, err := dockerClient.ImageBuild(
 		ctx, buildCtx, types.ImageBuildOptions{
 			Tags:        []string{imageTag},
 			PullParent:  true,
 			NetworkMode: viper.GetString(constants.Const.DockerNetwork),
+			BuildArgs:   buildArgs,
 		})
 
 	if err != nil {
@@ -187,11 +200,7 @@ func BuildImage(
 func InvokeCommandInLocaldev(
 	containerName string, config container.Config, host container.HostConfig, autoremove bool, verbose bool, logPipe func(io.ReadCloser, bool, string) int, exitPattern string) int {
 
-	dockerClient, err := GetDockerClient()
-
-	if err != nil {
-		log.Fatalf("%s getting dockerclient", err)
-	}
+	dockerClient := GetDockerClient()
 
 	ctx := context.Background()
 

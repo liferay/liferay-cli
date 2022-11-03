@@ -11,6 +11,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -24,6 +25,7 @@ import (
 	"liferay.com/liferay/cli/docker"
 	"liferay.com/liferay/cli/flags"
 	"liferay.com/liferay/cli/spinner"
+	"liferay.com/liferay/cli/user"
 )
 
 var openBrowser bool
@@ -36,11 +38,7 @@ var startCmd = &cobra.Command{
 	Long:  "Starts up localdev server including DXP server and monitors client-extension workspace to build and deploy workloads",
 	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		dockerClient, err := docker.GetDockerClient()
-
-		if err != nil {
-			log.Fatalf("%s getting dockerclient", err)
-		}
+		dockerClient := docker.GetDockerClient()
 
 		ctx := context.Background()
 
@@ -84,6 +82,9 @@ var startCmd = &cobra.Command{
 			},
 			ExposedPorts: exposedPorts,
 		}
+		if runtime.GOOS == "linux" {
+			config.User = user.UserUidAndGuidString()
+		}
 		host := container.HostConfig{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
@@ -102,6 +103,9 @@ var startCmd = &cobra.Command{
 					},
 				},
 			},
+		}
+		if runtime.GOOS == "linux" {
+			host.GroupAdd = []string{"docker"}
 		}
 
 		exitCode := spinner.Spin(
