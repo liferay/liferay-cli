@@ -266,6 +266,16 @@ func InvokeCommandInLocaldev(
 	return 0
 }
 
+func PerformOSSpecificAdjustments(config *container.Config, host *container.HostConfig) {
+	if runtime.GOOS == "linux" {
+		config.User = user.UserUidAndGuidString()
+		host.GroupAdd = []string{"docker"}
+	}
+	if runtime.GOOS == "windows" {
+		host.GroupAdd = []string{"0"}
+	}
+}
+
 type DockerEndpoints struct {
 	Host string
 }
