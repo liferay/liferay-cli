@@ -45,7 +45,7 @@ clean:
 	$(RM_CMD)
 
 test:
-	$(GO_CMD_WRAPPER) test ./docker
+	$(GO_CMD_WRAPPER) test ./...
 
 linux: export GOOS=linux
 linux: export GOARCH=amd64
