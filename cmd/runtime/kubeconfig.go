@@ -16,6 +16,7 @@ import (
 	"github.com/spf13/viper"
 	"liferay.com/liferay/cli/constants"
 	"liferay.com/liferay/cli/docker"
+	"liferay.com/liferay/cli/ext"
 	"liferay.com/liferay/cli/flags"
 	"liferay.com/liferay/cli/spinner"
 )
@@ -34,6 +35,7 @@ var kubeconfigCmd = &cobra.Command{
 			Image: "localdev-server",
 			Cmd:   []string{"/repo/scripts/runtime/kubeconfig.sh"},
 			Env: []string{
+				"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),
 				"LOCALDEV_REPO=/repo",
 				"KUBECONFIG=/var/run/.kube/config",
 			},

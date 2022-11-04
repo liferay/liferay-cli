@@ -25,6 +25,7 @@ import (
 	"liferay.com/liferay/cli/ansicolor"
 	"liferay.com/liferay/cli/constants"
 	"liferay.com/liferay/cli/docker"
+	"liferay.com/liferay/cli/ext"
 	"liferay.com/liferay/cli/flags"
 	"liferay.com/liferay/cli/spinner"
 )
@@ -276,6 +277,7 @@ func invokeCreate(args []string) {
 		Image: "localdev-server",
 		Cmd:   []string{"/repo/scripts/ext/create.py"},
 		Env: []string{
+			"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),
 			"WORKSPACE_BASE_PATH=/workspace/client-extensions",
 			"LOCALDEV_REPO=/repo",
 			"CREATE_ARGS=" + strings.Join(args, "|"),

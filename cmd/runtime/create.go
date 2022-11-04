@@ -15,6 +15,7 @@ import (
 
 	"liferay.com/liferay/cli/constants"
 	"liferay.com/liferay/cli/docker"
+	"liferay.com/liferay/cli/ext"
 	"liferay.com/liferay/cli/flags"
 	"liferay.com/liferay/cli/spinner"
 )
@@ -29,6 +30,7 @@ var createCmd = &cobra.Command{
 			Image: "localdev-server",
 			Cmd:   []string{"/repo/scripts/runtime/create.sh"},
 			Env: []string{
+				"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),
 				"LOCALDEV_REPO=/repo",
 				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
 			},
