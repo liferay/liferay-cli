@@ -126,17 +126,31 @@ func confirmUseOfDefaultDir() string {
 
 func setClientExtensionDir(dir string) {
 	if !filepath.IsAbs(dir) {
-		dirname, err := os.UserHomeDir()
+		dirname, err := os.Getwd()
+
+		if dir == "." {
+			dir = ""
+		} else if dir[0:2] == "~/" {
+			dirname, err = os.UserHomeDir()
+			dir = dir[2:]
+		} else if dir[0:3] == "~\\" {
+			dirname, err = os.UserHomeDir()
+			dir = dir[3:]
+		}
 
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		dir = filepath.Join(dirname, dir)
+		dir, err = filepath.Abs(filepath.Join(dirname, dir))
+
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	if !io.Exists(dir) {
-		err := os.MkdirAll(dir, 0644)
+		err := os.MkdirAll(dir, 0775)
 
 		if err != nil {
 			log.Fatal(err)
@@ -150,9 +164,9 @@ func setClientExtensionDir(dir string) {
 
 		viper.Set(constants.Const.ExtClientExtensionDir, dir)
 
-		flags.ClientExtensionDir = dir
-
 		viper.Set(constants.Const.ExtClientExtensionDirSpecified, true)
 		viper.WriteConfig()
 	}
+
+	flags.ClientExtensionDir = dir
 }
