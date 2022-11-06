@@ -163,12 +163,6 @@ func BuildImage(
 
 		buildArgs["UID"] = &currentUser.Uid
 		buildArgs["GID"] = &currentUser.Gid
-
-		host := GetDockerClient().DaemonHost()
-
-		if url, _ := client.ParseHostURL(host); url != nil {
-			buildArgs["DOCKER_GID"] = GetOsPathGid(url.Host)
-		}
 	}
 
 	response, err := dockerClient.ImageBuild(
@@ -269,10 +263,6 @@ func InvokeCommandInLocaldev(
 func PerformOSSpecificAdjustments(config *container.Config, host *container.HostConfig) {
 	if runtime.GOOS == "linux" {
 		config.User = user.UserUidAndGuidString()
-		host.GroupAdd = []string{"docker"}
-	}
-	if runtime.GOOS == "windows" {
-		host.GroupAdd = []string{"0"}
 	}
 }
 
