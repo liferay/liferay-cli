@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"sort"
 	"strings"
 
@@ -44,7 +45,7 @@ var createCmd = &cobra.Command{
 	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if noPrompt {
-			invokeCreate(args)
+			invokeCreate(cmd, args)
 		}
 
 		actionIdx, _ := selection("How you would like to proceed", []string{
@@ -55,16 +56,16 @@ var createCmd = &cobra.Command{
 
 		switch actionIdx {
 		case 0:
-			createFrom("sample")
+			createFrom(cmd, "sample")
 		case 1:
-			createFrom("template")
+			createFrom(cmd, "template")
 		case 2:
-			modifyExistingProject()
+			modifyExistingProject(cmd)
 		}
 	},
 }
 
-func applyPartialTo(project string) {
+func applyPartialTo(cmd *cobra.Command, project string) {
 	resourceType := "partial"
 	resources := getTypeSubset(resourceType, getClientExtentionResourcesJson())
 
@@ -87,7 +88,7 @@ func applyPartialTo(project string) {
 	if len(partials) > 0 {
 		resource = selectResourceByName(resourceType, partials)
 
-		createFromResource(resource, project)
+		createFromResource(cmd, resource, project)
 	} else {
 		fmt.Println("There are no partials that apply to", project)
 	}
@@ -101,7 +102,7 @@ func assembleSelectKey(template map[string]interface{}) string {
 	return key
 }
 
-func createFrom(resourceType string) {
+func createFrom(cmd *cobra.Command, resourceType string) {
 	resources := getTypeSubset(resourceType, getClientExtentionResourcesJson())
 	categories := getCategoriesFromSubset(resources)
 	var resource map[string]interface{}
@@ -122,10 +123,10 @@ func createFrom(resourceType string) {
 		resource = selectResourceByName(resourceType, resources)
 	}
 
-	createFromResource(resource, promptForWorkspacePath(resource["name"].(string)))
-
+	createFromResource(cmd, resource, promptForWorkspacePath(resource["name"].(string)))
 }
-func createFromResource(resource map[string]interface{}, workspacePath string) {
+
+func createFromResource(cmd *cobra.Command, resource map[string]interface{}, workspacePath string) {
 	args := make([]interface{}, 0)
 	if resource["args"] != nil {
 		args = resource["args"].([]interface{})
@@ -172,7 +173,7 @@ func createFromResource(resource map[string]interface{}, workspacePath string) {
 
 	switch idx {
 	case 0:
-		invokeCreate(generatorArgs)
+		invokeCreate(cmd, generatorArgs)
 	case 1:
 		cmd := "liferay ext create --noprompt --"
 		for _, garg := range generatorArgs {
@@ -272,7 +273,7 @@ func init() {
 	createCmd.Flags().BoolVarP(&noPrompt, "noprompt", "n", false, "Do not show the wizard prompts, just use args")
 }
 
-func invokeCreate(args []string) {
+func invokeCreate(cmd *cobra.Command, args []string) {
 	config := container.Config{
 		Image: "localdev-server",
 		Cmd:   []string{"/repo/scripts/ext/create.py"},
@@ -301,6 +302,10 @@ func invokeCreate(args []string) {
 			return docker.InvokeCommandInLocaldev("localdev-ext-create", config, host, true, flags.Verbose, fior, "")
 		})
 
+	if exitCode == 0 && runtime.GOOS == "windows" {
+		refreshCmd.Run(cmd, args)
+	}
+
 	os.Exit(exitCode)
 }
 
@@ -317,7 +322,7 @@ func listByCategory(resourceType string, categories map[string]map[string]map[st
 	return categories[categoryKey]
 }
 
-func modifyExistingProject() {
+func modifyExistingProject(cmd *cobra.Command) {
 	projects := getWorkspaceProjects()
 
 	if len(projects) < 1 {
@@ -334,7 +339,7 @@ func modifyExistingProject() {
 
 	switch actionIdx {
 	case 0:
-		applyPartialTo(project)
+		applyPartialTo(cmd, project)
 	case 1:
 		//addClientExtensionTo(project)
 	}
