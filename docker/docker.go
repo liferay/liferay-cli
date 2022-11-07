@@ -17,16 +17,12 @@ package docker
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -273,33 +269,6 @@ type DockerEndpoints struct {
 type DockerContext struct {
 	Name      string
 	Endpoints map[string]DockerEndpoints
-}
-
-func lookupSocketLocationFromContext() (string, error) {
-	// call docker context inspect to get info on sock
-	cmd := exec.Command("docker", "context", "inspect")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return string(output), err
-	}
-
-	var contexts []DockerContext
-	jsonerr := json.Unmarshal([]byte(output), &contexts)
-
-	if jsonerr != nil {
-		return "", jsonerr
-	}
-
-	if len(contexts) == 0 {
-		return "", errors.New("unable to find docker contexts")
-	}
-	hostString := contexts[0].Endpoints["docker"].Host
-
-	if strings.HasPrefix(hostString, "unix://") {
-		return strings.TrimPrefix(hostString, "unix://"), nil
-	}
-
-	return "", errors.New("hostString did not have unix:// prefix")
 }
 
 // ReadDockerignore reads the .dockerignore file in the context directory and
