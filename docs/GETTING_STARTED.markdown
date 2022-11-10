@@ -15,8 +15,8 @@ This guide will help you get started with Client Extension development using new
 
 Client Extension development that will support cloud workloads need to use real domain names and TLS 1.3.  Therefore we need to one-time generate a 'wildcard certificate' and a 'rootCA' and install them into your system, so that your browser will trust localdev domains, and DXP can trust your workfloads running in their own domains.
 
-- Execute `liferay extension mkcert` (this will generate a wildcard certificate for `*.lfr.dev`)
-- Execute `liferay extension mkcert --install` (This will install the rootCA that you just generated into your OS keystores, or Chrome/Firefox/Edge keystores)
+- Execute `liferay runtime mkcert` (this will generate a wildcard certificate for `*.lfr.dev`)
+- Execute `liferay runtime mkcert --install` (This will install the rootCA that you just generated into your OS keystores, or Chrome/Firefox/Edge keystores)
 - If you have problems with these commands, please [open an issue.](https://github.com/liferay/liferay-cli/issues)
 
 ## Bring up Localdev environment
