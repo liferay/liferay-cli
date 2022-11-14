@@ -40,11 +40,11 @@ Tool for performing Liferay Client Extension related operations from the command
     ```
 1. Make the binary executable.
     ```bash
-    chmod +x ./liferay-*
+    chmod +x ./liferay-darwin-*
     ```
 1. Move the binary to a file location on your system `PATH` and rename it to `liferay` for convenience.
     ```bash
-    sudo mv ./liferay-* /usr/local/bin/liferay
+    sudo mv ./liferay-darwin-* /usr/local/bin/liferay
     sudo chown root: /usr/local/bin/liferay
     ```
     _Make sure `/usr/local/bin` is in your `PATH` environment variable._
