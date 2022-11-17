@@ -55,6 +55,11 @@ Tool for performing Liferay Client Extension related operations from the command
 
 ### Manuall Installation On Linux using `curl`
 
+#### Known Issues
+
+* If you have less than 5% of disk space available on your system, the runtime environment will be unstable.
+* With very new versions of the Linux kernel (e.g. 6.0.8), you may encounter stability issues with the runtime environment. One method of verifying your kernel is compatible is documented [here](https://blog.hypriot.com/post/verify-kernel-container-compatibility/).
+
 1. Download the binary using curl
     ```bash
     curl -fsSL https://github.com/liferay/liferay-cli/releases/latest/download/liferay-linux-amd64 -O
@@ -145,6 +150,8 @@ Tool for performing Liferay Client Extension related operations from the command
 ## Automated Installation
 
 ### Installation on Mac or Linux using the `install.sh` script
+
+See [Known Issues](#known-issues) above for some issues with Linux.
 
 1. Execute:
     ```bash
