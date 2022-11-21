@@ -25,7 +25,7 @@ var statusCmd = &cobra.Command{
 	Short: "Returns the status of the extension environment",
 	Run: func(cmd *cobra.Command, args []string) {
 		config := container.Config{
-			Image: "localdev-server",
+			Image: viper.GetString(constants.Const.DockerLocaldevServerImage),
 			Cmd:   []string{"/repo/scripts/ext/status.sh"},
 			Env: []string{
 				"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),

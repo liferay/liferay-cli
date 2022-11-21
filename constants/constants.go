@@ -8,6 +8,7 @@ var Const = struct {
 	CliReleasesFile                string
 	CliReleasesURL                 string
 	DockerLocaldevServerImage      string
+	DockerLocaldevServerPullimage  string
 	DockerNetwork                  string
 	ExtClientExtensionDir          string
 	ExtClientExtensionDirSpecified string
@@ -27,6 +28,7 @@ var Const = struct {
 	CliReleasesFile:                "cli.releases.file",
 	CliReleasesURL:                 "cli.releases.url",
 	DockerLocaldevServerImage:      "docker.localdev.server.image",
+	DockerLocaldevServerPullimage:  "docker.localdev.server.pull-image",
 	DockerNetwork:                  "docker.network",
 	ExtClientExtensionDir:          "extension.client-extension.dir",
 	ExtClientExtensionDirSpecified: "extension.client-extension.dir-specified",
