@@ -275,7 +275,7 @@ func init() {
 
 func invokeCreate(cmd *cobra.Command, args []string) {
 	config := container.Config{
-		Image: "localdev-server",
+		Image: viper.GetString(constants.Const.DockerLocaldevServerImage),
 		Cmd:   []string{"/repo/scripts/ext/create.py"},
 		Env: []string{
 			"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),

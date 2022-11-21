@@ -16,6 +16,10 @@ import (
 func BuildImages(verbose bool) {
 	var s *spinner.Spinner
 
+	if viper.GetBool(constants.Const.DockerLocaldevServerPullimage) {
+		return
+	}
+
 	if !verbose {
 		s = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		s.Color("green")
@@ -28,8 +32,10 @@ func BuildImages(verbose bool) {
 	var g errgroup.Group
 
 	g.Go(func() error {
-		return BuildImage("localdev-server", filepath.Join(
-			viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-server"),
+		return BuildImage(
+			viper.GetString(constants.Const.DockerLocaldevServerImage),
+			filepath.Join(
+				viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-server"),
 			verbose)
 	})
 

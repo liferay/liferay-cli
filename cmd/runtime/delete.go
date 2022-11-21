@@ -27,7 +27,7 @@ var deleteCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := container.Config{
-			Image: "localdev-server",
+			Image: viper.GetString(constants.Const.DockerLocaldevServerImage),
 			Cmd:   []string{"/repo/scripts/runtime/delete.sh"},
 			Env: []string{
 				"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),

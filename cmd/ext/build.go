@@ -27,7 +27,7 @@ var buildCmd = &cobra.Command{
 		cmdArgs := append([]string{"/repo/scripts/ext/build.sh"}, args...)
 
 		config := container.Config{
-			Image: "localdev-server",
+			Image: viper.GetString(constants.Const.DockerLocaldevServerImage),
 			Cmd:   cmdArgs,
 			Env: []string{
 				"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),

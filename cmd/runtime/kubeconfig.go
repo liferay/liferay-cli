@@ -32,7 +32,7 @@ var kubeconfigCmd = &cobra.Command{
 		}
 
 		config := container.Config{
-			Image: "localdev-server",
+			Image: viper.GetString(constants.Const.DockerLocaldevServerImage),
 			Cmd:   []string{"/repo/scripts/runtime/kubeconfig.sh"},
 			Env: []string{
 				"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),
