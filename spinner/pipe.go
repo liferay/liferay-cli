@@ -12,6 +12,7 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 	"liferay.com/liferay/cli/ansicolor"
 	"liferay.com/liferay/cli/docker"
+	lstrings "liferay.com/liferay/cli/strings"
 )
 
 func SpinnerPipe(s *spinner.Spinner, prefix string) func(io.ReadCloser, bool, string) int {
@@ -36,7 +37,7 @@ func SpinnerPipe(s *spinner.Spinner, prefix string) func(io.ReadCloser, bool, st
 
 					if msg != "" {
 						s.FinalMSG = msg
-						s.Suffix = fmt.Sprintf(prefix, truncateText(msg, 80))
+						s.Suffix = fmt.Sprintf(prefix, lstrings.TruncateText(msg, 80))
 					}
 
 					if exitPattern != "" {
@@ -50,11 +51,4 @@ func SpinnerPipe(s *spinner.Spinner, prefix string) func(io.ReadCloser, bool, st
 		}
 		return 0
 	}
-}
-
-func truncateText(s string, max int) string {
-	if len(s) <= max {
-		return s
-	}
-	return s[:max]
 }
