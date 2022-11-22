@@ -14,7 +14,7 @@ import (
 var configCmd = &cobra.Command{
 	Use:     "config COMMAND [OPTIONS] [ARG...]",
 	Short:   "Operations for configuration of liferay cli",
-	Aliases: []string{"cfg"},
+	Aliases: []string{"cfg", "c"},
 	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()

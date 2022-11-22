@@ -27,7 +27,7 @@ import (
 var extCmd = &cobra.Command{
 	Use:     "extension COMMAND [OPTIONS] [ARG...]",
 	Short:   "Operations to control extension environment",
-	Aliases: []string{"ext"},
+	Aliases: []string{"ext", "e"},
 	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
