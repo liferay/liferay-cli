@@ -10,3 +10,10 @@ func StripCtlFromUTF8(str string) string {
 		return -1
 	}, str)
 }
+
+func TruncateText(str string, max int) string {
+	if len(str) <= max {
+		return str
+	}
+	return str[:max] + "…"
+}
