@@ -11,6 +11,17 @@ func StripCtlFromUTF8(str string) string {
 	}, str)
 }
 
+func StripNewlines(str string) string {
+	return strings.Map(func(r rune) rune {
+		switch r {
+		case '\n':
+			return ' '
+		default:
+			return r
+		}
+	}, str)
+}
+
 func TruncateText(str string, max int) string {
 	if len(str) <= max {
 		return str
