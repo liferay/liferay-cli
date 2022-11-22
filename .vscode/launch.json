@@ -11,7 +11,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["--version"]
+      "args": ["--version"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay config list",
@@ -19,7 +20,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["config", "list"]
+      "args": ["config", "list"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay runtime create",
@@ -27,7 +29,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["runtime", "create"]
+      "args": ["runtime", "create"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay runtime delete",
@@ -35,7 +38,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["runtime", "delete"]
+      "args": ["runtime", "delete"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay runtime mkcert",
@@ -43,7 +47,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["runtime", "mkcert"]
+      "args": ["runtime", "mkcert"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay runtime mkcert --install",
@@ -51,7 +56,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["runtime", "mkcert", "--install"]
+      "args": ["runtime", "mkcert", "--install"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay runtime kubeconfig",
@@ -59,7 +65,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["runtime", "kubeconfig"]
+      "args": ["runtime", "kubeconfig"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay runtime status",
@@ -67,7 +74,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["runtime", "status"]
+      "args": ["runtime", "status"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay runtime status -v",
@@ -75,7 +83,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["runtime", "status", "-v"]
+      "args": ["runtime", "status", "-v"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay runtime stop",
@@ -83,7 +92,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["runtime", "stop"]
+      "args": ["runtime", "stop"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay runtime stop -v",
@@ -91,7 +101,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["runtime", "stop", "-v"]
+      "args": ["runtime", "stop", "-v"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay ext create",
@@ -99,7 +110,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["ext", "create"]
+      "args": ["ext", "create"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay ext create -d foo",
@@ -107,7 +119,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["ext", "create", "-d", "foo"]
+      "args": ["ext", "create", "-d", "foo"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay ext refresh -v",
@@ -116,7 +129,8 @@
       "mode": "debug",
       "program": "main.go",
       "args": ["ext", "refresh", "-v"],
-      "cwd": "${input:workspacePath}"
+      "cwd": "${input:workspacePath}",
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay ext start",
@@ -124,7 +138,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["ext", "start"]
+      "args": ["ext", "start"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay ext start -b",
@@ -132,7 +147,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["ext", "start", "-b"]
+      "args": ["ext", "start", "-b"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay ext start -v",
@@ -140,7 +156,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["ext", "start", "-v"]
+      "args": ["ext", "start", "-v"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay ext status",
@@ -148,7 +165,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["ext", "status"]
+      "args": ["ext", "status"],
+      "console": "integratedTerminal"
     },
     {
       "name": "liferay ext stop",
@@ -156,7 +174,8 @@
       "request": "launch",
       "mode": "debug",
       "program": "main.go",
-      "args": ["ext", "stop"]
+      "args": ["ext", "stop"],
+      "console": "integratedTerminal"
     }
   ],
   "inputs": [
