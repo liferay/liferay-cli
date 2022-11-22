@@ -40,9 +40,10 @@ type void struct{}
 var novalue void
 
 var createCmd = &cobra.Command{
-	Use:   "create [OPTIONS] [FLAGS]",
-	Short: "Creates new Client Extensions using a wizard-like interface",
-	Args:  cobra.ArbitraryArgs,
+	Use:     "wizard [OPTIONS] [FLAGS]",
+	Short:   "A Client Extension wizard",
+	Aliases: []string{"create", "wiz", "w"},
+	Args:    cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if noPrompt {
 			invokeCreate(cmd, args)

@@ -18,7 +18,7 @@ import (
 var runtimeCmd = &cobra.Command{
 	Use:     "runtime COMMAND [OPTIONS] [ARG...]",
 	Short:   "Operations to control the runtime environment",
-	Aliases: []string{"rt"},
+	Aliases: []string{"rt", "r"},
 	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
