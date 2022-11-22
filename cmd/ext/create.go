@@ -227,9 +227,14 @@ func getWorkspaceProjects() []string {
 	e := filepath.Walk(
 		workspaceDir,
 		func(path string, info os.FileInfo, err error) error {
-			if err == nil && info.Name() == "client-extension.yaml" {
-				fullPathDir := filepath.Dir(path)
-				projectSet[fullPathDir[len(workspaceDir):]] = novalue
+			if err == nil {
+				if strings.HasPrefix(path, filepath.Join(workspaceDir, ".git")) {
+					return nil
+				}
+				if info.Name() == "client-extension.yaml" {
+					fullPathDir := filepath.Dir(path)
+					projectSet[fullPathDir[len(workspaceDir)+1:]] = novalue
+				}
 			}
 			return nil
 		},
