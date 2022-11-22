@@ -26,7 +26,6 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/builder/dockerignore"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/docker/pkg/fileutils"
@@ -34,6 +33,7 @@ import (
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/progress"
 	"github.com/docker/docker/pkg/streamformatter"
+	"github.com/moby/buildkit/frontend/dockerfile/dockerignore"
 	"github.com/spf13/viper"
 	"liferay.com/liferay/cli/constants"
 	"liferay.com/liferay/cli/user"
