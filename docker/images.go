@@ -36,7 +36,7 @@ func BuildImages(verbose bool) {
 			viper.GetString(constants.Const.DockerLocaldevServerImage),
 			filepath.Join(
 				viper.GetString(constants.Const.RepoDir), "docker", "images", "localdev-server"),
-			verbose)
+			verbose, s)
 	})
 
 	// g.Wait waits for all goroutines to complete

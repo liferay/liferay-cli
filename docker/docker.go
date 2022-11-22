@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/briandowns/spinner"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/builder/dockerignore"
@@ -123,7 +124,7 @@ func GetDockerClient() *client.Client {
 }
 
 func BuildImage(
-	imageTag string, dockerFileDir string, verbose bool) error {
+	imageTag string, dockerFileDir string, verbose bool, s *spinner.Spinner) error {
 
 	dockerClient := GetDockerClient()
 
