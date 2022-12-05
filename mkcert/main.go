@@ -29,7 +29,7 @@ import (
 
 const shortUsage = `Usage of mkcert:
 
-	$ mkcert -install
+	$ mkcert --install
 	Install the local CA in the system trust store.
 
 	$ mkcert example.org
@@ -199,7 +199,7 @@ func (m *mkcert) Run(args []string) {
 			log.Println("Note: the local CA is not installed in the Java trust store.")
 		}
 		if warning {
-			log.Println("Run \"mkcert -install\" for certificates to be trusted automatically ⚠️")
+			log.Println("Run \"mkcert --install\" for certificates to be trusted automatically ⚠️")
 		}
 	}
 
@@ -285,7 +285,7 @@ func (m *mkcert) install() {
 				log.Printf(`Note: %s support is not available on your platform. ℹ️`, NSSBrowsers)
 			} else if !hasCertutil {
 				log.Printf(`Warning: "certutil" is not available, so the CA can't be automatically installed in %s! ⚠️`, NSSBrowsers)
-				log.Printf(`Install "certutil" with "%s" and re-run "mkcert -install" 👈`, CertutilInstallHelp)
+				log.Printf(`Install "certutil" with "%s" and re-run "mkcert --install" 👈`, CertutilInstallHelp)
 			}
 		}
 	}
