@@ -140,25 +140,34 @@ func createFromResource(cmd *cobra.Command, resource map[string]interface{}, wor
 
 	for _, arg := range args {
 		argEntry := (arg).(map[string]interface{})
-		argDefault := ""
+		var argDefault interface{}
+		var value string
 
 		if argEntry["default"] != nil {
-			argDefault = argEntry["default"].(string)
+			argDefault = argEntry["default"]
 		}
 
 		argName := argEntry["name"].(string)
 
-		value := prompt(
-			fmt.Sprintf(argEntry["description"].(string)),
-			fmt.Sprintf("Specify '%s'", argName),
-			argDefault,
-			func(input string) error {
-				if len(input) <= 0 {
-					return errors.New(argName + " must not be empty")
-				}
-				return nil
-			},
-		)
+		switch argDefault.(type) {
+		case []interface{}:
+			_, value = selection(
+				fmt.Sprintf(argEntry["description"].(string)),
+				argDefault.([]interface{}),
+			)
+		default:
+			value = prompt(
+				fmt.Sprintf(argEntry["description"].(string)),
+				fmt.Sprintf("Specify '%s'", argName),
+				argDefault.(string),
+				func(input string) error {
+					if len(input) <= 0 {
+						return errors.New(argName + " must not be empty")
+					}
+					return nil
+				},
+			)
+		}
 
 		generatorArgs[argIdx] = fmt.Sprintf("--args=%s=%s", argEntry["name"].(string), value)
 		argIdx++
