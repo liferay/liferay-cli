@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 
 	"github.com/briandowns/spinner"
 	"github.com/docker/docker/api/types"
@@ -119,6 +120,18 @@ func GetDockerSocketPath() string {
 
 	if fileInfo, err := os.Stat(protoAddrParts[1]); err == nil {
 		fmt.Printf("mode of %v: %v\n", protoAddrParts[1], fileInfo.Mode())
+		var UID int
+		var GID int
+		if stat, ok := fileInfo.Sys().(*syscall.Stat_t); ok {
+			UID = int(stat.Uid)
+			GID = int(stat.Gid)
+		} else {
+			// we are not in linux, this won't work anyway in windows,
+			// but maybe you want to log warnings
+			UID = os.Getuid()
+			GID = os.Getgid()
+		}
+		fmt.Printf("uid,gid of %v: %v,%v\n", protoAddrParts[1], UID, GID)
 	} else {
 		panic(err)
 	}
