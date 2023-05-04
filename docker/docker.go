@@ -117,6 +117,12 @@ func GetDockerSocketPath() string {
 		log.Fatalf("unable to parse docker host `%s`", daemonHost)
 	}
 
+	if fileInfo, err := os.Stat(protoAddrParts[1]); err == nil {
+		fmt.Printf("mode of %v: %v\n", protoAddrParts[1], fileInfo.Mode())
+	} else {
+		panic(err)
+	}
+
 	return protoAddrParts[1]
 }
 
