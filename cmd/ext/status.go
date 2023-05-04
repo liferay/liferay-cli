@@ -38,8 +38,8 @@ var statusCmd = &cobra.Command{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
 				docker.GetDockerSocketPath() + ":/home/localdev/.local/cx/docker.sock",
 				fmt.Sprintf("%s:/workspace/client-extensions", flags.ClientExtensionDir),
-				"localdevGradleCache:/root/.gradle",
-				"localdevLiferayCache:/root/.liferay",
+				"localdevGradleCache:/home/localdev/.gradle",
+				"localdevLiferayCache:/home/localdev/.liferay",
 			},
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
