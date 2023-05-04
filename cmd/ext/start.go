@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package ext
 
@@ -79,13 +78,14 @@ var startCmd = &cobra.Command{
 				"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),
 				"LOCALDEV_REPO=/repo",
 				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
+				"DOCKER_HOST=unix:///home/localdev/.local/cx/docker.sock",
 			},
 			ExposedPorts: exposedPorts,
 		}
 		host := container.HostConfig{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
-				docker.GetDockerSocket() + ":/var/run/docker.sock",
+				docker.GetDockerSocketPath() + ":/home/localdev/.local/cx/docker.sock",
 				fmt.Sprintf("%s:/workspace/client-extensions", flags.ClientExtensionDir),
 				"localdevGradleCache:/root/.gradle",
 				"localdevLiferayCache:/root/.liferay",

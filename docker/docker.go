@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -104,21 +104,20 @@ func init() {
 	viper.SetDefault(constants.Const.DockerLocaldevServerImage, "localdev-server")
 }
 
-func GetDockerSocket() string {
-	/*
-		// TODO reenable this once bugs can be fixed
-		socketLocation, err := lookupSocketLocationFromContext()
+func GetDockerSocketPath() string {
+	dockerClient := GetDockerClient()
 
-		if err == nil {
-			return socketLocation
-		}
-	*/
+	daemonHost := dockerClient.DaemonHost()
 
-	if runtime.GOOS == "windows" {
-		return "//var/run/docker.sock"
+	fmt.Printf("daemonHost: %v\n", daemonHost)
+
+	protoAddrParts := strings.SplitN(daemonHost, "://", 2)
+
+	if len(protoAddrParts) == 1 {
+		log.Fatalf("unable to parse docker host `%s`", daemonHost)
 	}
 
-	return "/var/run/docker.sock"
+	return protoAddrParts[1]
 }
 
 func GetDockerClient() *client.Client {

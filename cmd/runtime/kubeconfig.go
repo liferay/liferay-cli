@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package runtime
 
@@ -38,12 +37,13 @@ var kubeconfigCmd = &cobra.Command{
 				"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),
 				"LOCALDEV_REPO=/repo",
 				"KUBECONFIG=/var/run/.kube/config",
+				"DOCKER_HOST=unix:///home/localdev/.local/cx/docker.sock",
 			},
 		}
 		host := container.HostConfig{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
-				docker.GetDockerSocket() + ":/var/run/docker.sock",
+				docker.GetDockerSocketPath() + ":/home/localdev/.local/cx/docker.sock",
 				filepath.Join(userHomeDir, ".kube") + ":/var/run/.kube",
 			},
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
