@@ -5,6 +5,8 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package runtime
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 	"liferay.com/liferay/cli/flags"
 	"liferay.com/liferay/cli/mkcert"
@@ -19,6 +21,8 @@ var mkcertCmd = &cobra.Command{
 	Short: "Uses mkcert package to make locally-trusted development certificates.",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		os.Setenv("TRUST_STORES", "nss")
+
 		mkcert.VerifyRootCALoaded(flags.Verbose)
 
 		if install {

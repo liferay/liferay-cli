@@ -1,51 +1,47 @@
+BINARY_NAME=cli
+
 ifeq ($(OS),Windows_NT)
+	export GOBIN=$(USERPROFILE)\go\bin
 	GO_CMD_WRAPPER=gow.cmd
 	RM_CMD=if exist bin rd /s /q bin
 
 	VERSION=$(shell git describe --match 'v[0-9\.]*' --dirty=.m --always --tags || echo "unknown-version")
-	GO_LDFLAGS="-X 'liferay.com/liferay/cli/cmd.Version=$(VERSION)'"
 
 	GIT_GO_PATCH_1=patches\issues-305.patch --directory=vendor/github.com/go-git/go-git/v5
 	GIT_GO_PATCH_2=patches\issues-gitgo2.patch
-
-	INSTALL_DEPS=windows
-	INSTALL_SRC=bin\windows\amd64\liferay.exe
-	INSTALL_CMD=copy /B /Y $(INSTALL_SRC) $(GOPATH)\bin
 else
+	export GOBIN=$(HOME)/go/bin
 	GO_CMD_WRAPPER=./gow
 	RM_CMD=rm -rf bin
 
 	VERSION=$(shell git describe --match 'v[0-9\.]*' --dirty='.m' --always --tags | sed 's/^v//' 2>/dev/null || echo "unknown-version")
-	GO_LDFLAGS="-X 'liferay.com/liferay/cli/cmd.Version=$(VERSION)'"
 
 	GIT_GO_PATCH_1=patches/issues-305.patch --directory=vendor/github.com/go-git/go-git/v5
 	GIT_GO_PATCH_2=patches/issues-gitgo2.patch
-
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Darwin)
-		INSTALL_DEPS=mac
-		INSTALL_SRC=bin/darwin/amd64/liferay
-		INSTALL_CMD=cp -f $(INSTALL_SRC) $(GOPATH)/bin
-	else ifeq ($(UNAME_S),Linux)
-		INSTALL_DEPS=linux
-		INSTALL_SRC=bin/linux/amd64/liferay
-		INSTALL_CMD=cp -f $(INSTALL_SRC) $(GOPATH)/bin
-	endif
 endif
+
+GO_LDFLAGS="-X 'liferay.com/liferay/cli/cmd.Version=$(VERSION)'"
 
 .PHONY: all clean patches
 
 all: clean build
 
+clean:
+	$(GO_CMD_WRAPPER) clean
+	$(RM_CMD)
+
+goenv:
+	$(GO_CMD_WRAPPER) env
+
 patches:
 	-git apply $(GIT_GO_PATCH_1)
 	-git apply $(GIT_GO_PATCH_2)
 
-clean:
-	$(RM_CMD)
-
 test:
 	$(GO_CMD_WRAPPER) test ./...
+
+testv:
+	$(GO_CMD_WRAPPER) test -v ./...
 
 linux: export GOOS=linux
 linux: export GOARCH=amd64
@@ -69,5 +65,8 @@ windows: patches
 
 build: linux mac mac_m1 windows
 
-install: $(INSTALL_DEPS)
-	$(INSTALL_CMD)
+install:
+	$(GO_CMD_WRAPPER) install -ldflags=$(GO_LDFLAGS)
+	@echo "🤖 $(BINARY_NAME) is installed to $(GOBIN)"
+	@echo "🤖 Make sure $(GOBIN) is in your PATH environment variable"
+	@echo "🤖 Try running: cli --version"

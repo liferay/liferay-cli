@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package ext
 
@@ -297,12 +296,13 @@ func invokeCreate(cmd *cobra.Command, args []string) {
 			"WORKSPACE_BASE_PATH=/workspace/client-extensions",
 			"LOCALDEV_REPO=/repo",
 			"CREATE_ARGS=" + strings.Join(args, "|"),
+			"DOCKER_HOST=unix:///home/localdev/.local/cx/docker.sock",
 		},
 	}
 	host := container.HostConfig{
 		Binds: []string{
 			fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
-			docker.GetDockerSocket() + ":/var/run/docker.sock",
+			docker.GetDockerSocketPath() + ":/home/localdev/.local/cx/docker.sock",
 			fmt.Sprintf("%s:/workspace/client-extensions", flags.ClientExtensionDir),
 		},
 		NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
