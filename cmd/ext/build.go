@@ -42,7 +42,6 @@ var buildCmd = &cobra.Command{
 				fmt.Sprintf("%s:/workspace/client-extensions", flags.ClientExtensionDir),
 				"localdevGradleCache:/root/.gradle",
 				"localdevLiferayCache:/root/.liferay",
-				"localdevNodeModulesCache:/workspace/node_modules_cache",
 			},
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
