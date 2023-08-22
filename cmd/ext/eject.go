@@ -20,7 +20,7 @@ import (
 
 var ejectCmd = &cobra.Command{
 	Use:   "eject [extract workspace resources for standalone build]",
-	Short: "Extracts workspace resources and client-extensions projects for standalone build",
+	Short: "Extracts workspace resources for standalone build",
 	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmdArgs := append([]string{"/repo/scripts/ext/eject.py"}, args...)
@@ -29,16 +29,16 @@ var ejectCmd = &cobra.Command{
 			Image: viper.GetString(constants.Const.DockerLocaldevServerImage),
 			Cmd:   cmdArgs,
 			Env: []string{
-				"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),
 				"LOCALDEV_REPO=/repo",
 				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
+				"WORKSPACE_DIR_KEY=" + ext.GetWorkspaceDirKey(),
 			},
 		}
 		host := container.HostConfig{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
 				docker.GetDockerSocket() + ":/var/run/docker.sock",
-				fmt.Sprintf("%s:/workspace/client-extensions", flags.ClientExtensionDir),
+				fmt.Sprintf("%s:/workspace", flags.WorkspaceDir),
 			},
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}

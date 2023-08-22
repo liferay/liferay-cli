@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package runtime
 
@@ -35,9 +34,9 @@ var kubeconfigCmd = &cobra.Command{
 			Image: viper.GetString(constants.Const.DockerLocaldevServerImage),
 			Cmd:   []string{"/repo/scripts/runtime/kubeconfig.sh"},
 			Env: []string{
-				"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),
 				"LOCALDEV_REPO=/repo",
 				"KUBECONFIG=/var/run/.kube/config",
+				"WORKSPACE_DIR_KEY=" + ext.GetWorkspaceDirKey(),
 			},
 		}
 		host := container.HostConfig{

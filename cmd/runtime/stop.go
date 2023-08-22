@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package runtime
 
@@ -30,9 +29,9 @@ var stopCmd = &cobra.Command{
 			Image: viper.GetString(constants.Const.DockerLocaldevServerImage),
 			Cmd:   []string{"/repo/scripts/runtime/stop.sh"},
 			Env: []string{
-				"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),
 				"LOCALDEV_REPO=/repo",
 				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
+				"WORKSPACE_DIR_KEY=" + ext.GetWorkspaceDirKey(),
 			},
 		}
 		host := container.HostConfig{

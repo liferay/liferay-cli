@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package ext
 
@@ -230,7 +229,7 @@ func getClientExtentionResourcesJson() []map[string]interface{} {
 }
 
 func getWorkspaceProjects() []string {
-	workspaceDir := viper.GetString(constants.Const.ExtClientExtensionDir)
+	workspaceDir := viper.GetString(constants.Const.ExtWorkspaceDir)
 	projectSet := make(map[string]void)
 
 	e := filepath.Walk(
@@ -293,17 +292,17 @@ func invokeCreate(cmd *cobra.Command, args []string) {
 		Image: viper.GetString(constants.Const.DockerLocaldevServerImage),
 		Cmd:   []string{"/repo/scripts/ext/create.py"},
 		Env: []string{
-			"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),
-			"WORKSPACE_BASE_PATH=/workspace/client-extensions",
-			"LOCALDEV_REPO=/repo",
 			"CREATE_ARGS=" + strings.Join(args, "|"),
+			"LOCALDEV_REPO=/repo",
+			"WORKSPACE_BASE_PATH=/workspace",
+			"WORKSPACE_DIR_KEY=" + ext.GetWorkspaceDirKey(),
 		},
 	}
 	host := container.HostConfig{
 		Binds: []string{
 			fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
 			docker.GetDockerSocket() + ":/var/run/docker.sock",
-			fmt.Sprintf("%s:/workspace/client-extensions", flags.ClientExtensionDir),
+			fmt.Sprintf("%s:/workspace", flags.WorkspaceDir),
 		},
 		NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 	}
@@ -392,7 +391,7 @@ func promptForWorkspacePath(dflt string) string {
 			if whitespace.MatchString(input) {
 				return errors.New("the directory name must not contain spaces")
 			}
-			path := filepath.Join(viper.GetString(constants.Const.ExtClientExtensionDir), input)
+			path := filepath.Join(viper.GetString(constants.Const.ExtWorkspaceDir), input)
 			if _, err := os.Stat(path); !os.IsNotExist(err) {
 				return errors.New("the directory name already exists")
 			}
@@ -408,7 +407,7 @@ func promptForWorkspacePath(dflt string) string {
 func readClientExtensionYamlFromProject(project string) map[string]interface{} {
 	yamlFile, err := ioutil.ReadFile(
 		filepath.Join(
-			viper.GetString(constants.Const.ExtClientExtensionDir),
+			viper.GetString(constants.Const.ExtWorkspaceDir),
 			project,
 			"client-extension.yaml",
 		),
