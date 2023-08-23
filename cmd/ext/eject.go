@@ -1,14 +1,12 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 */
-package runtime
+package ext
 
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/spf13/cobra"
@@ -20,22 +18,19 @@ import (
 	"liferay.com/liferay/cli/spinner"
 )
 
-// kubeconfigCmd represents the kubeconfig command
-var kubeconfigCmd = &cobra.Command{
-	Use:   "kubeconfig",
-	Short: "Generates the kubeconfig necessary to talk to k8s cluster context",
+var ejectCmd = &cobra.Command{
+	Use:   "eject [extract workspace resources for standalone build]",
+	Short: "Extracts workspace resources for standalone build",
+	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		userHomeDir, err := os.UserHomeDir()
-		if err != nil {
-			log.Fatal(err)
-		}
+		cmdArgs := append([]string{"/repo/scripts/ext/eject.py"}, args...)
 
 		config := container.Config{
 			Image: viper.GetString(constants.Const.DockerLocaldevServerImage),
-			Cmd:   []string{"/repo/scripts/runtime/kubeconfig.sh"},
+			Cmd:   cmdArgs,
 			Env: []string{
 				"LOCALDEV_REPO=/repo",
-				"KUBECONFIG=/var/run/.kube/config",
+				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
 				"WORKSPACE_DIR_KEY=" + ext.GetWorkspaceDirKey(),
 			},
 		}
@@ -43,7 +38,7 @@ var kubeconfigCmd = &cobra.Command{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
 				docker.GetDockerSocket() + ":/var/run/docker.sock",
-				filepath.Join(userHomeDir, ".kube") + ":/var/run/.kube",
+				fmt.Sprintf("%s:/workspace", flags.WorkspaceDir),
 			},
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
@@ -51,10 +46,10 @@ var kubeconfigCmd = &cobra.Command{
 
 		exitCode := spinner.Spin(
 			spinner.SpinOptions{
-				Doing: "Writing", Done: "was written", On: "'kubeconfig' config file", Enable: !flags.Verbose,
+				Doing: "Eject", Done: "is running", On: "'localdev' extension environment", Enable: !flags.Verbose,
 			},
 			func(fior func(io.ReadCloser, bool, string) int) int {
-				return docker.InvokeCommandInLocaldev("localdev-kubeconfig", config, host, true, flags.Verbose, fior, "")
+				return docker.InvokeCommandInLocaldev("localdev-build", config, host, true, flags.Verbose, fior, "")
 			})
 
 		os.Exit(exitCode)
@@ -62,5 +57,5 @@ var kubeconfigCmd = &cobra.Command{
 }
 
 func init() {
-	runtimeCmd.AddCommand(kubeconfigCmd)
+	extCmd.AddCommand(ejectCmd)
 }

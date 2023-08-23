@@ -74,10 +74,12 @@ func SyncGit(verbose bool) {
 			}
 		}
 
+		tagOrBranchAndHash := tagOrBranchAndHash(repo)
+
 		if s != nil {
-			s.FinalMSG = fmt.Sprintf(ansicolor.Good+" Cloned 'localdev' sources to %s\n", repoDir)
+			s.FinalMSG = fmt.Sprintf(ansicolor.Good+" Cloned 'localdev' [%s] sources to %s\n", tagOrBranchAndHash, repoDir)
 		} else {
-			fmt.Printf("Cloned 'localdev' sources to %s\n", repoDir)
+			fmt.Printf("Cloned 'localdev' [%s] sources to %s\n", tagOrBranchAndHash, repoDir)
 		}
 
 		cloned = true
@@ -157,10 +159,42 @@ func SyncGit(verbose bool) {
 			}
 		}
 
+		tagOrBranchAndHash := tagOrBranchAndHash(repo)
+
 		if s != nil {
-			s.FinalMSG = fmt.Sprintf(ansicolor.Good + " 'localdev' sources updated.\n")
+			s.FinalMSG = fmt.Sprintf(ansicolor.Good+" 'localdev' sources updated to [%s]\n", tagOrBranchAndHash)
 		} else {
-			fmt.Printf("'localdev' sources updated.\n")
+			fmt.Printf("'localdev' sources updated to [%s]\n", tagOrBranchAndHash)
 		}
 	}
+}
+
+func tagOrBranchAndHash(repo *git.Repository) string {
+	head, err := repo.Head()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	itr, err := repo.Tags()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var tag *plumbing.Reference
+	err = itr.ForEach(func(t *plumbing.Reference) error {
+		tag = t
+		return nil
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if tag == nil {
+		tag = head
+	}
+
+	return tag.Name().Short() + "-g" + head.Hash().String()[0:7]
 }

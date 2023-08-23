@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package ext
 
@@ -27,7 +26,7 @@ import (
 var extCmd = &cobra.Command{
 	Use:     "extension COMMAND [OPTIONS] [ARG...]",
 	Short:   "Operations to control extension environment",
-	Aliases: []string{"ext"},
+	Aliases: []string{"ext", "e"},
 	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
@@ -44,12 +43,12 @@ var extCmd = &cobra.Command{
 
 		if dirFlag != nil {
 			specifiedDir = dirFlag.Value.String()
-		} else if !viper.GetBool(constants.Const.ExtClientExtensionDirSpecified) {
+		} else if !viper.GetBool(constants.Const.ExtWorkspaceDirSpecified) {
 			specifiedDir = confirmUseOfDefaultDir()
 		}
 
 		if specifiedDir != "" {
-			setClientExtensionDir(specifiedDir)
+			setWorkspaceDir(specifiedDir)
 		}
 	},
 }
@@ -59,21 +58,21 @@ func init() {
 	if err != nil {
 		log.Fatalf("%s error getting working dir", err)
 	}
-	viper.SetDefault(constants.Const.ExtClientExtensionDir, wd)
-	viper.SetDefault(constants.Const.ExtClientExtensionDirSpecified, false)
+	viper.SetDefault(constants.Const.ExtWorkspaceDir, wd)
+	viper.SetDefault(constants.Const.ExtWorkspaceDirSpecified, false)
 }
 
 func AddExtCmd(cmd *cobra.Command) {
-	extCmd.PersistentFlags().StringVarP(&flags.ClientExtensionDir, "dir", "d", viper.GetString(constants.Const.ExtClientExtensionDir), "Set the base dir for up command")
+	extCmd.PersistentFlags().StringVarP(&flags.WorkspaceDir, "dir", "d", viper.GetString(constants.Const.ExtWorkspaceDir), "Set the base dir for up command")
 	viper.BindPFlag("dir", extCmd.Flags().Lookup("dir"))
 
 	cmd.AddCommand(extCmd)
 }
 
 func confirmUseOfDefaultDir() string {
-	fmt.Println(ansicolor.Bold("It looks like the default Client Extension directory was never specified. The current default is"), flags.ClientExtensionDir)
+	fmt.Println(ansicolor.Bold("It looks like the default Workspace directory was never specified. The current default is"), flags.WorkspaceDir)
 
-	if !io.IsDirEmpty(flags.ClientExtensionDir) {
+	if !io.IsDirEmpty(flags.WorkspaceDir) {
 		fmt.Println(ansicolor.Bold("However, this directory is not empty. It would be preferrable to start with an empty directory."))
 	}
 
@@ -107,12 +106,12 @@ func confirmUseOfDefaultDir() string {
 			return nil
 		}
 
-		clientExtenionDirPrompt := promptui.Prompt{
+		worskspaceDirPrompt := promptui.Prompt{
 			Label:    "Directory",
 			Validate: validate,
 		}
 
-		result, err = clientExtenionDirPrompt.Run()
+		result, err = worskspaceDirPrompt.Run()
 
 		if err != nil {
 			log.Fatal(err)
@@ -124,7 +123,7 @@ func confirmUseOfDefaultDir() string {
 	return ""
 }
 
-func setClientExtensionDir(dir string) {
+func setWorkspaceDir(dir string) {
 	if !filepath.IsAbs(dir) {
 		dirname, err := os.Getwd()
 
@@ -157,16 +156,16 @@ func setClientExtensionDir(dir string) {
 		}
 	}
 
-	currentDir := viper.GetString(constants.Const.ExtClientExtensionDir)
+	currentDir := viper.GetString(constants.Const.ExtWorkspaceDir)
 
 	if dir != currentDir {
-		fmt.Println("Specified Client Extension directory is ", dir)
+		fmt.Println("Specified Workspace directory is ", dir)
 
-		viper.Set(constants.Const.ExtClientExtensionDir, dir)
+		viper.Set(constants.Const.ExtWorkspaceDir, dir)
 
-		viper.Set(constants.Const.ExtClientExtensionDirSpecified, true)
+		viper.Set(constants.Const.ExtWorkspaceDirSpecified, true)
 		viper.WriteConfig()
 	}
 
-	flags.ClientExtensionDir = dir
+	flags.WorkspaceDir = dir
 }

@@ -11,17 +11,17 @@ import (
 
 var replacements = regexp.MustCompile(`[^a-zA-Z0-9_.-]`)
 
-func GetExtensionDirKey() string {
-	path := viper.GetString(constants.Const.ExtClientExtensionDir)
+func GetWorkspaceDirKey() string {
+	path := viper.GetString(constants.Const.ExtWorkspaceDir)
 
 	dirPath := filepath.Dir(path)
 	baseDirName := filepath.Base(path)
 
-	return MakeExtensionDirKey(
+	return MakeWorkspaceDirKey(
 		baseDirName, dirPath, string(filepath.Separator))
 }
 
-func MakeExtensionDirKey(baseDirName string, dirPath string, pathSeparator string) string {
+func MakeWorkspaceDirKey(baseDirName string, dirPath string, pathSeparator string) string {
 	parts := strings.Split(dirPath, pathSeparator)
 
 	newParts := make([]string, 0)

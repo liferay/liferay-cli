@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package ext
 
@@ -27,21 +26,21 @@ var stopCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := container.Config{
-			Image: "localdev-server",
+			Image: viper.GetString(constants.Const.DockerLocaldevServerImage),
 			Cmd:   []string{"/repo/scripts/ext/stop.sh"},
 			Env: []string{
-				"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),
 				"LOCALDEV_REPO=/repo",
 				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
+				"WORKSPACE_DIR_KEY=" + ext.GetWorkspaceDirKey(),
 			},
 		}
 		host := container.HostConfig{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
 				docker.GetDockerSocket() + ":/var/run/docker.sock",
-				fmt.Sprintf("%s:/workspace/client-extensions", flags.ClientExtensionDir),
-				"localdevGradleCache:/root/.gradle",
-				"localdevLiferayCache:/root/.liferay",
+				fmt.Sprintf("%s:/workspace", flags.WorkspaceDir),
+				"localdevGradleCache:/home/localdev/.gradle",
+				"localdevLiferayCache:/home/localdev/.liferay",
 			},
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}

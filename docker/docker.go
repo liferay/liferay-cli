@@ -23,10 +23,11 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
+	"github.com/briandowns/spinner"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/builder/dockerignore"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/docker/pkg/fileutils"
@@ -34,8 +35,11 @@ import (
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/progress"
 	"github.com/docker/docker/pkg/streamformatter"
+	"github.com/moby/buildkit/frontend/dockerfile/dockerignore"
 	"github.com/spf13/viper"
+	"liferay.com/liferay/cli/ansicolor"
 	"liferay.com/liferay/cli/constants"
+	lstrings "liferay.com/liferay/cli/strings"
 	"liferay.com/liferay/cli/user"
 )
 
@@ -76,6 +80,14 @@ func (out *lastProgressOutput) WriteProgress(prog progress.Progress) error {
 	}
 
 	return out.output.WriteProgress(prog)
+}
+
+type spinnerWriter struct {
+	callback func(p []byte) (int, error)
+}
+
+func (e spinnerWriter) Write(p []byte) (int, error) {
+	return e.callback(p)
 }
 
 var dockerClient *client.Client
@@ -123,7 +135,7 @@ func GetDockerClient() *client.Client {
 }
 
 func BuildImage(
-	imageTag string, dockerFileDir string, verbose bool) error {
+	imageTag string, dockerFileDir string, verbose bool, s *spinner.Spinner) error {
 
 	dockerClient := GetDockerClient()
 
@@ -175,13 +187,33 @@ func BuildImage(
 
 	defer response.Body.Close()
 
-	if verbose {
-		err = jsonmessage.DisplayJSONMessagesStream(response.Body, os.Stdout, os.Stdout.Fd(), true, nil)
-		if err != nil {
-			_, err = io.Copy(os.Stdout, response.Body)
+	var out io.Writer = os.Stdout
+	var fd = os.Stdout.Fd()
+	isTerminal := true
+
+	if !verbose {
+		out = spinnerWriter{
+			callback: func(bytes []byte) (int, error) {
+				msg := ansicolor.StripCodes(
+					strings.TrimSpace(
+						string(TrimLogHeader(bytes))))
+
+				if msg != "" {
+					s.Suffix = fmt.Sprintf(
+						" Building 'localdev' %s",
+						lstrings.StripNewlines(lstrings.TruncateText(msg, 80)))
+				}
+
+				return 0, nil
+			},
 		}
-	} else {
-		io.ReadAll(response.Body)
+		fd = 0
+		isTerminal = true
+	}
+
+	err = jsonmessage.DisplayJSONMessagesStream(response.Body, out, fd, isTerminal, nil)
+	if err != nil {
+		return err
 	}
 
 	return nil

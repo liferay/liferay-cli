@@ -12,9 +12,10 @@ import (
 
 // syncCmd represents the config command
 var syncCmd = &cobra.Command{
-	Use:   "sync [OPTIONS] [ARG...]",
-	Short: "Sync the backing git repo of liferay cli",
-	Args:  cobra.NoArgs,
+	Use:     "sync [OPTIONS] [ARG...]",
+	Short:   "Sync the backing git repo of liferay cli",
+	Aliases: []string{"s"},
+	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		git.SyncGit(flags.Verbose)
 	},

@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package ext
 
@@ -40,9 +39,10 @@ type void struct{}
 var novalue void
 
 var createCmd = &cobra.Command{
-	Use:   "create [OPTIONS] [FLAGS]",
-	Short: "Creates new Client Extensions using a wizard-like interface",
-	Args:  cobra.ArbitraryArgs,
+	Use:     "wizard [OPTIONS] [FLAGS]",
+	Short:   "A Client Extension wizard",
+	Aliases: []string{"create", "wiz", "w"},
+	Args:    cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if noPrompt {
 			invokeCreate(cmd, args)
@@ -139,25 +139,34 @@ func createFromResource(cmd *cobra.Command, resource map[string]interface{}, wor
 
 	for _, arg := range args {
 		argEntry := (arg).(map[string]interface{})
-		argDefault := ""
+		var argDefault interface{}
+		var value string
 
 		if argEntry["default"] != nil {
-			argDefault = argEntry["default"].(string)
+			argDefault = argEntry["default"]
 		}
 
 		argName := argEntry["name"].(string)
 
-		value := prompt(
-			fmt.Sprintf(argEntry["description"].(string)),
-			fmt.Sprintf("Specify '%s'", argName),
-			argDefault,
-			func(input string) error {
-				if len(input) <= 0 {
-					return errors.New(argName + " must not be empty")
-				}
-				return nil
-			},
-		)
+		switch argDefault.(type) {
+		case []interface{}:
+			_, value = selection(
+				fmt.Sprintf(argEntry["description"].(string)),
+				argDefault.([]interface{}),
+			)
+		default:
+			value = prompt(
+				fmt.Sprintf(argEntry["description"].(string)),
+				fmt.Sprintf("Specify '%s'", argName),
+				argDefault.(string),
+				func(input string) error {
+					if len(input) <= 0 {
+						return errors.New(argName + " must not be empty")
+					}
+					return nil
+				},
+			)
+		}
 
 		generatorArgs[argIdx] = fmt.Sprintf("--args=%s=%s", argEntry["name"].(string), value)
 		argIdx++
@@ -220,15 +229,20 @@ func getClientExtentionResourcesJson() []map[string]interface{} {
 }
 
 func getWorkspaceProjects() []string {
-	workspaceDir := viper.GetString(constants.Const.ExtClientExtensionDir)
+	workspaceDir := viper.GetString(constants.Const.ExtWorkspaceDir)
 	projectSet := make(map[string]void)
 
 	e := filepath.Walk(
 		workspaceDir,
 		func(path string, info os.FileInfo, err error) error {
-			if err == nil && info.Name() == "client-extension.yaml" {
-				fullPathDir := filepath.Dir(path)
-				projectSet[fullPathDir[len(workspaceDir):]] = novalue
+			if err == nil {
+				if strings.HasPrefix(path, filepath.Join(workspaceDir, ".git")) {
+					return nil
+				}
+				if info.Name() == "client-extension.yaml" {
+					fullPathDir := filepath.Dir(path)
+					projectSet[fullPathDir[len(workspaceDir)+1:]] = novalue
+				}
 			}
 			return nil
 		},
@@ -275,20 +289,20 @@ func init() {
 
 func invokeCreate(cmd *cobra.Command, args []string) {
 	config := container.Config{
-		Image: "localdev-server",
+		Image: viper.GetString(constants.Const.DockerLocaldevServerImage),
 		Cmd:   []string{"/repo/scripts/ext/create.py"},
 		Env: []string{
-			"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),
-			"WORKSPACE_BASE_PATH=/workspace/client-extensions",
-			"LOCALDEV_REPO=/repo",
 			"CREATE_ARGS=" + strings.Join(args, "|"),
+			"LOCALDEV_REPO=/repo",
+			"WORKSPACE_BASE_PATH=/workspace",
+			"WORKSPACE_DIR_KEY=" + ext.GetWorkspaceDirKey(),
 		},
 	}
 	host := container.HostConfig{
 		Binds: []string{
 			fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
 			docker.GetDockerSocket() + ":/var/run/docker.sock",
-			fmt.Sprintf("%s:/workspace/client-extensions", flags.ClientExtensionDir),
+			fmt.Sprintf("%s:/workspace", flags.WorkspaceDir),
 		},
 		NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 	}
@@ -377,7 +391,7 @@ func promptForWorkspacePath(dflt string) string {
 			if whitespace.MatchString(input) {
 				return errors.New("the directory name must not contain spaces")
 			}
-			path := filepath.Join(viper.GetString(constants.Const.ExtClientExtensionDir), input)
+			path := filepath.Join(viper.GetString(constants.Const.ExtWorkspaceDir), input)
 			if _, err := os.Stat(path); !os.IsNotExist(err) {
 				return errors.New("the directory name already exists")
 			}
@@ -393,7 +407,7 @@ func promptForWorkspacePath(dflt string) string {
 func readClientExtensionYamlFromProject(project string) map[string]interface{} {
 	yamlFile, err := ioutil.ReadFile(
 		filepath.Join(
-			viper.GetString(constants.Const.ExtClientExtensionDir),
+			viper.GetString(constants.Const.ExtWorkspaceDir),
 			project,
 			"client-extension.yaml",
 		),
