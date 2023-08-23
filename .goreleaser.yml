@@ -26,11 +26,11 @@ builds:
 archives:
   - name_template: "{{ .Binary }}"
     format: binary
-    replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      amd64: x86_64
+#    replacements:
+#      darwin: Darwin
+#      linux: Linux
+#      windows: Windows
+#      amd64: x86_64
     files:
       - README.md
       - LICENSE.md
