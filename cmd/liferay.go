@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -130,8 +130,8 @@ func initConfig() {
 	err = viper.ReadInConfig()
 
 	if err != nil {
-		// ensure .liferay directory exists
-		os.MkdirAll(liferayPath, os.ModePerm)
+		// ensure .liferay/cli directory exists
+		os.MkdirAll(filepath.Join(liferayPath, "cli"), os.ModePerm)
 		err = viper.SafeWriteConfig()
 
 		if err != nil {
