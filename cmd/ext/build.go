@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package ext
 
@@ -30,18 +29,18 @@ var buildCmd = &cobra.Command{
 			Image: viper.GetString(constants.Const.DockerLocaldevServerImage),
 			Cmd:   cmdArgs,
 			Env: []string{
-				"CLIENT_EXTENSION_DIR_KEY=" + ext.GetExtensionDirKey(),
 				"LOCALDEV_REPO=/repo",
 				"LFRDEV_DOMAIN=" + viper.GetString(constants.Const.TlsLfrdevDomain),
+				"WORKSPACE_DIR_KEY=" + ext.GetWorkspaceDirKey(),
 			},
 		}
 		host := container.HostConfig{
 			Binds: []string{
 				fmt.Sprintf("%s:%s", viper.GetString(constants.Const.RepoDir), "/repo"),
 				docker.GetDockerSocket() + ":/var/run/docker.sock",
-				fmt.Sprintf("%s:/workspace/client-extensions", flags.ClientExtensionDir),
-				"localdevGradleCache:/root/.gradle",
-				"localdevLiferayCache:/root/.liferay",
+				fmt.Sprintf("%s:/workspace", flags.WorkspaceDir),
+				"localdevGradleCache:/home/localdev/.gradle",
+				"localdevLiferayCache:/home/localdev/.liferay",
 			},
 			NetworkMode: container.NetworkMode(viper.GetString(constants.Const.DockerNetwork)),
 		}
