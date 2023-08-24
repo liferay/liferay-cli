@@ -60,6 +60,10 @@ func checkForUpdate() {
 		return
 	}
 
+	if !viper.GetBool(constants.Const.CliUpdateCheck) {
+		return
+	}
+
 	bytes, err := http.GetOrFetchBytes(http.GetOrFetchBytesOptions{
 		EtagKey: constants.Const.CliReleasesEtag,
 		FileKey: constants.Const.CliReleasesFile,
@@ -125,6 +129,7 @@ func initConfig() {
 
 	viper.SetDefault(constants.Const.CliReleasesFile, filepath.Join(home, ".liferay", "cli", "cli-releases.json"))
 	viper.SetDefault(constants.Const.CliReleasesURL, "https://api.github.com/repos/liferay/liferay-cli/releases/latest")
+	viper.SetDefault(constants.Const.CliUpdateCheck, true)
 
 	// If a config file is found, read it in.
 	err = viper.ReadInConfig()

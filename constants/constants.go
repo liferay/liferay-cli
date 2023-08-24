@@ -7,6 +7,7 @@ var Const = struct {
 	CliReleasesEtag               string
 	CliReleasesFile               string
 	CliReleasesURL                string
+	CliUpdateCheck                string
 	DockerLocaldevServerImage     string
 	DockerLocaldevServerPullimage string
 	DockerNetwork                 string
@@ -27,6 +28,7 @@ var Const = struct {
 	CliReleasesEtag:               "cli.releases.etag",
 	CliReleasesFile:               "cli.releases.file",
 	CliReleasesURL:                "cli.releases.url",
+	CliUpdateCheck:                "cli.update.check",
 	DockerLocaldevServerImage:     "docker.localdev.server.image",
 	DockerLocaldevServerPullimage: "docker.localdev.server.pull-image",
 	DockerNetwork:                 "docker.network",

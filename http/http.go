@@ -24,6 +24,10 @@ type GetOrFetchBytesOptions struct {
 func GetOrFetchBytes(options GetOrFetchBytesOptions) ([]byte, error) {
 	req, err := http.NewRequest("GET", options.URL, nil)
 
+	if err != nil {
+		return nil, err
+	}
+
 	releasesEtag := viper.GetString(options.EtagKey)
 
 	f := viper.GetString(options.FileKey)
@@ -43,7 +47,6 @@ func GetOrFetchBytes(options GetOrFetchBytesOptions) ([]byte, error) {
 	resp, err := client.Do(req)
 
 	if err != nil || resp.StatusCode == http.StatusNotModified {
-		//f := viper.GetString(options.FileKey)
 		if options.Verbose {
 			fmt.Printf("Not mofified use local %s=%s\n", options.FileKey, f)
 		}
@@ -58,12 +61,11 @@ func GetOrFetchBytes(options GetOrFetchBytesOptions) ([]byte, error) {
 			return nil, err
 		}
 
-		err = os.MkdirAll(filepath.Dir(viper.GetString(options.FileKey)), 0775)
+		err = os.MkdirAll(filepath.Dir(f), 0775)
 		if err != nil {
 			return nil, err
 		}
 
-		return body, os.WriteFile(
-			viper.GetString(options.FileKey), body, 0644)
+		return body, os.WriteFile(f, body, 0644)
 	}
 }
